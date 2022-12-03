@@ -1,11 +1,7 @@
 package main
 
-import (
-	"github.com/geniot/digger/gui"
-)
+import "geniot.com/geniot/digger/internal/gui"
 
 func main() {
-	gl := gui.GameLoop()
-	gl.Start()
-	println("Hello digger")
+	gui.NewApplication().Start()
 }
