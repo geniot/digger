@@ -1,31 +1,30 @@
 package gui
 
 import (
-	"geniot.com/geniot/digger/internal/utils"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type Application interface {
-	Start()
-}
-
-type application struct {
-	gameLoop GameLoop
-	window   Window
-	config   utils.Config
+type Application struct {
+	loop   *Loop
+	window *Window
+	config *Config
 }
 
 func NewApplication() Application {
-	sdl.Init(sdl.INIT_EVERYTHING)
-	cfg := utils.NewConfig()
-	return application{
-		NewGameLoop(),
-		NewWindow(cfg),
-		cfg}
+	return Application{nil, nil, nil}
 }
 
-func (app application) Start() {
+func (app Application) Start() {
+	sdl.Init(sdl.INIT_EVERYTHING)
 	println("init")
 	defer println("free")
-	app.gameLoop.Start(app.window)
+
+	cnf := NewConfig(&app)
+	app.config = &cnf
+	wnd := NewWindow(&app)
+	app.window = &wnd
+	lp := NewLoop(&app)
+	app.loop = &lp
+
+	app.loop.Start()
 }

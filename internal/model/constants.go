@@ -1,6 +1,7 @@
 package model
 
 import (
+	"os"
 	"path/filepath"
 )
 
@@ -16,6 +17,7 @@ const (
 )
 
 var (
-	PATH_TO_CONFIG = filepath.Join("${HOME}", CONF_FILE_NAME)
+	HOME_DIR, _    = os.UserHomeDir()
+	PATH_TO_CONFIG = filepath.Join(HOME_DIR, CONF_FILE_NAME)
 	WINDOW_TITLE   = APP_NAME + " " + APP_VERSION
 )
