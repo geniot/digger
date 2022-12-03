@@ -28,13 +28,22 @@ func NewConfig(app *Application) Config {
 	if loadedProps != nil {
 		props = loadedProps
 	}
+
+	//patching window state
+	windowStateStr, _ := props.Get(model.WINDOW_STATE_KEY)
+	windowState, _ := strconv.ParseInt(windowStateStr, 10, 0)
+	windowState |= sdl.WINDOW_SHOWN
+	windowState |= sdl.WINDOW_RESIZABLE
+
+	props.Set(model.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
+
 	return Config{app, props}
 }
 
-func (cfg Config) Get(key string) int32 {
+func (cfg Config) Get(key string) uint32 {
 	valStr, _ := cfg.props.Get(key)
 	valInt, _ := strconv.ParseInt(valStr, 10, 0)
-	return int32(valInt)
+	return uint32(valInt)
 }
 
 func (cfg Config) Set(key string, value string) {
