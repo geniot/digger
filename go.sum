@@ -1,2 +1,4 @@
+github.com/magiconair/properties v1.8.6 h1:5ibWZ6iY0NctNGWo87LalDlEZ6R41TqbbDamhfG/Qzo=
+github.com/magiconair/properties v1.8.6/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
 github.com/veandco/go-sdl2 v0.4.27 h1:p6CbXe7cNxhvR/QhiajEbRpwpCtOuO5VQqqCQW3saUs=
 github.com/veandco/go-sdl2 v0.4.27/go.mod h1:OROqMhHD43nT4/i9crJukyVecjPNYYuCofep6SNiAjY=
