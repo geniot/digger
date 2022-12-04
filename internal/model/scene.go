@@ -9,10 +9,10 @@ type Scene struct {
 	balls mapset.Set[Ball]
 }
 
-func NewScene() Scene {
+func NewScene() *Scene {
 	set := mapset.NewSet[Ball]()
-	set.Add(NewBall())
-	return Scene{set}
+	set.Add(*NewBall())
+	return &Scene{set}
 }
 
 func (scene Scene) Render(renderer *sdl.Renderer) {

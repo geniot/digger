@@ -13,8 +13,8 @@ type Config struct {
 	props       *properties.Properties
 }
 
-func NewConfig(app *Application) Config {
-	return Config{app, Load()}
+func NewConfig(app *Application) *Config {
+	return &Config{app, Load()}
 }
 
 func (cfg Config) Get(key string) uint32 {

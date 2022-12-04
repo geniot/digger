@@ -10,11 +10,11 @@ type Loop struct {
 	renderLoop  *RenderLoop
 }
 
-func NewLoop(app *Application) Loop {
+func NewLoop(app *Application) *Loop {
 	eventLoop := NewEventLoop(app)
 	physicsLoop := NewPhysicsLoop(app)
 	renderLoop := NewRenderLoop(app)
-	return Loop{app, abool.New(), &eventLoop, &physicsLoop, &renderLoop}
+	return &Loop{app, abool.New(), eventLoop, physicsLoop, renderLoop}
 }
 
 func (loop Loop) Start() {

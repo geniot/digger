@@ -4,8 +4,8 @@ type RenderLoop struct {
 	application *Application
 }
 
-func NewRenderLoop(app *Application) RenderLoop {
-	return RenderLoop{app}
+func NewRenderLoop(app *Application) *RenderLoop {
+	return &RenderLoop{app}
 }
 
 func (renderLoop RenderLoop) Run() {

@@ -12,7 +12,7 @@ type Window struct {
 	sdlRenderer *sdl.Renderer
 }
 
-func NewWindow(app *Application) Window {
+func NewWindow(app *Application) *Window {
 	wnd, _ := sdl.CreateWindow(
 		model.WINDOW_TITLE,
 		int32(app.config.Get(model.WINDOW_XPOS_KEY)),
@@ -28,7 +28,7 @@ func NewWindow(app *Application) Window {
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
 
-	return w
+	return &w
 }
 
 func (window Window) resizingEventWatcher(event sdl.Event, data interface{}) bool {

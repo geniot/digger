@@ -14,8 +14,8 @@ type Ball struct {
 	lastUpdate uint32
 }
 
-func NewBall() Ball {
-	return Ball{}
+func NewBall() *Ball {
+	return &Ball{}
 }
 
 func (ball Ball) Render(renderer *sdl.Renderer) {

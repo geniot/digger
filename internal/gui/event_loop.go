@@ -8,8 +8,8 @@ type EventLoop struct {
 	application *Application
 }
 
-func NewEventLoop(app *Application) EventLoop {
-	return EventLoop{app}
+func NewEventLoop(app *Application) *EventLoop {
+	return &EventLoop{app}
 }
 
 func (eventLoop EventLoop) Run() {

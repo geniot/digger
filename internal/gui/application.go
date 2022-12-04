@@ -12,21 +12,21 @@ type Application struct {
 	scene  *model.Scene
 }
 
-func NewApplication() Application {
-	return Application{nil, nil, nil, nil}
+func NewApplication() *Application {
+	return &Application{nil, nil, nil, nil}
 }
 
 func (app Application) Start() {
 	sdl.Init(sdl.INIT_EVERYTHING)
 
 	scn := model.NewScene()
-	app.scene = &scn
+	app.scene = scn
 	cnf := NewConfig(&app)
-	app.config = &cnf
+	app.config = cnf
 	wnd := NewWindow(&app)
-	app.window = &wnd
+	app.window = wnd
 	lp := NewLoop(&app)
-	app.loop = &lp
+	app.loop = lp
 
 	app.loop.Start()
 }
