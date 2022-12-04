@@ -21,7 +21,9 @@ func NewWindow(app *Application) Window {
 		int32(app.config.Get(model.WINDOW_HEIGHT_KEY)),
 		app.config.Get(model.WINDOW_STATE_KEY))
 
-	rnd, _ := sdl.CreateRenderer(wnd, -1, sdl.RENDERER_ACCELERATED)
+	rnd, _ := sdl.CreateRenderer(wnd, -1,
+		sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
+	//sdl.RENDERER_ACCELERATED)
 	w := Window{app, wnd, rnd}
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
@@ -43,6 +45,17 @@ func (window Window) resizingEventWatcher(event sdl.Event, data interface{}) boo
 func (window Window) Redraw() {
 	window.sdlRenderer.SetDrawColor(255, 255, 255, 255)
 	window.sdlRenderer.Clear()
+
+	width, height := window.sdlWindow.GetSize()
+	factor := int32(10)
+	rects := []sdl.Rect{{
+		width / factor,
+		height / factor,
+		width - (width/factor)*2,
+		height - (height/factor)*2}}
+
+	window.sdlRenderer.SetDrawColor(0, 0, 255, 255)
+	window.sdlRenderer.DrawRects(rects)
 	window.sdlRenderer.Present()
 }
 
