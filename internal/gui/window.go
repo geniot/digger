@@ -1,9 +1,7 @@
 package gui
 
 import (
-	"fmt"
 	"geniot.com/geniot/digger/internal/model"
-	"github.com/robfig/cron/v3"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )
@@ -11,6 +9,7 @@ import (
 type Window struct {
 	application *Application
 	sdlWindow   *sdl.Window
+	sdlRenderer *sdl.Renderer
 }
 
 func NewWindow(app *Application) Window {
@@ -22,16 +21,8 @@ func NewWindow(app *Application) Window {
 		int32(app.config.Get(model.WINDOW_HEIGHT_KEY)),
 		app.config.Get(model.WINDOW_STATE_KEY))
 
-	w := Window{app, wnd}
-
-	w.Redraw()
-
-	c := cron.New()
-	_, err := c.AddFunc("@every 16ms", w.Redraw) //fps=60
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	c.Start()
+	rnd, _ := sdl.CreateRenderer(wnd, -1, sdl.RENDERER_ACCELERATED)
+	w := Window{app, wnd, rnd}
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
 
@@ -50,9 +41,9 @@ func (window Window) resizingEventWatcher(event sdl.Event, data interface{}) boo
 }
 
 func (window Window) Redraw() {
-	surface, _ := window.sdlWindow.GetSurface()
-	surface.FillRect(nil, sdl.MapRGB(surface.Format, 16, 16, 16))
-	window.sdlWindow.UpdateSurface()
+	window.sdlRenderer.SetDrawColor(255, 255, 255, 255)
+	window.sdlRenderer.Clear()
+	window.sdlRenderer.Present()
 }
 
 func (window Window) OnBeforeClose() {

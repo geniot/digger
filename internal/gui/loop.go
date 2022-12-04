@@ -37,7 +37,7 @@ func (loop Loop) Start() {
 			}
 		}
 
-		//loop.application.window.Redraw()
-		//sdl.Delay(1000 / 60)
+		loop.application.window.Redraw()
+		sdl.Delay(1000 / 60)
 	}
 }
