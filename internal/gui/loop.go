@@ -27,7 +27,7 @@ func (loop Loop) Start() {
 
 			case *sdl.WindowEvent:
 				if t.Event == sdl.WINDOWEVENT_CLOSE {
-					loop.application.window.SaveWindowState()
+					loop.application.window.OnBeforeClose()
 				}
 				break
 
@@ -37,7 +37,7 @@ func (loop Loop) Start() {
 			}
 		}
 
-		loop.application.window.Redraw()
-		sdl.Delay(1000 / 60)
+		//loop.application.window.Redraw()
+		//sdl.Delay(1000 / 60)
 	}
 }

@@ -1,7 +1,9 @@
 package gui
 
 import (
+	"fmt"
 	"geniot.com/geniot/digger/internal/model"
+	"github.com/robfig/cron/v3"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )
@@ -9,7 +11,6 @@ import (
 type Window struct {
 	application *Application
 	sdlWindow   *sdl.Window
-	sdlSurface  *sdl.Surface
 }
 
 func NewWindow(app *Application) Window {
@@ -20,17 +21,42 @@ func NewWindow(app *Application) Window {
 		int32(app.config.Get(model.WINDOW_WIDTH_KEY)),
 		int32(app.config.Get(model.WINDOW_HEIGHT_KEY)),
 		app.config.Get(model.WINDOW_STATE_KEY))
-	surface, _ := wnd.GetSurface()
 
-	return Window{app, wnd, surface}
+	w := Window{app, wnd}
+
+	w.Redraw()
+
+	c := cron.New()
+	_, err := c.AddFunc("@every 16ms", w.Redraw) //fps=60
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	c.Start()
+
+	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
+
+	return w
+}
+
+func (window Window) resizingEventWatcher(event sdl.Event, data interface{}) bool {
+	switch t := event.(type) {
+	case *sdl.WindowEvent:
+		if t.Event == sdl.WINDOWEVENT_RESIZED {
+			window.Redraw()
+		}
+		break
+	}
+	return false
 }
 
 func (window Window) Redraw() {
 	surface, _ := window.sdlWindow.GetSurface()
-	window.sdlSurface = surface
-
-	window.sdlSurface.FillRect(nil, sdl.MapRGB(window.sdlSurface.Format, 16, 16, 16))
+	surface.FillRect(nil, sdl.MapRGB(surface.Format, 16, 16, 16))
 	window.sdlWindow.UpdateSurface()
+}
+
+func (window Window) OnBeforeClose() {
+	window.SaveWindowState()
 }
 
 func (window Window) SaveWindowState() {

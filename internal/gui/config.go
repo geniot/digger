@@ -14,30 +14,7 @@ type Config struct {
 }
 
 func NewConfig(app *Application) Config {
-	props := properties.NewProperties()
-	props.Set(model.WINDOW_XPOS_KEY, strconv.FormatInt(int64(sdl.WINDOWPOS_UNDEFINED), 10))
-	props.Set(model.WINDOW_YPOS_KEY, strconv.FormatInt(int64(sdl.WINDOWPOS_UNDEFINED), 10))
-	displayMode, err := sdl.GetCurrentDisplayMode(0)
-	if err != nil {
-		println(err.Error())
-	}
-	props.Set(model.WINDOW_WIDTH_KEY, strconv.FormatInt(int64(displayMode.W/2), 10))
-	props.Set(model.WINDOW_HEIGHT_KEY, strconv.FormatInt(int64(displayMode.H/2), 10))
-
-	loadedProps, _ := properties.LoadFile(model.PATH_TO_CONFIG, properties.UTF8)
-	if loadedProps != nil {
-		props = loadedProps
-	}
-
-	//patching window state
-	windowStateStr, _ := props.Get(model.WINDOW_STATE_KEY)
-	windowState, _ := strconv.ParseInt(windowStateStr, 10, 0)
-	windowState |= sdl.WINDOW_SHOWN
-	windowState |= sdl.WINDOW_RESIZABLE
-
-	props.Set(model.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
-
-	return Config{app, props}
+	return Config{app, Load()}
 }
 
 func (cfg Config) Get(key string) uint32 {
@@ -48,6 +25,29 @@ func (cfg Config) Get(key string) uint32 {
 
 func (cfg Config) Set(key string, value string) {
 	cfg.props.Set(key, value)
+}
+
+func Load() *properties.Properties {
+	loadedProps, _ := properties.LoadFile(model.PATH_TO_CONFIG, properties.UTF8)
+
+	if loadedProps == nil {
+		loadedProps = properties.NewProperties()
+		loadedProps.Set(model.WINDOW_XPOS_KEY, strconv.FormatInt(int64(sdl.WINDOWPOS_UNDEFINED), 10))
+		loadedProps.Set(model.WINDOW_YPOS_KEY, strconv.FormatInt(int64(sdl.WINDOWPOS_UNDEFINED), 10))
+		displayMode, _ := sdl.GetCurrentDisplayMode(0)
+		loadedProps.Set(model.WINDOW_WIDTH_KEY, strconv.FormatInt(int64(displayMode.W/2), 10))
+		loadedProps.Set(model.WINDOW_HEIGHT_KEY, strconv.FormatInt(int64(displayMode.H/2), 10))
+		loadedProps.Set(model.WINDOW_STATE_KEY, strconv.FormatInt(int64(sdl.WINDOW_SHOWN|sdl.WINDOW_RESIZABLE), 10))
+	}
+
+	//patching window state
+	windowStateStr, _ := loadedProps.Get(model.WINDOW_STATE_KEY)
+	windowState, _ := strconv.ParseInt(windowStateStr, 10, 0)
+	windowState |= sdl.WINDOW_SHOWN
+	windowState |= sdl.WINDOW_RESIZABLE
+	loadedProps.Set(model.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
+
+	return loadedProps
 }
 
 func (cfg Config) Save() {
