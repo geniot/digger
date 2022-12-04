@@ -35,28 +35,11 @@ func (window Window) resizingEventWatcher(event sdl.Event, data interface{}) boo
 	switch t := event.(type) {
 	case *sdl.WindowEvent:
 		if t.Event == sdl.WINDOWEVENT_RESIZED {
-			window.Redraw()
+			window.application.loop.renderLoop.Run()
 		}
 		break
 	}
 	return false
-}
-
-func (window Window) Redraw() {
-	window.sdlRenderer.SetDrawColor(255, 255, 255, 255)
-	window.sdlRenderer.Clear()
-
-	width, height := window.sdlWindow.GetSize()
-	factor := int32(10)
-	rects := []sdl.Rect{{
-		width / factor,
-		height / factor,
-		width - (width/factor)*2,
-		height - (height/factor)*2}}
-
-	window.sdlRenderer.SetDrawColor(0, 0, 255, 255)
-	window.sdlRenderer.DrawRects(rects)
-	window.sdlRenderer.Present()
 }
 
 func (window Window) OnBeforeClose() {

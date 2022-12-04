@@ -1,43 +1,27 @@
 package gui
 
-import (
-	"github.com/veandco/go-sdl2/sdl"
-)
+import "github.com/tevino/abool/v2"
 
 type Loop struct {
 	application *Application
-	isRunning   bool
+	isRunning   *abool.AtomicBool
+	eventLoop   *EventLoop
+	physicsLoop *PhysicsLoop
+	renderLoop  *RenderLoop
 }
 
 func NewLoop(app *Application) Loop {
-	return Loop{app, false}
+	eventLoop := NewEventLoop(app)
+	physicsLoop := NewPhysicsLoop(app)
+	renderLoop := NewRenderLoop(app)
+	return Loop{app, abool.New(), &eventLoop, &physicsLoop, &renderLoop}
 }
 
 func (loop Loop) Start() {
-	loop.isRunning = true
-	for loop.isRunning {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch t := event.(type) {
-
-			case *sdl.KeyboardEvent:
-				if t.Repeat > 0 {
-					break
-				}
-				break
-
-			case *sdl.WindowEvent:
-				if t.Event == sdl.WINDOWEVENT_CLOSE {
-					loop.application.window.OnBeforeClose()
-				}
-				break
-
-			case *sdl.QuitEvent:
-				loop.isRunning = false
-				break
-			}
-		}
-
-		loop.application.window.Redraw()
-		//sdl.Delay(1000 / 60)
+	loop.isRunning.Set()
+	for loop.isRunning.IsSet() {
+		loop.eventLoop.Run()
+		loop.physicsLoop.Run()
+		loop.renderLoop.Run()
 	}
 }
