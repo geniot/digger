@@ -31,7 +31,14 @@ func NewWindow() *WindowImpl {
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
 
+	go w.show()
+
 	return &w
+}
+
+func (window WindowImpl) show() {
+	window.sdlWindow.Show()
+	window.sdlWindow.Raise()
 }
 
 func (window WindowImpl) resizingEventWatcher(event sdl.Event, data interface{}) bool {

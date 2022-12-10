@@ -20,14 +20,18 @@ func NewFpsCounter() *FpsCounter {
 func (fpsCounter *FpsCounter) Render() {
 	fpsCounter.frameCount += 1
 	currentTicks := sdl.GetTicks()
-	if currentTicks == 0 {
-		return
+	newFps := uint32(0)
+	if currentTicks != 0 {
+		ticksDelta := currentTicks - fpsCounter.startTicks
+		frameDuration := ticksDelta / fpsCounter.frameCount
+		if frameDuration != 0 {
+			newFps = 1000 / frameDuration
+		}
 	}
-	fps := 1000 / ((currentTicks - fpsCounter.startTicks) / fpsCounter.frameCount)
 
 	sec := currentTicks / 1000
 	if sec > fpsCounter.currentSecond {
-		fpsCounter.currentFPS = fps
+		fpsCounter.currentFPS = newFps
 		fpsCounter.frameCount = 0
 		fpsCounter.startTicks = currentTicks
 		fpsCounter.currentSecond = sec

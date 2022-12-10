@@ -32,8 +32,8 @@ func (desktopDevice DesktopDeviceImpl) GetWindowPosAndSize() (int32, int32, int3
 }
 
 func (desktopDevice DesktopDeviceImpl) GetWindowState() uint32 {
-	//return ctx.ConfigIns.Get(glb.WINDOW_STATE_KEY)
-	return sdl.WINDOW_SHOWN
+	return ctx.ConfigIns.Get(glb.WINDOW_STATE_KEY)
+	//return sdl.WINDOW_HIDDEN
 }
 
 func NewDesktopDevice() DesktopDeviceImpl {
