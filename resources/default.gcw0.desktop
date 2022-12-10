@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Chipmunk2d SDL2 Demo
+Comment=Demonstrates Chipmunk2d physics using SDL2
+Exec=go-sdl2-cp-examples.gcw
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=go-sdl2-cp-examples
+Categories=applications;
