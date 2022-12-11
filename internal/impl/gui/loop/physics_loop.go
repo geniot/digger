@@ -1,6 +1,7 @@
 package loop
 
 import (
+	"geniot.com/geniot/digger/internal/ctx"
 	"geniot.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -9,6 +10,7 @@ type PhysicsLoopImpl struct {
 	accumulator       float64
 	lastTime, lastFps float64
 	frames, fps       int
+	stepCount         uint64
 }
 
 func NewPhysicsLoop() *PhysicsLoopImpl {
@@ -30,6 +32,7 @@ func (physicsLoop *PhysicsLoopImpl) Run() {
 	}
 
 	for physicsLoop.accumulator += dt; physicsLoop.accumulator > glb.TICK; physicsLoop.accumulator -= glb.TICK {
-		//step
+		physicsLoop.stepCount += 1
+		ctx.SceneIns.Step(physicsLoop.stepCount)
 	}
 }

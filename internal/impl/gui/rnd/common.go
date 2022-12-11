@@ -2,6 +2,8 @@ package rnd
 
 import (
 	"geniot.com/geniot/digger/internal/ctx"
+	"geniot.com/geniot/digger/resources"
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -18,4 +20,14 @@ func drawText(txt string, x int32, y int32, color sdl.Color) int32 {
 		&sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H})
 	defer textTexture.Destroy()
 	return textSurface.W
+}
+
+func loadTexture(fileName string) *sdl.Texture {
+	surface, _ := img.LoadRW(resources.GetResource(fileName), true)
+	defer surface.Free()
+	txt, err := ctx.RendererIns.CreateTextureFromSurface(surface)
+	if err != nil {
+		println(err.Error())
+	}
+	return txt
 }

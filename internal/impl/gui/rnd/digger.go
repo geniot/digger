@@ -3,8 +3,6 @@ package rnd
 import (
 	"geniot.com/geniot/digger/internal/ctx"
 	"geniot.com/geniot/digger/internal/glb"
-	"geniot.com/geniot/digger/resources"
-	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -13,20 +11,27 @@ type Digger struct {
 	height  int32
 	offsetX int32
 	offsetY int32
-	texture *sdl.Texture
+
+	spritePointer    int
+	spritePointerInc int
+	sprites          []*sdl.Texture
 }
 
-func NewDigger() Digger {
-	surface, _ := img.LoadRW(resources.GetResource("cldig1.png"), true)
-	defer surface.Free()
-	txt, err := ctx.RendererIns.CreateTextureFromSurface(surface)
-	if err != nil {
-		println(err.Error())
-	}
-	return Digger{surface.W, surface.H, glb.SCREEN_LOGICAL_WIDTH / 2, glb.SCREEN_LOGICAL_HEIGHT / 2, txt}
+func NewDigger() *Digger {
+	spts := []*sdl.Texture{loadTexture("cldig1.png"), loadTexture("cldig2.png"), loadTexture("cldig3.png")}
+	return &Digger{16, 15, glb.SCREEN_LOGICAL_WIDTH / 2, glb.SCREEN_LOGICAL_HEIGHT / 2, 0, 1, spts}
 }
 
 func (digger Digger) Render() {
 	dstRect := sdl.Rect{digger.offsetX, digger.offsetY, digger.width, digger.height}
-	ctx.RendererIns.Copy(digger.texture, nil, &dstRect)
+	ctx.RendererIns.CopyEx(digger.sprites[digger.spritePointer], nil, &dstRect, 0, &sdl.Point{0, 0}, sdl.FLIP_HORIZONTAL)
+}
+
+func (digger *Digger) Step(n uint64) {
+	if n%8 == 0 {
+		digger.spritePointer += digger.spritePointerInc
+		if digger.spritePointer == len(digger.sprites)-1 || digger.spritePointer == 0 {
+			digger.spritePointerInc = -digger.spritePointerInc
+		}
+	}
 }

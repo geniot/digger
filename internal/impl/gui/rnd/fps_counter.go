@@ -17,6 +17,10 @@ func NewFpsCounter() *FpsCounter {
 	return &FpsCounter{sdl.GetTicks(), 0, sdl.GetTicks() / 1000, 0}
 }
 
+func (fpsCounter *FpsCounter) Step(n uint64) {
+
+}
+
 func (fpsCounter *FpsCounter) Render() {
 	fpsCounter.frameCount += 1
 	currentTicks := sdl.GetTicks()

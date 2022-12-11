@@ -9,6 +9,12 @@ type Scene struct {
 	renderables *list.List
 }
 
+func (scene *Scene) Step(n uint64) {
+	for e := scene.renderables.Front(); e != nil; e = e.Next() {
+		e.Value.(api.IRenderable).Step(n)
+	}
+}
+
 func NewScene() *Scene {
 
 	l := list.New()

@@ -11,6 +11,7 @@ type IWindow interface {
 
 type IScene interface {
 	Render()
+	Step(n uint64)
 }
 
 type IConfig interface {
@@ -38,4 +39,5 @@ type IStartable interface {
 
 type IRenderable interface {
 	Render()
+	Step(n uint64)
 }

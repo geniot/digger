@@ -13,8 +13,7 @@ const (
 	FONT_FILE_NAME                = "OpenSans-Regular.ttf"
 	ICON_FILE_NAME                = "digger.png"
 	FONT_SIZE                     = 16
-	GRABBABLE_MASK_BIT    uint    = 1 << 31
-	TICK                  float64 = 1.0 / 60.0
+	TICK                  float64 = 1.0 / 100.0
 	SCREEN_LOGICAL_WIDTH          = 320
 	SCREEN_LOGICAL_HEIGHT         = 200
 
