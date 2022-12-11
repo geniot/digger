@@ -34,4 +34,14 @@ func (digger *Digger) Step(n uint64) {
 			digger.spritePointerInc = -digger.spritePointerInc
 		}
 	}
+
+	if n%2 == 0 {
+		if ctx.PressedKeysCodesSetIns.Contains(glb.GCW_BUTTON_LEFT) {
+			digger.offsetX -= 1
+		}
+		if ctx.PressedKeysCodesSetIns.Contains(glb.GCW_BUTTON_RIGHT) {
+			digger.offsetX += 1
+		}
+	}
+
 }
