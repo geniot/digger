@@ -18,8 +18,10 @@ func (scene *Scene) Step(n uint64) {
 func NewScene() *Scene {
 
 	l := list.New()
-	l.PushBack(NewFpsCounter())
 	l.PushBack(NewDigger())
+
+	l.PushBack(NewDebugGrid())
+	l.PushBack(NewFpsCounter())
 
 	return &Scene{l}
 }

@@ -2,20 +2,31 @@ package glb
 
 import (
 	"fmt"
+	"geniot.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/sdl"
 	"math"
 )
 
 const (
-	APP_NAME                      = "Digger"
-	APP_VERSION                   = "0.1"
-	CONF_FILE_NAME                = ".digger.properties"
-	FONT_FILE_NAME                = "OpenSans-Regular.ttf"
-	ICON_FILE_NAME                = "digger.png"
-	FONT_SIZE                     = 16
-	TICK                  float64 = 1.0 / 100.0
-	SCREEN_LOGICAL_WIDTH          = 320
-	SCREEN_LOGICAL_HEIGHT         = 200
+	APP_NAME       = "Digger"
+	APP_VERSION    = "0.1"
+	CONF_FILE_NAME = ".digger.properties"
+	FONT_FILE_NAME = "OpenSans-Regular.ttf"
+	ICON_FILE_NAME = "digger.png"
+	FONT_SIZE      = 16
+
+	TICK               float64 = 1.0 / 100.0
+	SPRITE_UPDATE_RATE         = 9
+	DIGGER_SPEED               = 2
+
+	SCREEN_LOGICAL_WIDTH  = 320
+	SCREEN_LOGICAL_HEIGHT = 200
+	CELLS_HORIZONTAL      = 15
+	CELLS_VERTICAL        = 10
+	CELL_WIDTH            = 20
+	CELL_HEIGHT           = 18 //leaving some space above for stats
+	CELLS_OFFSET_X        = (SCREEN_LOGICAL_WIDTH - CELLS_HORIZONTAL*CELL_WIDTH) / 2
+	CELLS_OFFSET_Y        = SCREEN_LOGICAL_HEIGHT - CELLS_VERTICAL*CELL_HEIGHT
 
 	WINDOW_XPOS_KEY   = "WINDOW_XPOS_KEY"
 	WINDOW_YPOS_KEY   = "WINDOW_YPOS_KEY"
@@ -52,6 +63,11 @@ const (
 	GCW_BUTTON_L3 = sdl.K_KP_DIVIDE
 	//GCW_BUTTON_R3    = sdl.K_KP_PERIOD
 	//GCW_BUTTON_POWER = sdl.K_HOME
+
+	UP    api.Direction = 0
+	DOWN  api.Direction = 1
+	LEFT  api.Direction = 2
+	RIGHT api.Direction = 3
 )
 
 var (
@@ -64,7 +80,7 @@ var (
 	COLOR_BLUE   = sdl.Color{R: 0, G: 255, B: 255, A: 255}
 	COLOR_BLACK  = sdl.Color{R: 0, G: 0, B: 0, A: 255}
 
-	BGR_COLOR = [4]uint8{0, 0, 0, 255}
+	BGR_COLOR = [4]uint8{0, 0, 0, 255} //black
 )
 
 func If[T any](cond bool, vTrue, vFalse T) T {
