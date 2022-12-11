@@ -36,5 +36,5 @@ func (fpsCounter *FpsCounter) Render() {
 		fpsCounter.startTicks = currentTicks
 		fpsCounter.currentSecond = sec
 	}
-	drawText("FPS: "+strconv.FormatInt(int64(fpsCounter.currentFPS), 10), 10, 10, glb.COLOR_BLACK)
+	drawText("FPS: "+strconv.FormatInt(int64(fpsCounter.currentFPS), 10), 10, 10, glb.COLOR_WHITE)
 }

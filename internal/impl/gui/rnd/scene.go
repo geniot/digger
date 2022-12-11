@@ -13,6 +13,7 @@ func NewScene() *Scene {
 
 	l := list.New()
 	l.PushBack(NewFpsCounter())
+	l.PushBack(NewDigger())
 
 	return &Scene{l}
 }

@@ -2,7 +2,7 @@ package dev
 
 import (
 	"geniot.com/geniot/digger/internal/ctx"
-	"geniot.com/geniot/digger/internal/glb"
+	. "geniot.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -24,15 +24,15 @@ func (desktopDevice DesktopDeviceImpl) ProcessKeyActions() {
 }
 
 func (desktopDevice DesktopDeviceImpl) GetWindowPosAndSize() (int32, int32, int32, int32) {
-	return int32(ctx.ConfigIns.Get(glb.WINDOW_XPOS_KEY)),
-		int32(ctx.ConfigIns.Get(glb.WINDOW_YPOS_KEY)),
-		640, 480
-	//int32(ctx.ConfigIns.Get(glb.WINDOW_WIDTH_KEY)),
-	//int32(ctx.ConfigIns.Get(glb.WINDOW_HEIGHT_KEY))
+	return int32(ctx.ConfigIns.Get(WINDOW_XPOS_KEY)),
+		int32(ctx.ConfigIns.Get(WINDOW_YPOS_KEY)),
+		//SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT
+		int32(ctx.ConfigIns.Get(WINDOW_WIDTH_KEY)),
+		int32(ctx.ConfigIns.Get(WINDOW_HEIGHT_KEY))
 }
 
 func (desktopDevice DesktopDeviceImpl) GetWindowState() uint32 {
-	return ctx.ConfigIns.Get(glb.WINDOW_STATE_KEY)
+	return ctx.ConfigIns.Get(WINDOW_STATE_KEY)
 	//return sdl.WINDOW_HIDDEN
 }
 

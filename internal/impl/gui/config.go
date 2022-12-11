@@ -62,6 +62,7 @@ func (cfg *ConfigImpl) load() {
 	if ok {
 		windowState, _ := strconv.ParseInt(windowStateStr, 10, 0)
 		windowState |= sdl.WINDOW_HIDDEN
+		windowState |= sdl.WINDOW_RESIZABLE
 		loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
 	} else {
 		loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(sdl.WINDOW_HIDDEN, 10))

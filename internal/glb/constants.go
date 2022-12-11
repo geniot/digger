@@ -7,14 +7,16 @@ import (
 )
 
 const (
-	APP_NAME                   = "Digger"
-	APP_VERSION                = "0.1"
-	CONF_FILE_NAME             = ".digger.properties"
-	FONT_FILE_NAME             = "OpenSans-Regular.ttf"
-	ICON_FILE_NAME             = "digger.png"
-	FONT_SIZE                  = 16
-	GRABBABLE_MASK_BIT uint    = 1 << 31
-	TICK               float64 = 1.0 / 60.0
+	APP_NAME                      = "Digger"
+	APP_VERSION                   = "0.1"
+	CONF_FILE_NAME                = ".digger.properties"
+	FONT_FILE_NAME                = "OpenSans-Regular.ttf"
+	ICON_FILE_NAME                = "digger.png"
+	FONT_SIZE                     = 16
+	GRABBABLE_MASK_BIT    uint    = 1 << 31
+	TICK                  float64 = 1.0 / 60.0
+	SCREEN_LOGICAL_WIDTH          = 320
+	SCREEN_LOGICAL_HEIGHT         = 200
 
 	WINDOW_XPOS_KEY   = "WINDOW_XPOS_KEY"
 	WINDOW_YPOS_KEY   = "WINDOW_YPOS_KEY"
@@ -63,8 +65,7 @@ var (
 	COLOR_BLUE   = sdl.Color{R: 0, G: 255, B: 255, A: 255}
 	COLOR_BLACK  = sdl.Color{R: 0, G: 0, B: 0, A: 255}
 
-	LIGHT_GRAY       = [4]uint8{211, 211, 211, 255}
-	COLOR_LIGHT_GRAY = sdl.Color{LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2], LIGHT_GRAY[3]}
+	BGR_COLOR = [4]uint8{0, 0, 0, 255}
 )
 
 func If[T any](cond bool, vTrue, vFalse T) T {
