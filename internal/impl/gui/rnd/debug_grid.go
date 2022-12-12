@@ -14,10 +14,12 @@ func NewDebugGrid() *DebugGrid {
 }
 
 func (debugGrid DebugGrid) Render() {
+	//whole area
 	ctx.RendererIns.SetDrawColor(255, 0, 0, 255)
 	ctx.RendererIns.DrawRect(&sdl.Rect{0, 0, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+	//stats
 	ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
-	ctx.RendererIns.DrawRect(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 2, 14})
+	ctx.RendererIns.DrawRect(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 2, 20})
 
 	ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
 	//horizontal lines

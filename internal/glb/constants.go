@@ -15,18 +15,18 @@ const (
 	ICON_FILE_NAME = "digger.png"
 	FONT_SIZE      = 16
 
-	TICK               float64 = 1.0 / 100.0
-	SPRITE_UPDATE_RATE         = 9
-	DIGGER_SPEED               = 2
+	TICK               float64 = 1.0 / 200.0
+	SPRITE_UPDATE_RATE         = 18
+	DIGGER_SPEED_RATE          = 5 //less is faster
 
 	SCREEN_LOGICAL_WIDTH  = 320
-	SCREEN_LOGICAL_HEIGHT = 200
+	SCREEN_LOGICAL_HEIGHT = 240
 	CELLS_HORIZONTAL      = 15
 	CELLS_VERTICAL        = 10
 	CELL_WIDTH            = 20
-	CELL_HEIGHT           = 18                                                       //leaving some space above for stats
-	CELLS_OFFSET_X        = (SCREEN_LOGICAL_WIDTH - CELLS_HORIZONTAL*CELL_WIDTH) / 2 //10+20*15+10=320
-	CELLS_OFFSET_Y        = 17                                                       //14+3+18*10+3=200
+	CELL_HEIGHT           = 20 //leaving some space above for stats
+	CELLS_OFFSET_X        = 10 //10+20*15+10=320
+	CELLS_OFFSET_Y        = 30 //14+3+18*10+3=200
 
 	WINDOW_XPOS_KEY   = "WINDOW_XPOS_KEY"
 	WINDOW_YPOS_KEY   = "WINDOW_YPOS_KEY"
