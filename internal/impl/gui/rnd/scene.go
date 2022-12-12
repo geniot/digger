@@ -21,7 +21,7 @@ func NewScene() *Scene {
 	l.PushBack(NewDigger())
 
 	l.PushBack(NewDebugGrid())
-	l.PushBack(NewFpsCounter())
+	//l.PushBack(NewFpsCounter())
 
 	return &Scene{l}
 }

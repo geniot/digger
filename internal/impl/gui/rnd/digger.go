@@ -12,6 +12,8 @@ type Digger struct {
 	height    int32
 	offsetX   int32
 	offsetY   int32
+	cellX     int
+	cellY     int
 	direction api.Direction
 
 	spritePointer    int
@@ -21,8 +23,14 @@ type Digger struct {
 
 func NewDigger() *Digger {
 	spts := []*sdl.Texture{loadTexture("cldig1.png"), loadTexture("cldig2.png"), loadTexture("cldig3.png")}
+	cX := 14
+	cY := 0
+	oX := int32(CELLS_OFFSET_X + cX*CELL_WIDTH)
+	oY := int32(CELLS_OFFSET_Y + cY*CELL_HEIGHT)
+
 	return &Digger{16, 15,
-		SCREEN_LOGICAL_WIDTH / 2, SCREEN_LOGICAL_HEIGHT / 2,
+		oX, oY,
+		cX, cY,
 		RIGHT, 0, 1, spts}
 }
 
@@ -54,11 +62,15 @@ func (digger *Digger) Step(n uint64) {
 
 	if n%DIGGER_SPEED == 0 {
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_RIGHT) {
-			digger.offsetX += 1
+			if digger.offsetX < CELLS_OFFSET_X+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
+				digger.offsetX += 1
+			}
 			digger.direction = RIGHT
 		}
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_LEFT) {
-			digger.offsetX -= 1
+			if digger.offsetX > CELLS_OFFSET_X {
+				digger.offsetX -= 1
+			}
 			digger.direction = LEFT
 		}
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
