@@ -21,6 +21,7 @@ var (
 	SceneIns api.IScene
 
 	RendererIns            *sdl.Renderer
+	SurfaceIns             *sdl.Surface
 	FontIns                *ttf.Font
 	PressedKeysCodesSetIns mapset.Set[sdl.Keycode] = mapset.NewSet[sdl.Keycode]()
 )

@@ -18,6 +18,8 @@ func (scene *Scene) Step(n uint64) {
 func NewScene() *Scene {
 
 	l := list.New()
+
+	l.PushBack(NewField())
 	l.PushBack(NewDigger())
 
 	l.PushBack(NewDebugGrid())
