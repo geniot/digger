@@ -20,9 +20,10 @@ type Digger struct {
 	spritePointer    int
 	spritePointerInc int
 	sprites          []*sdl.Texture
+	scene            *Scene
 }
 
-func NewDigger() *Digger {
+func NewDigger(scn *Scene) *Digger {
 	spts := []*sdl.Texture{loadTexture("cldig1.png"), loadTexture("cldig2.png"), loadTexture("cldig3.png")}
 	cX := 0
 	cY := 0
@@ -32,7 +33,7 @@ func NewDigger() *Digger {
 	return &Digger{20, 20,
 		oX, oY,
 		cX, cY,
-		RIGHT, 0, 1, spts}
+		RIGHT, 0, 1, spts, scn}
 }
 
 func (digger Digger) Render() {

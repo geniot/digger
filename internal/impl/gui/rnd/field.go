@@ -6,13 +6,16 @@ import (
 	"geniot.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"unsafe"
 )
 
 type Field struct {
-	background *sdl.Texture
+	background  *sdl.Texture
+	scene       *Scene
+	blackPixels *[20 * 20 * 4]uint32
 }
 
-func NewField() *Field {
+func NewField(scn *Scene) *Field {
 	bgrTile, _ := img.LoadRW(resources.GetResource("cback1.png"), true)
 	defer bgrTile.Free()
 	bgrSurface, _ := sdl.CreateRGBSurfaceWithFormat(0,
@@ -29,7 +32,16 @@ func NewField() *Field {
 		}
 	}
 	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(bgrSurface)
-	return &Field{bgrTexture}
+
+	pixels := [20 * 20 * 4]uint32{}
+	for x := 0; x < len(pixels); x += 4 {
+		pixels[x] = 0
+		pixels[x+1] = 0
+		pixels[x+2] = 0
+		pixels[x+3] = 0
+	}
+
+	return &Field{bgrTexture, scn, &pixels}
 }
 
 func (field Field) Render() {
@@ -37,5 +49,7 @@ func (field Field) Render() {
 }
 
 func (field *Field) Step(n uint64) {
+	diggerRect := sdl.Rect{field.scene.digger.offsetX, field.scene.digger.offsetY - 20, 20, 20}
+	field.background.Update(&diggerRect, unsafe.Pointer(&field.blackPixels[0]), 20*4)
 
 }
