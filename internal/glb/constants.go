@@ -24,9 +24,9 @@ const (
 	CELLS_HORIZONTAL      = 15
 	CELLS_VERTICAL        = 10
 	CELL_WIDTH            = 20
-	CELL_HEIGHT           = 20 //leaving some space above for stats
-	CELLS_OFFSET_X        = 10 //10+20*15+10=320
-	CELLS_OFFSET_Y        = 30 //14+3+18*10+3=200
+	CELL_HEIGHT           = 20
+	CELLS_OFFSET_X        = 10
+	CELLS_OFFSET_Y        = 30
 
 	WINDOW_XPOS_KEY   = "WINDOW_XPOS_KEY"
 	WINDOW_YPOS_KEY   = "WINDOW_YPOS_KEY"
