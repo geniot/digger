@@ -74,11 +74,15 @@ func (digger *Digger) Step(n uint64) {
 			digger.direction = LEFT
 		}
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
-			digger.offsetY -= 1
+			if digger.offsetY > CELLS_OFFSET_Y {
+				digger.offsetY -= 1
+			}
 			digger.direction = UP
 		}
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_DOWN) {
-			digger.offsetY += 1
+			if digger.offsetY < CELLS_OFFSET_Y+CELL_HEIGHT*(CELLS_VERTICAL-1) {
+				digger.offsetY += 1
+			}
 			digger.direction = DOWN
 		}
 	}
