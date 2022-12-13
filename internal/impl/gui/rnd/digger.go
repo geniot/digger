@@ -25,8 +25,8 @@ type Digger struct {
 
 func NewDigger(scn *Scene) *Digger {
 	spts := []*sdl.Texture{loadTexture("cldig1.png"), loadTexture("cldig2.png"), loadTexture("cldig3.png")}
-	cX := 0
-	cY := 0
+	cX := 5
+	cY := 5
 	oX := int32(CELLS_OFFSET_X + cX*CELL_WIDTH)
 	oY := int32(CELLS_OFFSET_Y + cY*CELL_HEIGHT)
 

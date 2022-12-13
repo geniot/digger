@@ -10,17 +10,24 @@ import (
 )
 
 type Field struct {
-	background   *sdl.Surface
-	tunnelBlob   *sdl.Surface
-	endLeftBlob  *sdl.Surface
-	endRightBlob *sdl.Surface
-	scene        *Scene
+	background     *sdl.Surface
+	horizontalBlob *sdl.Surface
+	verticalBlob   *sdl.Surface
+	endLeftBlob    *sdl.Surface
+	endRightBlob   *sdl.Surface
+	endUpBlob      *sdl.Surface
+	endDownBlob    *sdl.Surface
+	scene          *Scene
 }
 
 func NewField(scn *Scene) *Field {
-	tunnelB, _ := img.LoadRW(resources.GetResource("blob1.png"), true)
-	endLeftB, _ := img.LoadRW(resources.GetResource("blob2.png"), true)
-	endRightB, _ := img.LoadRW(resources.GetResource("blob3.png"), true)
+	horizontalB, _ := img.LoadRW(resources.GetResource("blob1.png"), true)
+	verticalB, _ := img.LoadRW(resources.GetResource("blob2.png"), true)
+	endLeftB, _ := img.LoadRW(resources.GetResource("blob3.png"), true)
+	endRightB, _ := img.LoadRW(resources.GetResource("blob4.png"), true)
+	endUpB, _ := img.LoadRW(resources.GetResource("blob5.png"), true)
+	endDownB, _ := img.LoadRW(resources.GetResource("blob6.png"), true)
+
 	bgrTile, _ := img.LoadRW(resources.GetResource("cback1.png"), true)
 
 	defer bgrTile.Free()
@@ -39,7 +46,7 @@ func NewField(scn *Scene) *Field {
 		}
 	}
 
-	return &Field{bgrSurface, tunnelB, endLeftB, endRightB, scn}
+	return &Field{bgrSurface, horizontalB, verticalB, endLeftB, endRightB, endUpB, endDownB, scn}
 }
 
 func (field Field) Render() {
@@ -49,17 +56,52 @@ func (field Field) Render() {
 }
 
 func (field *Field) Step(n uint64) {
-	sourceTunnelRect := sdl.Rect{int32(math.Mod(float64(field.scene.digger.offsetX), float64(field.tunnelBlob.W))), 0, 1, field.tunnelBlob.H}
-	if field.scene.digger.direction == glb.RIGHT {
-		targetTunnelRect := sdl.Rect{field.scene.digger.offsetX + glb.CELL_WIDTH - field.tunnelBlob.W, field.scene.digger.offsetY - glb.CELL_HEIGHT, glb.CELL_WIDTH, glb.CELL_HEIGHT}
-		targetEndRect := sdl.Rect{field.scene.digger.offsetX + glb.CELL_WIDTH - field.endRightBlob.W, field.scene.digger.offsetY - glb.CELL_HEIGHT, glb.CELL_WIDTH, glb.CELL_HEIGHT}
-		field.tunnelBlob.Blit(&sourceTunnelRect, field.background, &targetTunnelRect)
+	sourceHorizontalTunnelRect := sdl.Rect{int32(math.Mod(float64(field.scene.digger.offsetX), float64(field.horizontalBlob.W))), 0, 1, field.horizontalBlob.H}
+	sourceVerticalTunnelRect := sdl.Rect{0, int32(math.Mod(float64(field.scene.digger.offsetY), float64(field.verticalBlob.H))), field.verticalBlob.W, 1}
+	if field.scene.digger.direction == glb.RIGHT { //RIGHT
+		targetTunnelRect := sdl.Rect{
+			field.scene.digger.offsetX + glb.CELL_WIDTH - field.horizontalBlob.W,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.horizontalBlob.Blit(&sourceHorizontalTunnelRect, field.background, &targetTunnelRect)
+		targetEndRect := sdl.Rect{
+			field.scene.digger.offsetX + glb.CELL_WIDTH - field.endRightBlob.W + 2,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
 		field.endRightBlob.Blit(nil, field.background, &targetEndRect)
-	} else if field.scene.digger.direction == glb.LEFT {
-		targetTunnelRect := sdl.Rect{field.scene.digger.offsetX + field.tunnelBlob.W, field.scene.digger.offsetY - glb.CELL_HEIGHT, glb.CELL_WIDTH, glb.CELL_HEIGHT}
-		targetEndRect := sdl.Rect{field.scene.digger.offsetX, field.scene.digger.offsetY - glb.CELL_HEIGHT, glb.CELL_WIDTH, glb.CELL_HEIGHT}
-		field.tunnelBlob.Blit(&sourceTunnelRect, field.background, &targetTunnelRect)
+	} else if field.scene.digger.direction == glb.LEFT { //LEFT
+		targetTunnelRect := sdl.Rect{
+			field.scene.digger.offsetX + field.horizontalBlob.W,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.horizontalBlob.Blit(&sourceHorizontalTunnelRect, field.background, &targetTunnelRect)
+		targetEndRect := sdl.Rect{
+			field.scene.digger.offsetX - 2,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
 		field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
+	} else if field.scene.digger.direction == glb.UP { //UP
+		targetTunnelRect := sdl.Rect{
+			field.scene.digger.offsetX,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT + field.verticalBlob.H,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.verticalBlob.Blit(&sourceVerticalTunnelRect, field.background, &targetTunnelRect)
+		targetEndRect := sdl.Rect{
+			field.scene.digger.offsetX,
+			field.scene.digger.offsetY - glb.CELL_HEIGHT - field.endUpBlob.H + 2,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.endUpBlob.Blit(nil, field.background, &targetEndRect)
+	} else if field.scene.digger.direction == glb.DOWN { //DOWN
+		targetTunnelRect := sdl.Rect{
+			field.scene.digger.offsetX,
+			field.scene.digger.offsetY - field.verticalBlob.H,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.verticalBlob.Blit(&sourceVerticalTunnelRect, field.background, &targetTunnelRect)
+		targetEndRect := sdl.Rect{
+			field.scene.digger.offsetX,
+			field.scene.digger.offsetY - 3,
+			glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		field.endDownBlob.Blit(nil, field.background, &targetEndRect)
 	}
 
 }
