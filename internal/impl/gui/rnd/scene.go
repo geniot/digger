@@ -21,7 +21,7 @@ func NewScene() *Scene {
 	scn.renderables = list.New()
 	scn.renderables.PushBack(scn.field)
 	scn.renderables.PushBack(scn.digger)
-	scn.renderables.PushBack(NewDebugGrid())
+	//scn.renderables.PushBack(NewDebugGrid())
 	//l.PushBack(NewFpsCounter())
 
 	return scn
