@@ -9,8 +9,6 @@ import (
 )
 
 type Digger struct {
-	width     int32
-	height    int32
 	offsetX   int32
 	offsetY   int32
 	cellX     int
@@ -30,14 +28,18 @@ func NewDigger(scn *Scene) *Digger {
 	oX := int32(CELLS_OFFSET_X + cX*CELL_WIDTH)
 	oY := int32(CELLS_OFFSET_Y + cY*CELL_HEIGHT)
 
-	return &Digger{20, 20,
+	return &Digger{
 		oX, oY,
 		cX, cY,
 		RIGHT, 0, 1, spts, scn}
 }
 
+func (digger Digger) getHitBox() (int32, int32, int32, int32) {
+	return digger.offsetX + 2, digger.offsetY + 2, digger.offsetX + CELL_WIDTH - 2, digger.offsetY + CELL_HEIGHT - 2
+}
+
 func (digger Digger) Render() {
-	dstRect := sdl.Rect{digger.offsetX, digger.offsetY, digger.width, digger.height}
+	dstRect := sdl.Rect{digger.offsetX, digger.offsetY, CELL_WIDTH, CELL_HEIGHT}
 	flip := sdl.FLIP_NONE
 	if digger.direction == RIGHT {
 		flip = sdl.FLIP_HORIZONTAL
@@ -50,8 +52,13 @@ func (digger Digger) Render() {
 		angle = 270
 	}
 
+	//draw hit box for debug purposes
+	//x1, y1, x2, y2 := digger.getHitBox()
+	//ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
+	//ctx.RendererIns.DrawRect(&sdl.Rect{x1, y1, x2 - x1, y2 - y1})
+
 	ctx.RendererIns.CopyEx(digger.sprites[digger.spritePointer], nil, &dstRect, angle,
-		&sdl.Point{digger.width / 2, digger.height / 2}, flip)
+		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
 }
 
 func (digger *Digger) Step(n uint64) {

@@ -1,7 +1,8 @@
-package rnd
+package dbg
 
 import (
 	"geniot.com/geniot/digger/internal/glb"
+	"geniot.com/geniot/digger/internal/impl/gui/rnd"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )
@@ -40,5 +41,5 @@ func (fpsCounter *FpsCounter) Render() {
 		fpsCounter.startTicks = currentTicks
 		fpsCounter.currentSecond = sec
 	}
-	drawText("FPS: "+strconv.FormatInt(int64(fpsCounter.currentFPS), 10), 10, 10, glb.COLOR_WHITE)
+	rnd.drawText("FPS: "+strconv.FormatInt(int64(fpsCounter.currentFPS), 10), 10, 10, glb.COLOR_WHITE)
 }

@@ -8,6 +8,8 @@ import (
 var (
 	//go:embed media/*
 	mediaList embed.FS
+	//go:embed levels/*
+	levelsList embed.FS
 )
 
 func GetResource(fileName string) *sdl.RWops {

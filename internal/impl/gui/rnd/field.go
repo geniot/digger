@@ -105,3 +105,13 @@ func (field *Field) Step(n uint64) {
 	}
 
 }
+
+func (field Field) eatEmerald(emerald *Emerald) {
+	oX := int32(glb.CELLS_OFFSET_X + emerald.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.CELLS_OFFSET_Y + (emerald.cellY-1)*glb.CELL_HEIGHT)
+	targetRect := sdl.Rect{
+		oX,
+		oY,
+		glb.CELL_WIDTH, glb.CELL_HEIGHT}
+	emerald.textureMask.Blit(nil, field.background, &targetRect)
+}
