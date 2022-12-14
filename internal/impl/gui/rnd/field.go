@@ -32,10 +32,11 @@ func NewField(scn *Scene) *Field {
 
 	defer bgrTile.Free()
 
+	info, _ := ctx.RendererIns.GetInfo()
 	bgrSurface, _ := sdl.CreateRGBSurfaceWithFormat(0,
 		glb.SCREEN_LOGICAL_WIDTH,
 		glb.SCREEN_LOGICAL_HEIGHT,
-		32, ctx.SurfaceIns.Format.Format)
+		32, uint32(info.TextureFormats[0]))
 
 	for i := 0; i < glb.SCREEN_LOGICAL_WIDTH/int(bgrTile.W); i++ {
 		for j := 0; j < glb.SCREEN_LOGICAL_HEIGHT/int(bgrTile.H); j++ {
