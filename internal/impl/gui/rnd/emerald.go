@@ -46,3 +46,8 @@ func (emerald Emerald) Render() {
 func (emerald *Emerald) Step(n uint64) {
 
 }
+
+func (emerald *Emerald) Destroy() {
+	emerald.textureMask.Free()
+	emerald.texture.Destroy()
+}
