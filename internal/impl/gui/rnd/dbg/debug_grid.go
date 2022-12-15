@@ -1,8 +1,8 @@
 package dbg
 
 import (
-	"geniot.com/geniot/digger/internal/ctx"
-	. "geniot.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/internal/ctx"
+	. "github.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 )
 

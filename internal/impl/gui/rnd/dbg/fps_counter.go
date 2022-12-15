@@ -1,8 +1,8 @@
 package dbg
 
 import (
-	"geniot.com/geniot/digger/internal/glb"
-	"geniot.com/geniot/digger/internal/impl/gui/rnd"
+	"github.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/internal/impl/gui/rnd"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )

@@ -1,4 +1,4 @@
-module geniot.com/geniot/digger
+module github.com/geniot/digger
 
 go 1.19
 

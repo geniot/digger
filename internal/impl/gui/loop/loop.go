@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"geniot.com/geniot/digger/internal/ctx"
+	"github.com/geniot/digger/internal/ctx"
 	"github.com/tevino/abool/v2"
 )
 

@@ -1,8 +1,8 @@
 package ctx
 
 import (
-	"geniot.com/geniot/digger/internal/api"
 	mapset "github.com/deckarep/golang-set/v2"
+	"github.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )

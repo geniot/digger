@@ -1,9 +1,9 @@
 package rnd
 
 import (
-	"geniot.com/geniot/digger/internal/api"
-	"geniot.com/geniot/digger/internal/ctx"
-	. "geniot.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/internal/api"
+	"github.com/geniot/digger/internal/ctx"
+	. "github.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 	"math"
 )

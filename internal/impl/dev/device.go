@@ -1,7 +1,7 @@
 package dev
 
 import (
-	"geniot.com/geniot/digger/internal/api"
+	"github.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"

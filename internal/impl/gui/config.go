@@ -1,7 +1,7 @@
 package gui
 
 import (
-	"geniot.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/internal/glb"
 	"github.com/magiconair/properties"
 	"github.com/veandco/go-sdl2/sdl"
 	"os"

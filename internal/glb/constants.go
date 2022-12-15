@@ -2,7 +2,7 @@ package glb
 
 import (
 	"fmt"
-	"geniot.com/geniot/digger/internal/api"
+	"github.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/sdl"
 	"math"
 )

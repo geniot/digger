@@ -2,7 +2,7 @@ package rnd
 
 import (
 	"container/list"
-	"geniot.com/geniot/digger/internal/api"
+	"github.com/geniot/digger/internal/api"
 )
 
 type Scene struct {

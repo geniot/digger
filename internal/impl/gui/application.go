@@ -1,12 +1,12 @@
 package gui
 
 import (
-	"geniot.com/geniot/digger/internal/ctx"
-	"geniot.com/geniot/digger/internal/glb"
-	"geniot.com/geniot/digger/internal/impl/dev"
-	"geniot.com/geniot/digger/internal/impl/gui/loop"
-	"geniot.com/geniot/digger/internal/impl/gui/rnd"
-	"geniot.com/geniot/digger/resources"
+	"github.com/geniot/digger/internal/ctx"
+	"github.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/internal/impl/dev"
+	"github.com/geniot/digger/internal/impl/gui/loop"
+	"github.com/geniot/digger/internal/impl/gui/rnd"
+	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/ttf"
 )
 
