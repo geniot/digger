@@ -59,14 +59,13 @@ func (cfg *ConfigImpl) load() {
 
 	//patching window state
 	windowStateStr, ok := loadedProps.Get(glb.WINDOW_STATE_KEY)
+	windowState := int64(sdl.WINDOW_HIDDEN | sdl.WINDOW_RESIZABLE)
 	if ok {
-		windowState, _ := strconv.ParseInt(windowStateStr, 10, 0)
-		windowState |= sdl.WINDOW_HIDDEN
-		windowState |= sdl.WINDOW_RESIZABLE
-		loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
-	} else {
-		loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(sdl.WINDOW_HIDDEN, 10))
+		windowState, _ = strconv.ParseInt(windowStateStr, 10, 0)
 	}
+	windowState |= sdl.WINDOW_HIDDEN
+	windowState |= sdl.WINDOW_RESIZABLE
+	loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
 
 	cfg.props = loadedProps
 }
