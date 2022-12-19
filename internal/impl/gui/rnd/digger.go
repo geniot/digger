@@ -35,8 +35,8 @@ func NewDigger(scn *Scene) *Digger {
 	cellX := 7
 	cellY := 9
 
-	dg.offsetX = int32(CELLS_OFFSET_X + cellX*CELL_WIDTH)
-	dg.offsetY = int32(CELLS_OFFSET_Y + cellY*CELL_HEIGHT)
+	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
+	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
 	dg.direction = RIGHT
 	dg.spritePointer = 0
 	dg.spritePointerInc = 1
@@ -58,13 +58,13 @@ func (digger *Digger) Step(n uint64) {
 
 	if n%DIGGER_SPEED_RATE == 0 {
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_RIGHT) {
-			digger.move(RIGHT, digger.moveRight, math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
+			digger.move(RIGHT, digger.moveRight, math.Mod(float64(FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_LEFT) {
-			digger.move(LEFT, digger.moveLeft, math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
+			digger.move(LEFT, digger.moveLeft, math.Mod(float64(FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
-			digger.move(UP, digger.moveUp, math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
+			digger.move(UP, digger.moveUp, math.Mod(float64(CELLS_OFFSET+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_DOWN) {
-			digger.move(DOWN, digger.moveDown, math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
+			digger.move(DOWN, digger.moveDown, math.Mod(float64(CELLS_OFFSET+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
 		}
 	}
 }
@@ -90,25 +90,25 @@ func (digger *Digger) move(
 }
 
 func (digger *Digger) moveRight() {
-	if digger.offsetX < CELLS_OFFSET_X+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
+	if digger.offsetX < CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
 		digger.direction = RIGHT
 		digger.offsetX += 1
 	}
 }
 func (digger *Digger) moveLeft() {
-	if digger.offsetX > CELLS_OFFSET_X {
+	if digger.offsetX > CELLS_OFFSET {
 		digger.direction = LEFT
 		digger.offsetX -= 1
 	}
 }
 func (digger *Digger) moveUp() {
-	if digger.offsetY > CELLS_OFFSET_Y {
+	if digger.offsetY > FIELD_OFFSET_Y+CELLS_OFFSET {
 		digger.direction = UP
 		digger.offsetY -= 1
 	}
 }
 func (digger *Digger) moveDown() {
-	if digger.offsetY < CELLS_OFFSET_Y+CELL_HEIGHT*(CELLS_VERTICAL-1) {
+	if digger.offsetY < FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1) {
 		digger.direction = DOWN
 		digger.offsetY += 1
 	}
@@ -150,52 +150,13 @@ func (digger Digger) Render() {
 func (digger *Digger) eatField() {
 	field := digger.scene.field
 
-	sourceHorizontalTunnelRect := sdl.Rect{int32(math.Mod(float64(digger.offsetX), float64(field.horizontalBlob.W))), 0, 1, field.horizontalBlob.H}
-	sourceVerticalTunnelRect := sdl.Rect{0, int32(math.Mod(float64(digger.offsetY), float64(field.verticalBlob.H))), field.verticalBlob.W, 1}
-
 	if digger.direction == RIGHT { //RIGHT
-
-		field.drawEat(
-			field.horizontalBlob,
-			digger.offsetX+CELL_WIDTH-field.horizontalBlob.W,
-			digger.offsetY-CELL_HEIGHT,
-			field.endRightBlob,
-			digger.offsetX+CELL_WIDTH-field.endRightBlob.W+2,
-			digger.offsetY-CELL_HEIGHT,
-			&sourceHorizontalTunnelRect)
-
+		field.drawEatRight(digger.offsetX, digger.offsetY)
 	} else if digger.direction == LEFT { //LEFT
-
-		field.drawEat(
-			field.horizontalBlob,
-			digger.offsetX+field.horizontalBlob.W,
-			digger.offsetY-CELL_HEIGHT,
-			field.endLeftBlob,
-			digger.offsetX-2,
-			digger.offsetY-CELL_HEIGHT,
-			&sourceHorizontalTunnelRect)
-
+		field.drawEatLeft(digger.offsetX, digger.offsetY)
 	} else if digger.direction == UP { //UP
-
-		field.drawEat(
-			field.verticalBlob,
-			digger.offsetX,
-			digger.offsetY-CELL_HEIGHT+field.verticalBlob.H,
-			field.endUpBlob,
-			digger.offsetX,
-			digger.offsetY-CELL_HEIGHT-field.endUpBlob.H+2,
-			&sourceVerticalTunnelRect)
-
+		field.drawEatUp(digger.offsetX, digger.offsetY)
 	} else if digger.direction == DOWN { //DOWN
-
-		field.drawEat(
-			field.verticalBlob,
-			digger.offsetX,
-			digger.offsetY-field.verticalBlob.H,
-			field.endDownBlob,
-			digger.offsetX,
-			digger.offsetY-3,
-			&sourceVerticalTunnelRect)
-
+		field.drawEatDown(digger.offsetX, digger.offsetY)
 	}
 }

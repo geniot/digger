@@ -39,8 +39,8 @@ func (emerald *Emerald) Step(n uint64) {
 }
 
 func (emerald Emerald) getHitBox() (int32, int32, int32, int32) {
-	oX := int32(glb.CELLS_OFFSET_X + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.CELLS_OFFSET_Y + emerald.cellY*glb.CELL_HEIGHT)
+	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + emerald.cellY*glb.CELL_HEIGHT)
 	return oX + 5, oY + 7, oX + glb.CELL_WIDTH - 5, oY + glb.CELL_HEIGHT - 5
 }
 
@@ -55,8 +55,8 @@ func (emerald *Emerald) Destroy() {
 
 func (emerald Emerald) Render() {
 
-	oX := int32(glb.CELLS_OFFSET_X + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.CELLS_OFFSET_Y + emerald.cellY*glb.CELL_HEIGHT)
+	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + emerald.cellY*glb.CELL_HEIGHT)
 	ctx.RendererIns.Copy(emerald.texture, nil, &sdl.Rect{oX, oY, glb.CELL_WIDTH, glb.CELL_HEIGHT})
 
 	//debug
@@ -66,8 +66,8 @@ func (emerald Emerald) Render() {
 }
 
 func (emerald Emerald) eatField() {
-	oX := int32(glb.CELLS_OFFSET_X + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.CELLS_OFFSET_Y + (emerald.cellY-1)*glb.CELL_HEIGHT)
+	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + (emerald.cellY-1)*glb.CELL_HEIGHT)
 	targetRect := sdl.Rect{
 		oX,
 		oY,

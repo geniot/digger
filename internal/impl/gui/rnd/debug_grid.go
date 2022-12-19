@@ -24,17 +24,17 @@ func (debugGrid DebugGrid) Render() {
 	ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
 	//horizontal lines
 	for y := 0; y < CELLS_VERTICAL+1; y++ {
-		x1 := int32(CELLS_OFFSET_X)
-		y1 := int32(CELLS_OFFSET_Y + y*CELL_HEIGHT)
-		x2 := int32(CELLS_OFFSET_X + CELL_WIDTH*CELLS_HORIZONTAL)
-		y2 := int32(CELLS_OFFSET_Y + y*CELL_HEIGHT)
+		x1 := int32(CELLS_OFFSET)
+		y1 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
+		x2 := int32(CELLS_OFFSET + CELL_WIDTH*CELLS_HORIZONTAL)
+		y2 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
 		ctx.RendererIns.DrawLine(x1, y1, x2, y2)
 	}
 	//vertical lines
 	for x := 0; x < CELLS_HORIZONTAL+1; x++ {
 		ctx.RendererIns.DrawLine(
-			int32(CELLS_OFFSET_X+x*CELL_WIDTH), CELLS_OFFSET_Y,
-			int32(CELLS_OFFSET_X+x*CELL_WIDTH), CELLS_OFFSET_Y+CELL_HEIGHT*CELLS_VERTICAL)
+			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET,
+			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
 	}
 }
 

@@ -43,8 +43,8 @@ func (bag *Bag) Destroy() {
  */
 
 func (bag Bag) Render() {
-	oX := int32(glb.CELLS_OFFSET_X + bag.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.CELLS_OFFSET_Y + bag.cellY*glb.CELL_HEIGHT)
+	oX := int32(glb.CELLS_OFFSET + bag.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + bag.cellY*glb.CELL_HEIGHT)
 	ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{oX, oY, glb.CELL_WIDTH, glb.CELL_HEIGHT})
 
 	//debug

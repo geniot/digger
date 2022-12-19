@@ -3,6 +3,7 @@ package rnd
 import (
 	"container/list"
 	"github.com/geniot/digger/internal/api"
+	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
 	"strings"
 )
@@ -29,14 +30,29 @@ func NewScene() *Scene {
 	scn.renderables.PushBack(scn.field)
 	scn.renderables.PushBack(scn.digger)
 
-	for y, row := range strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n") {
-		for x, _ := range row {
+	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
+	for y := 0; y < len(rows); y++ {
+		row := rows[y]
+		for x := 0; x < len(row); x++ {
 			if row[x] == 'C' {
 				scn.renderables.PushBack(NewEmerald(x, y, scn))
 			} else if row[x] == 'B' {
 				scn.renderables.PushBack(NewBag(x, y, scn))
 			} else if row[x] == 'S' {
-				//scn.field.ea
+				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+			} else if row[x] == 'V' {
+				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+			} else if row[x] == 'H' {
+				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
 			}
 		}
 	}
@@ -45,6 +61,10 @@ func NewScene() *Scene {
 	//l.PushBack(NewFpsCounter())
 
 	return scn
+}
+
+func (scene *Scene) isTunnel(ch uint8) bool {
+	return ch == 'V' || ch == 'H' || ch == 'S'
 }
 
 /**

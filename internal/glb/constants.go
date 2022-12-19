@@ -23,8 +23,7 @@ const (
 	CELLS_VERTICAL        = 10
 	CELL_WIDTH            = 20
 	CELL_HEIGHT           = 20
-	CELLS_OFFSET_X        = 10
-	CELLS_OFFSET_Y        = 30
+	CELLS_OFFSET          = 10
 	FIELD_OFFSET_Y        = 20
 
 	WINDOW_XPOS_KEY   = "WINDOW_XPOS_KEY"
