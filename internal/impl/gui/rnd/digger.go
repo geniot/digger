@@ -71,73 +71,33 @@ func (digger *Digger) Step(n uint64) {
 
 	if n%DIGGER_SPEED_RATE == 0 {
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_RIGHT) {
-			if digger.direction == RIGHT {
-				digger.moveRight()
-			} else if digger.direction == LEFT {
-				digger.direction = RIGHT
-			} else {
-				mod := math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT)
-				if mod != 0 {
-					if digger.direction == UP {
-						digger.moveUp()
-					} else {
-						digger.moveDown()
-					}
-				} else {
-					digger.direction = RIGHT
-				}
-			}
+			digger.move(RIGHT, digger.moveRight, math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_LEFT) {
-			if digger.direction == LEFT {
-				digger.moveLeft()
-			} else if digger.direction == RIGHT {
-				digger.direction = LEFT
-			} else {
-				mod := math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT)
-				if mod != 0 {
-					if digger.direction == UP {
-						digger.moveUp()
-					} else {
-						digger.moveDown()
-					}
-				} else {
-					digger.direction = LEFT
-				}
-			}
+			digger.move(LEFT, digger.moveLeft, math.Mod(float64(CELLS_OFFSET_Y+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
-			if digger.direction == UP {
-				digger.moveUp()
-			} else if digger.direction == DOWN {
-				digger.direction = UP
-			} else {
-				mod := math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH)
-				if mod != 0 {
-					if digger.direction == LEFT {
-						digger.moveLeft()
-					} else {
-						digger.moveRight()
-					}
-				} else {
-					digger.direction = UP
-				}
-			}
+			digger.move(UP, digger.moveUp, math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_DOWN) {
-			if digger.direction == DOWN {
-				digger.moveDown()
-			} else if digger.direction == UP {
-				digger.direction = DOWN
+			digger.move(DOWN, digger.moveDown, math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
+		}
+	}
+}
+
+func (digger *Digger) move(
+	dir api.Direction, moveFunc api.DirectionMoveFunc, mod float64,
+	perpendicularDir api.Direction, perpendicularMoveFunc1 api.DirectionMoveFunc, perpendicularMoveFunc2 api.DirectionMoveFunc) {
+	if digger.direction == dir {
+		moveFunc()
+	} else if digger.direction == Opposite(dir) {
+		digger.direction = dir
+	} else {
+		if mod != 0 {
+			if digger.direction == perpendicularDir {
+				perpendicularMoveFunc1()
 			} else {
-				mod := math.Mod(float64(CELLS_OFFSET_X+digger.offsetX), CELL_WIDTH)
-				if mod != 0 {
-					if digger.direction == LEFT {
-						digger.moveLeft()
-					} else {
-						digger.moveRight()
-					}
-				} else {
-					digger.direction = DOWN
-				}
+				perpendicularMoveFunc2()
 			}
+		} else {
+			digger.direction = dir
 		}
 	}
 }
