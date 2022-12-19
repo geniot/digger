@@ -1,4 +1,4 @@
-package dbg
+package rnd
 
 import (
 	"github.com/geniot/digger/internal/ctx"

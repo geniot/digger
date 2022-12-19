@@ -6,7 +6,6 @@ import (
 	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"math/rand"
 )
 
 type Emerald struct {
@@ -21,13 +20,13 @@ type Emerald struct {
  * INIT
  */
 
-func NewEmerald(scn *Scene) *Emerald {
+func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 	em := &Emerald{}
 	em.scene = scn
 	em.texture = resources.LoadTexture("emerald.png")
 	em.textureMask, _ = img.LoadRW(resources.GetResource("emerald_mask.png"), true)
-	em.cellX = rand.Intn(glb.CELLS_HORIZONTAL)
-	em.cellY = rand.Intn(glb.CELLS_VERTICAL)
+	em.cellX = cX
+	em.cellY = cY
 	em.eatField()
 	return em
 }

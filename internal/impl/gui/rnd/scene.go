@@ -3,13 +3,12 @@ package rnd
 import (
 	"container/list"
 	"github.com/geniot/digger/internal/api"
-	"github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"strings"
 )
 
 type Scene struct {
 	level       int
-	world       glb.World
 	field       *Field
 	digger      *Digger
 	renderables *list.List
@@ -23,17 +22,24 @@ func NewScene() *Scene {
 
 	scn := &Scene{}
 	scn.level = 1
-	scn.world = glb.ParseWorld(resources.GetLevel(scn.level))
 	scn.field = NewField(scn)
 	scn.digger = NewDigger(scn)
 
 	scn.renderables = list.New()
 	scn.renderables.PushBack(scn.field)
 	scn.renderables.PushBack(scn.digger)
-	for i := 0; i < 10; i++ {
-		scn.renderables.PushBack(NewEmerald(scn))
+
+	for y, row := range strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n") {
+		for x, _ := range row {
+			if row[x] == 'C' {
+				scn.renderables.PushBack(NewEmerald(x, y, scn))
+			} else if row[x] == 'B' {
+				scn.renderables.PushBack(NewBag(x, y, scn))
+			}
+		}
 	}
-	//scn.renderables.PushBack(NewDebugGrid())
+
+	scn.renderables.PushBack(NewDebugGrid())
 	//l.PushBack(NewFpsCounter())
 
 	return scn

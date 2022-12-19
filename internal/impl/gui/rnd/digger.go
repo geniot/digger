@@ -45,8 +45,10 @@ func NewDigger(scn *Scene) *Digger {
 	dg.endUpBlob, _ = img.LoadRW(resources.GetResource("blob5.png"), true)
 	dg.endDownBlob, _ = img.LoadRW(resources.GetResource("blob6.png"), true)
 
-	cellX := 5
-	cellY := 5
+	//same for all levels
+	cellX := 7
+	cellY := 9
+
 	dg.offsetX = int32(CELLS_OFFSET_X + cellX*CELL_WIDTH)
 	dg.offsetY = int32(CELLS_OFFSET_Y + cellY*CELL_HEIGHT)
 	dg.direction = RIGHT
