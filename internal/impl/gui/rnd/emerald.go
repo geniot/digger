@@ -24,7 +24,7 @@ type Emerald struct {
 func NewEmerald(scn *Scene) *Emerald {
 	em := &Emerald{}
 	em.scene = scn
-	em.texture = loadTexture("emerald.png")
+	em.texture = resources.LoadTexture("emerald.png")
 	em.textureMask, _ = img.LoadRW(resources.GetResource("emerald_mask.png"), true)
 	em.cellX = rand.Intn(glb.CELLS_HORIZONTAL)
 	em.cellY = rand.Intn(glb.CELLS_VERTICAL)

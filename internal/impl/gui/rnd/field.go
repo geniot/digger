@@ -10,8 +10,7 @@ import (
 
 type Field struct {
 	background *sdl.Surface
-
-	scene *Scene
+	scene      *Scene
 }
 
 /**

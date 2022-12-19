@@ -37,7 +37,7 @@ func NewDigger(scn *Scene) *Digger {
 	dg := &Digger{}
 	dg.scene = scn
 
-	dg.sprites = []*sdl.Texture{loadTexture("cldig1.png"), loadTexture("cldig2.png"), loadTexture("cldig3.png")}
+	dg.sprites = []*sdl.Texture{resources.LoadTexture("cldig1.png"), resources.LoadTexture("cldig2.png"), resources.LoadTexture("cldig3.png")}
 	dg.horizontalBlob, _ = img.LoadRW(resources.GetResource("blob1.png"), true)
 	dg.verticalBlob, _ = img.LoadRW(resources.GetResource("blob2.png"), true)
 	dg.endLeftBlob, _ = img.LoadRW(resources.GetResource("blob3.png"), true)

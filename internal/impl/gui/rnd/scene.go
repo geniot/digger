@@ -3,18 +3,27 @@ package rnd
 import (
 	"container/list"
 	"github.com/geniot/digger/internal/api"
+	"github.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/resources"
 )
 
 type Scene struct {
+	level       int
+	world       glb.World
 	field       *Field
 	digger      *Digger
 	renderables *list.List
 }
 
+/**
+ * INIT
+ */
+
 func NewScene() *Scene {
 
 	scn := &Scene{}
-
+	scn.level = 1
+	scn.world = glb.ParseWorld(resources.GetLevel(scn.level))
 	scn.field = NewField(scn)
 	scn.digger = NewDigger(scn)
 
@@ -30,11 +39,9 @@ func NewScene() *Scene {
 	return scn
 }
 
-func (scene *Scene) Render() {
-	for e := scene.renderables.Front(); e != nil; e = e.Next() {
-		e.Value.(api.IRenderable).Render()
-	}
-}
+/**
+ * MODEL
+ */
 
 func (scene *Scene) Step(n uint64) {
 	for e := scene.renderables.Front(); e != nil; e = e.Next() {
@@ -60,4 +67,14 @@ func collide(digger *Digger, emerald *Emerald) bool {
 		return false
 	}
 	return true
+}
+
+/**
+ * VIEW
+ */
+
+func (scene *Scene) Render() {
+	for e := scene.renderables.Front(); e != nil; e = e.Next() {
+		e.Value.(api.IRenderable).Render()
+	}
 }
