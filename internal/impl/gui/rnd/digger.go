@@ -5,7 +5,6 @@ import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
-	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"math"
 )
@@ -19,13 +18,6 @@ type Digger struct {
 	spritePointerInc int
 	sprites          []*sdl.Texture
 
-	horizontalBlob *sdl.Surface
-	verticalBlob   *sdl.Surface
-	endLeftBlob    *sdl.Surface
-	endRightBlob   *sdl.Surface
-	endUpBlob      *sdl.Surface
-	endDownBlob    *sdl.Surface
-
 	scene *Scene
 }
 
@@ -38,12 +30,6 @@ func NewDigger(scn *Scene) *Digger {
 	dg.scene = scn
 
 	dg.sprites = []*sdl.Texture{resources.LoadTexture("cldig1.png"), resources.LoadTexture("cldig2.png"), resources.LoadTexture("cldig3.png")}
-	dg.horizontalBlob, _ = img.LoadRW(resources.GetResource("blob1.png"), true)
-	dg.verticalBlob, _ = img.LoadRW(resources.GetResource("blob2.png"), true)
-	dg.endLeftBlob, _ = img.LoadRW(resources.GetResource("blob3.png"), true)
-	dg.endRightBlob, _ = img.LoadRW(resources.GetResource("blob4.png"), true)
-	dg.endUpBlob, _ = img.LoadRW(resources.GetResource("blob5.png"), true)
-	dg.endDownBlob, _ = img.LoadRW(resources.GetResource("blob6.png"), true)
 
 	//same for all levels
 	cellX := 7
@@ -162,59 +148,54 @@ func (digger Digger) Render() {
 }
 
 func (digger *Digger) eatField() {
-	sourceHorizontalTunnelRect := sdl.Rect{int32(math.Mod(float64(digger.offsetX), float64(digger.horizontalBlob.W))), 0, 1, digger.horizontalBlob.H}
-	sourceVerticalTunnelRect := sdl.Rect{0, int32(math.Mod(float64(digger.offsetY), float64(digger.verticalBlob.H))), digger.verticalBlob.W, 1}
+	field := digger.scene.field
+
+	sourceHorizontalTunnelRect := sdl.Rect{int32(math.Mod(float64(digger.offsetX), float64(field.horizontalBlob.W))), 0, 1, field.horizontalBlob.H}
+	sourceVerticalTunnelRect := sdl.Rect{0, int32(math.Mod(float64(digger.offsetY), float64(field.verticalBlob.H))), field.verticalBlob.W, 1}
 
 	if digger.direction == RIGHT { //RIGHT
 
-		digger.drawEat(
-			digger.horizontalBlob,
-			CELL_WIDTH-digger.horizontalBlob.W,
-			-CELL_HEIGHT,
-			digger.endRightBlob,
-			CELL_WIDTH-digger.endRightBlob.W+2,
-			-CELL_HEIGHT,
+		field.drawEat(
+			field.horizontalBlob,
+			digger.offsetX+CELL_WIDTH-field.horizontalBlob.W,
+			digger.offsetY-CELL_HEIGHT,
+			field.endRightBlob,
+			digger.offsetX+CELL_WIDTH-field.endRightBlob.W+2,
+			digger.offsetY-CELL_HEIGHT,
 			&sourceHorizontalTunnelRect)
 
 	} else if digger.direction == LEFT { //LEFT
 
-		digger.drawEat(
-			digger.horizontalBlob,
-			digger.horizontalBlob.W,
-			-CELL_HEIGHT,
-			digger.endLeftBlob,
-			-2,
-			-CELL_HEIGHT,
+		field.drawEat(
+			field.horizontalBlob,
+			digger.offsetX+field.horizontalBlob.W,
+			digger.offsetY-CELL_HEIGHT,
+			field.endLeftBlob,
+			digger.offsetX-2,
+			digger.offsetY-CELL_HEIGHT,
 			&sourceHorizontalTunnelRect)
 
 	} else if digger.direction == UP { //UP
 
-		digger.drawEat(
-			digger.verticalBlob,
-			0,
-			-CELL_HEIGHT+digger.verticalBlob.H,
-			digger.endUpBlob,
-			0,
-			-CELL_HEIGHT-digger.endUpBlob.H+2,
+		field.drawEat(
+			field.verticalBlob,
+			digger.offsetX,
+			digger.offsetY-CELL_HEIGHT+field.verticalBlob.H,
+			field.endUpBlob,
+			digger.offsetX,
+			digger.offsetY-CELL_HEIGHT-field.endUpBlob.H+2,
 			&sourceVerticalTunnelRect)
 
 	} else if digger.direction == DOWN { //DOWN
 
-		digger.drawEat(
-			digger.verticalBlob,
-			0,
-			-digger.verticalBlob.H,
-			digger.endDownBlob,
-			0,
-			-3,
+		field.drawEat(
+			field.verticalBlob,
+			digger.offsetX,
+			digger.offsetY-field.verticalBlob.H,
+			field.endDownBlob,
+			digger.offsetX,
+			digger.offsetY-3,
 			&sourceVerticalTunnelRect)
 
 	}
-}
-
-func (digger *Digger) drawEat(tunnelSurface *sdl.Surface, x1 int32, y1 int32, endSurface *sdl.Surface, x2 int32, y2 int32, sourceRect *sdl.Rect) {
-	targetTunnelRect := sdl.Rect{digger.offsetX + x1, digger.offsetY + y1, CELL_WIDTH, CELL_HEIGHT}
-	tunnelSurface.Blit(sourceRect, digger.scene.field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{digger.offsetX + x2, digger.offsetY + y2, CELL_WIDTH, CELL_HEIGHT}
-	endSurface.Blit(nil, digger.scene.field.background, &targetEndRect)
 }

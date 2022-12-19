@@ -35,11 +35,13 @@ func NewScene() *Scene {
 				scn.renderables.PushBack(NewEmerald(x, y, scn))
 			} else if row[x] == 'B' {
 				scn.renderables.PushBack(NewBag(x, y, scn))
+			} else if row[x] == 'S' {
+				//scn.field.ea
 			}
 		}
 	}
 
-	scn.renderables.PushBack(NewDebugGrid())
+	//scn.renderables.PushBack(NewDebugGrid())
 	//l.PushBack(NewFpsCounter())
 
 	return scn
