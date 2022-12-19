@@ -41,7 +41,6 @@ func (scene *Scene) Step(n uint64) {
 		e.Value.(api.IRenderable).Step(n)
 		if _, ok := e.Value.(*Emerald); ok {
 			if collide(scene.digger, e.Value.(*Emerald)) {
-				scene.field.eatEmerald(e.Value.(*Emerald))
 				e.Value.(*Emerald).Destroy()
 				scene.renderables.Remove(e)
 			}

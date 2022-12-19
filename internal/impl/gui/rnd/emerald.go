@@ -17,12 +17,26 @@ type Emerald struct {
 	scene       *Scene
 }
 
+/**
+ * INIT
+ */
+
 func NewEmerald(scn *Scene) *Emerald {
-	txt := loadTexture("emerald.png")
-	txtMask, _ := img.LoadRW(resources.GetResource("emerald_mask.png"), true)
-	cX := rand.Intn(glb.CELLS_HORIZONTAL)
-	cY := rand.Intn(glb.CELLS_VERTICAL)
-	return &Emerald{cX, cY, txt, txtMask, scn}
+	em := &Emerald{}
+	em.scene = scn
+	em.texture = loadTexture("emerald.png")
+	em.textureMask, _ = img.LoadRW(resources.GetResource("emerald_mask.png"), true)
+	em.cellX = rand.Intn(glb.CELLS_HORIZONTAL)
+	em.cellY = rand.Intn(glb.CELLS_VERTICAL)
+	em.eatField()
+	return em
+}
+
+/**
+ * MODEL
+ */
+
+func (emerald *Emerald) Step(n uint64) {
 }
 
 func (emerald Emerald) getHitBox() (int32, int32, int32, int32) {
@@ -30,6 +44,15 @@ func (emerald Emerald) getHitBox() (int32, int32, int32, int32) {
 	oY := int32(glb.CELLS_OFFSET_Y + emerald.cellY*glb.CELL_HEIGHT)
 	return oX + 5, oY + 7, oX + glb.CELL_WIDTH - 5, oY + glb.CELL_HEIGHT - 5
 }
+
+func (emerald *Emerald) Destroy() {
+	emerald.textureMask.Free()
+	emerald.texture.Destroy()
+}
+
+/**
+ * VIEW
+ */
 
 func (emerald Emerald) Render() {
 
@@ -43,11 +66,12 @@ func (emerald Emerald) Render() {
 	//ctx.RendererIns.DrawRect(&sdl.Rect{x1, y1, x2 - x1, y2 - y1})
 }
 
-func (emerald *Emerald) Step(n uint64) {
-
-}
-
-func (emerald *Emerald) Destroy() {
-	emerald.textureMask.Free()
-	emerald.texture.Destroy()
+func (emerald Emerald) eatField() {
+	oX := int32(glb.CELLS_OFFSET_X + emerald.cellX*glb.CELL_WIDTH)
+	oY := int32(glb.CELLS_OFFSET_Y + (emerald.cellY-1)*glb.CELL_HEIGHT)
+	targetRect := sdl.Rect{
+		oX,
+		oY,
+		glb.CELL_WIDTH, glb.CELL_HEIGHT}
+	emerald.textureMask.Blit(nil, emerald.scene.field.background, &targetRect)
 }
