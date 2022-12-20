@@ -65,7 +65,7 @@ func (field *Field) Step(n uint64) {
  * VIEW
  */
 
-func (field Field) Render() {
+func (field *Field) Render() {
 	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
 	defer bgrTexture.Destroy()
 	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
@@ -129,4 +129,28 @@ func (field *Field) eatHorizontal(x int, y int, isRightCont bool, isLeftCont boo
 		oX = int32(CELLS_OFFSET + x*CELL_WIDTH + i)
 		field.drawEatLeft(oX, oY)
 	}
+}
+
+func (field *Field) collides(x1 int32, y1 int32, x2 int32, y2 int32) bool {
+	xDelta := (x2 - x1) / 2
+	yDelta := (y2 - y1) / 2
+	if field.isPointField(x1+xDelta, y1) {
+		return true
+	}
+	if field.isPointField(x2, y1+yDelta) {
+		return true
+	}
+	if field.isPointField(x1+xDelta, y2) {
+		return true
+	}
+	if field.isPointField(x1, y1+yDelta) {
+		return true
+	}
+
+	return false
+}
+
+func (field *Field) isPointField(x int32, y int32) bool {
+	r, g, b, _ := field.background.At(int(x), int(y-FIELD_OFFSET_Y)).RGBA()
+	return r != 0 || g != 0 || b != 0
 }
