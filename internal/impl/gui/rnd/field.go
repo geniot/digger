@@ -6,7 +6,6 @@ import (
 	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"math"
 )
 
 type Field struct {
@@ -73,7 +72,7 @@ func (field Field) Render() {
 }
 
 func (field *Field) drawEatRight(x int32, y int32) {
-	sourceRect := &sdl.Rect{int32(math.Mod(float64(x), float64(field.horizontalBlob.W))), 0, 1, field.horizontalBlob.H}
+	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
 	targetTunnelRect := sdl.Rect{x + CELL_WIDTH - field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
@@ -81,7 +80,7 @@ func (field *Field) drawEatRight(x int32, y int32) {
 }
 
 func (field *Field) drawEatLeft(x int32, y int32) {
-	sourceRect := &sdl.Rect{int32(math.Mod(float64(x), float64(field.horizontalBlob.W))), 0, 1, field.horizontalBlob.H}
+	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
 	targetTunnelRect := sdl.Rect{x + field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
@@ -89,7 +88,7 @@ func (field *Field) drawEatLeft(x int32, y int32) {
 }
 
 func (field *Field) drawEatUp(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, int32(math.Mod(float64(y), float64(field.verticalBlob.H))), field.verticalBlob.W, 1}
+	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
 	targetTunnelRect := sdl.Rect{x, y - CELL_HEIGHT + field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
@@ -97,7 +96,7 @@ func (field *Field) drawEatUp(x int32, y int32) {
 }
 
 func (field *Field) drawEatDown(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, int32(math.Mod(float64(y), float64(field.verticalBlob.H))), field.verticalBlob.W, 1}
+	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
 	targetTunnelRect := sdl.Rect{x, y - field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}

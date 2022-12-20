@@ -6,7 +6,6 @@ import (
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/sdl"
-	"math"
 )
 
 type Digger struct {
@@ -58,19 +57,19 @@ func (digger *Digger) Step(n uint64) {
 
 	if n%DIGGER_SPEED_RATE == 0 {
 		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_RIGHT) {
-			digger.move(RIGHT, digger.moveRight, math.Mod(float64(FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
+			digger.move(RIGHT, digger.moveRight, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT, UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_LEFT) {
-			digger.move(LEFT, digger.moveLeft, math.Mod(float64(FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY), CELL_HEIGHT), UP, digger.moveUp, digger.moveDown)
+			digger.move(LEFT, digger.moveLeft, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT, UP, digger.moveUp, digger.moveDown)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
-			digger.move(UP, digger.moveUp, math.Mod(float64(CELLS_OFFSET+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
+			digger.move(UP, digger.moveUp, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH, LEFT, digger.moveLeft, digger.moveRight)
 		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_DOWN) {
-			digger.move(DOWN, digger.moveDown, math.Mod(float64(CELLS_OFFSET+digger.offsetX), CELL_WIDTH), LEFT, digger.moveLeft, digger.moveRight)
+			digger.move(DOWN, digger.moveDown, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH, LEFT, digger.moveLeft, digger.moveRight)
 		}
 	}
 }
 
 func (digger *Digger) move(
-	dir api.Direction, moveFunc api.DirectionMoveFunc, mod float64,
+	dir api.Direction, moveFunc api.DirectionMoveFunc, mod int32,
 	perpendicularDir api.Direction, perpendicularMoveFunc1 api.DirectionMoveFunc, perpendicularMoveFunc2 api.DirectionMoveFunc) {
 	if digger.direction == dir {
 		moveFunc()
@@ -151,12 +150,20 @@ func (digger *Digger) eatField() {
 	field := digger.scene.field
 
 	if digger.direction == RIGHT { //RIGHT
-		field.drawEatRight(digger.offsetX, digger.offsetY)
+		for i := 0; i <= CELL_WIDTH/2; i++ {
+			field.drawEatRight(digger.offsetX-int32(i), digger.offsetY)
+		}
 	} else if digger.direction == LEFT { //LEFT
-		field.drawEatLeft(digger.offsetX, digger.offsetY)
+		for i := CELL_WIDTH / 2; i >= 0; i-- {
+			field.drawEatLeft(digger.offsetX+int32(i), digger.offsetY)
+		}
 	} else if digger.direction == UP { //UP
-		field.drawEatUp(digger.offsetX, digger.offsetY)
+		for i := CELL_WIDTH / 2; i >= 0; i-- {
+			field.drawEatUp(digger.offsetX, digger.offsetY+int32(i))
+		}
 	} else if digger.direction == DOWN { //DOWN
-		field.drawEatDown(digger.offsetX, digger.offsetY)
+		for i := 0; i <= CELL_WIDTH/2; i++ {
+			field.drawEatDown(digger.offsetX, digger.offsetY-int32(i))
+		}
 	}
 }
