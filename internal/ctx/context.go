@@ -1,7 +1,6 @@
 package ctx
 
 import (
-	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
@@ -22,5 +21,5 @@ var (
 
 	RendererIns            *sdl.Renderer
 	FontIns                *ttf.Font
-	PressedKeysCodesSetIns mapset.Set[sdl.Keycode] = mapset.NewSet[sdl.Keycode]()
+	PressedKeysCodesSetIns map[sdl.Keycode]int64 = make(map[sdl.Keycode]int64)
 )

@@ -3,6 +3,7 @@ package loop
 import (
 	"github.com/geniot/digger/internal/ctx"
 	"github.com/veandco/go-sdl2/sdl"
+	"time"
 )
 
 type EventLoopImpl struct {
@@ -21,9 +22,9 @@ func (eventLoop EventLoopImpl) Run() {
 				break
 			}
 			if t.State == sdl.PRESSED {
-				ctx.PressedKeysCodesSetIns.Add(t.Keysym.Sym)
+				ctx.PressedKeysCodesSetIns[t.Keysym.Sym] = time.Now().UnixNano()
 			} else { // if t.State == sdl.RELEASED {
-				ctx.PressedKeysCodesSetIns.Remove(t.Keysym.Sym)
+				delete(ctx.PressedKeysCodesSetIns, t.Keysym.Sym)
 			}
 			break
 

@@ -17,6 +17,8 @@ type Digger struct {
 	spritePointerInc int
 	sprites          []*sdl.Texture
 
+	processedTimeStamp int64
+
 	scene *Scene
 }
 
@@ -56,17 +58,23 @@ func (digger *Digger) Step(n uint64) {
 	}
 
 	if n%DIGGER_SPEED_RATE == 0 {
-		if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_RIGHT) {
+		if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
 			digger.move(RIGHT, digger.moveRight, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT, UP, digger.moveUp, digger.moveDown)
-		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_LEFT) {
+		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
 			digger.move(LEFT, digger.moveLeft, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT, UP, digger.moveUp, digger.moveDown)
-		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_UP) {
+		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok {
 			digger.move(UP, digger.moveUp, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH, LEFT, digger.moveLeft, digger.moveRight)
-		} else if ctx.PressedKeysCodesSetIns.Contains(GCW_BUTTON_DOWN) {
+		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
 			digger.move(DOWN, digger.moveDown, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH, LEFT, digger.moveLeft, digger.moveRight)
 		}
 	}
+	if p, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_A]; ok && p != digger.processedTimeStamp {
+		digger.processedTimeStamp = p
+		digger.fire()
+	}
 }
+
+func (digger *Digger) fire() {}
 
 func (digger *Digger) move(
 	dir api.Direction, moveFunc api.DirectionMoveFunc, mod int32,

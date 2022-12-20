@@ -24,8 +24,9 @@ func (handhelpDevice HandheldDeviceImpl) Stop() {
 }
 
 func (handhelpDevice HandheldDeviceImpl) ProcessKeyActions() {
-	if ctx.PressedKeysCodesSetIns.Contains(glb.GCW_BUTTON_L1) &&
-		ctx.PressedKeysCodesSetIns.Contains(glb.GCW_BUTTON_START) {
+	_, ok1 := ctx.PressedKeysCodesSetIns[glb.GCW_BUTTON_L1]
+	_, ok2 := ctx.PressedKeysCodesSetIns[glb.GCW_BUTTON_START]
+	if ok1 && ok2 {
 		ctx.LoopIns.Stop()
 	}
 }

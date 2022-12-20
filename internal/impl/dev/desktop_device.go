@@ -18,7 +18,7 @@ func (desktopDevice DesktopDeviceImpl) Stop() {
 }
 
 func (desktopDevice DesktopDeviceImpl) ProcessKeyActions() {
-	if ctx.PressedKeysCodesSetIns.Contains(sdl.K_q) {
+	if _, ok := ctx.PressedKeysCodesSetIns[sdl.K_q]; ok {
 		ctx.LoopIns.Stop()
 	}
 }
