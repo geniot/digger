@@ -1,6 +1,7 @@
 package rnd
 
 import (
+	"github.com/geniot/digger/internal/api"
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
@@ -131,20 +132,26 @@ func (field *Field) eatHorizontal(x int, y int, isRightCont bool, isLeftCont boo
 	}
 }
 
-func (field *Field) collides(x1 int32, y1 int32, x2 int32, y2 int32) bool {
-	xDelta := (x2 - x1) / 2
-	yDelta := (y2 - y1) / 2
-	if field.isPointField(x1+xDelta, y1) {
-		return true
-	}
-	if field.isPointField(x2, y1+yDelta) {
-		return true
-	}
-	if field.isPointField(x1+xDelta, y2) {
-		return true
-	}
-	if field.isPointField(x1, y1+yDelta) {
-		return true
+func (field *Field) collides(rect *sdl.Rect, dir api.Direction) bool {
+	xDelta := rect.W / 2
+	yDelta := rect.H / 2
+
+	if dir == UP {
+		if field.isPointField(rect.X+xDelta, rect.Y) {
+			return true
+		}
+	} else if dir == DOWN {
+		if field.isPointField(rect.X+xDelta, rect.Y+rect.H) {
+			return true
+		}
+	} else if dir == LEFT {
+		if field.isPointField(rect.X, rect.Y+yDelta) {
+			return true
+		}
+	} else if dir == RIGHT {
+		if field.isPointField(rect.X+rect.W, rect.Y+yDelta) {
+			return true
+		}
 	}
 
 	return false

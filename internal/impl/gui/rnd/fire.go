@@ -11,6 +11,8 @@ import (
 type Fire struct {
 	offsetX int32
 	offsetY int32
+	width   int32
+	height  int32
 
 	spritePointer    int
 	spritePointerInc int
@@ -34,6 +36,8 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 	fr := &Fire{}
 	fr.scene = scn
 
+	fr.width = 8
+	fr.height = 8
 	fr.spritePointer = 0
 	fr.spritePointerInc = 1
 	fr.sprites = []*sdl.Texture{resources.LoadTexture("cfire1.png"), resources.LoadTexture("cfire2.png"), resources.LoadTexture("cfire3.png")}
@@ -80,14 +84,14 @@ func (fire *Fire) Step(n uint64) {
 		} else if fire.direction == RIGHT {
 			fire.offsetX += 1
 		}
-		if fire.scene.field.collides(fire.getHitBox()) {
+		if fire.scene.field.collides(fire.getHitBox(), fire.direction) {
 			fire.isMoving = false
 		}
 	}
 }
 
-func (fire Fire) getHitBox() (int32, int32, int32, int32) {
-	return fire.offsetX + 5, fire.offsetY + 5, fire.offsetX + CELL_WIDTH - 5, fire.offsetY + CELL_HEIGHT - 6
+func (fire Fire) getHitBox() *sdl.Rect {
+	return &sdl.Rect{fire.offsetX + 6, fire.offsetY + 6, fire.width, fire.height}
 }
 
 func (fire *Fire) Destroy() {
@@ -118,7 +122,6 @@ func (fire Fire) Render() {
 		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
 
 	//debug
-	//x1, y1, x2, y2 := fire.getHitBox()
 	//ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-	//ctx.RendererIns.DrawRect(&sdl.Rect{x1, y1, x2 - x1, y2 - y1})
+	//ctx.RendererIns.DrawRect(fire.getHitBox())
 }
