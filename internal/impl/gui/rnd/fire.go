@@ -22,8 +22,9 @@ type Fire struct {
 	spriteExplPointerInc int
 	spritesExpl          []*sdl.Texture
 
-	direction api.Direction
-	isMoving  bool
+	direction  api.Direction
+	isMoving   bool
+	isFinished bool
 
 	scene *Scene
 }
@@ -50,6 +51,7 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 	fr.direction = digger.direction
 
 	fr.isMoving = true
+	fr.isFinished = false
 
 	if fr.direction == RIGHT {
 		fr.offsetX += CELL_WIDTH / 2
@@ -69,9 +71,16 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 
 func (fire *Fire) Step(n uint64) {
 	if n%SPRITE_UPDATE_RATE == 0 {
-		fire.spritePointer += fire.spritePointerInc
-		if fire.spritePointer == len(fire.sprites)-1 || fire.spritePointer == 0 {
-			fire.spritePointerInc = -fire.spritePointerInc
+		if fire.isMoving {
+			fire.spritePointer += fire.spritePointerInc
+			if fire.spritePointer == len(fire.sprites)-1 || fire.spritePointer == 0 {
+				fire.spritePointerInc = -fire.spritePointerInc
+			}
+		} else {
+			fire.spriteExplPointer += fire.spriteExplPointerInc
+			if fire.spriteExplPointer == len(fire.spritesExpl) {
+				fire.isFinished = true
+			}
 		}
 	}
 	if n%FIRE_SPEED_RATE == 0 && fire.isMoving {
@@ -118,7 +127,7 @@ func (fire Fire) Render() {
 		angle = 270
 	}
 
-	ctx.RendererIns.CopyEx(fire.sprites[fire.spritePointer], nil, &dstRect, angle,
+	ctx.RendererIns.CopyEx(If(fire.isMoving, fire.sprites[fire.spritePointer], fire.spritesExpl[fire.spriteExplPointer]), nil, &dstRect, angle,
 		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
 
 	//debug

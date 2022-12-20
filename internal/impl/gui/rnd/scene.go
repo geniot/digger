@@ -79,6 +79,11 @@ func (scene *Scene) Step(n uint64) {
 				e.Value.(*Emerald).Destroy()
 				scene.renderables.Remove(e)
 			}
+		} else if _, ok = e.Value.(*Fire); ok {
+			if e.Value.(*Fire).isFinished {
+				e.Value.(*Fire).Destroy()
+				scene.renderables.Remove(e)
+			}
 		}
 	}
 }
