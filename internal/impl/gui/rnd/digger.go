@@ -74,7 +74,9 @@ func (digger *Digger) Step(n uint64) {
 	}
 }
 
-func (digger *Digger) fire() {}
+func (digger *Digger) fire() {
+	digger.scene.renderables.PushBack(NewFire(digger, digger.scene))
+}
 
 func (digger *Digger) move(
 	dir api.Direction, moveFunc api.DirectionMoveFunc, mod int32,
