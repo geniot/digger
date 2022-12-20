@@ -6,12 +6,13 @@ import (
 )
 
 const (
+	IS_DEBUG_ON    = false
 	APP_NAME       = "Digger"
 	APP_VERSION    = "0.1"
 	CONF_FILE_NAME = ".digger.properties"
 	FONT_FILE_NAME = "OpenSans-Regular.ttf"
 	ICON_FILE_NAME = "digger.png"
-	FONT_SIZE      = 16
+	FONT_SIZE      = 12
 
 	TICK               float64 = 1.0 / 200.0
 	SPRITE_UPDATE_RATE         = 18

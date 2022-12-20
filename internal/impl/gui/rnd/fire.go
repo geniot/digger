@@ -130,7 +130,8 @@ func (fire Fire) Render() {
 	ctx.RendererIns.CopyEx(If(fire.isMoving, fire.sprites[fire.spritePointer], fire.spritesExpl[fire.spriteExplPointer]), nil, &dstRect, angle,
 		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
 
-	//debug
-	//ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-	//ctx.RendererIns.DrawRect(fire.getHitBox())
+	if IS_DEBUG_ON {
+		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
+		ctx.RendererIns.DrawRect(fire.getHitBox())
+	}
 }

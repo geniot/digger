@@ -2,15 +2,17 @@ package rnd
 
 import (
 	"github.com/geniot/digger/internal/ctx"
-	"github.com/geniot/digger/internal/glb"
+	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Emerald struct {
-	cellX       int
-	cellY       int
+	offsetX     int32
+	offsetY     int32
+	width       int32
+	height      int32
 	texture     *sdl.Texture
 	textureMask *sdl.Surface
 	scene       *Scene
@@ -25,8 +27,10 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 	em.scene = scn
 	em.texture = resources.LoadTexture("emerald.png")
 	em.textureMask, _ = img.LoadRW(resources.GetResource("emerald_mask.png"), true)
-	em.cellX = cX
-	em.cellY = cY
+	em.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
+	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
+	em.width = 10
+	em.height = 8
 	em.eatField()
 	return em
 }
@@ -38,10 +42,8 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 func (emerald *Emerald) Step(n uint64) {
 }
 
-func (emerald Emerald) getHitBox() (int32, int32, int32, int32) {
-	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + emerald.cellY*glb.CELL_HEIGHT)
-	return oX + 5, oY + 7, oX + glb.CELL_WIDTH - 5, oY + glb.CELL_HEIGHT - 5
+func (emerald *Emerald) getHitBox() *sdl.Rect {
+	return &sdl.Rect{emerald.offsetX + 5, emerald.offsetY + 7, emerald.width, emerald.height}
 }
 
 func (emerald *Emerald) Destroy() {
@@ -53,24 +55,20 @@ func (emerald *Emerald) Destroy() {
  * VIEW
  */
 
-func (emerald Emerald) Render() {
+func (emerald *Emerald) Render() {
+	ctx.RendererIns.Copy(emerald.texture, nil, &sdl.Rect{emerald.offsetX, emerald.offsetY, CELL_WIDTH, CELL_HEIGHT})
 
-	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + emerald.cellY*glb.CELL_HEIGHT)
-	ctx.RendererIns.Copy(emerald.texture, nil, &sdl.Rect{oX, oY, glb.CELL_WIDTH, glb.CELL_HEIGHT})
+	if IS_DEBUG_ON {
+		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
+		ctx.RendererIns.DrawRect(emerald.getHitBox())
+	}
 
-	//debug
-	//x1, y1, x2, y2 := emerald.getHitBox()
-	//ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-	//ctx.RendererIns.DrawRect(&sdl.Rect{x1, y1, x2 - x1, y2 - y1})
 }
 
-func (emerald Emerald) eatField() {
-	oX := int32(glb.CELLS_OFFSET + emerald.cellX*glb.CELL_WIDTH)
-	oY := int32(glb.FIELD_OFFSET_Y + glb.CELLS_OFFSET + (emerald.cellY-1)*glb.CELL_HEIGHT)
+func (emerald *Emerald) eatField() {
 	targetRect := sdl.Rect{
-		oX,
-		oY,
-		glb.CELL_WIDTH, glb.CELL_HEIGHT}
+		emerald.offsetX,
+		emerald.offsetY - FIELD_OFFSET_Y,
+		CELL_WIDTH, CELL_HEIGHT}
 	emerald.textureMask.Blit(nil, emerald.scene.field.background, &targetRect)
 }

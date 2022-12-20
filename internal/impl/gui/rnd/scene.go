@@ -5,6 +5,7 @@ import (
 	"github.com/geniot/digger/internal/api"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/veandco/go-sdl2/sdl"
 	"strings"
 )
 
@@ -57,8 +58,10 @@ func NewScene() *Scene {
 		}
 	}
 
-	//scn.renderables.PushBack(NewDebugGrid())
-	//l.PushBack(NewFpsCounter())
+	if IS_DEBUG_ON {
+		scn.renderables.PushBack(NewDebugGrid())
+		scn.renderables.PushBack(NewFpsCounter())
+	}
 
 	return scn
 }
@@ -75,7 +78,7 @@ func (scene *Scene) Step(n uint64) {
 	for e := scene.renderables.Front(); e != nil; e = e.Next() {
 		e.Value.(api.IRenderable).Step(n)
 		if _, ok := e.Value.(*Emerald); ok {
-			if collide(scene.digger, e.Value.(*Emerald)) {
+			if collide(scene.digger.getHitBox(), e.Value.(*Emerald).getHitBox()) {
 				e.Value.(*Emerald).Destroy()
 				scene.renderables.Remove(e)
 			}
@@ -88,9 +91,15 @@ func (scene *Scene) Step(n uint64) {
 	}
 }
 
-func collide(digger *Digger, emerald *Emerald) bool {
-	x1, y1, x2, y2 := digger.getHitBox()
-	x3, y3, x4, y4 := emerald.getHitBox()
+func collide(rect1 *sdl.Rect, rect2 *sdl.Rect) bool {
+	x1 := rect1.X
+	y1 := rect1.Y
+	x2 := x1 + rect1.W
+	y2 := y1 + rect1.H
+	x3 := rect2.X
+	y3 := rect2.Y
+	x4 := x3 + rect2.W
+	y4 := y3 + rect2.H
 	// If one rectangle is on left side of other
 	if x1 > x4 || x3 > x2 {
 		return false

@@ -29,6 +29,7 @@ func NewWindow() *WindowImpl {
 	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
 		sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
 	ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	//sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "0")
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
 
