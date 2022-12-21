@@ -26,7 +26,7 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	em.texture = resources.LoadTexture("csbag.png")
 	em.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
-	em.width = 12
+	em.width = 11
 	em.height = 11
 	return em
 }
