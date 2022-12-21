@@ -3,6 +3,7 @@ package rnd
 import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 type DebugGrid struct {
@@ -12,13 +13,13 @@ func NewDebugGrid() *DebugGrid {
 	return &DebugGrid{}
 }
 
-func (debugGrid DebugGrid) Render() {
+func (debugGrid *DebugGrid) Render() {
 	//whole area
 	ctx.RendererIns.SetDrawColor(255, 0, 0, 255)
-	DrawRect(0, 0, SCREEN_LOGICAL_WIDTH-1, SCREEN_LOGICAL_HEIGHT-1)
+	DrawRectLines(&sdl.Rect{0, 0, SCREEN_LOGICAL_WIDTH - 1, SCREEN_LOGICAL_HEIGHT - 1})
 	//stats
 	ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
-	DrawRect(1, 1, SCREEN_LOGICAL_WIDTH-3, 20-2)
+	DrawRectLines(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 3, 20 - 2})
 
 	ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
 	//horizontal lines
@@ -35,8 +36,4 @@ func (debugGrid DebugGrid) Render() {
 			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET,
 			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
 	}
-}
-
-func (debugGrid *DebugGrid) Step(n uint64) {
-
 }

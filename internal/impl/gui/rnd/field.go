@@ -55,14 +55,6 @@ func NewField(scn *Scene) *Field {
 }
 
 /**
- * MODEL
- */
-
-func (field *Field) Step(n uint64) {
-
-}
-
-/**
  * VIEW
  */
 
@@ -132,7 +124,7 @@ func (field *Field) eatHorizontal(x int, y int, isRightCont bool, isLeftCont boo
 	}
 }
 
-func (field *Field) collides(rect *sdl.Rect, dir api.Direction) bool {
+func (field *Field) collide(rect *sdl.Rect, dir api.Direction) bool {
 	xDelta := rect.W / 2
 	yDelta := rect.H / 2
 

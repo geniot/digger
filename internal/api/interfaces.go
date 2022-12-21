@@ -39,5 +39,4 @@ type IStartable interface {
 
 type IRenderable interface {
 	Render()
-	Step(n uint64)
 }

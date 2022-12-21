@@ -39,9 +39,6 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
  * MODEL
  */
 
-func (emerald *Emerald) Step(n uint64) {
-}
-
 func (emerald *Emerald) getHitBox() *sdl.Rect {
 	return &sdl.Rect{emerald.offsetX + 5, emerald.offsetY + 7, emerald.width, emerald.height}
 }
@@ -60,7 +57,7 @@ func (emerald *Emerald) Render() {
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-		ctx.RendererIns.DrawRect(emerald.getHitBox())
+		DrawRectLines(emerald.getHitBox())
 	}
 
 }

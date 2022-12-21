@@ -72,14 +72,22 @@ func (digger *Digger) Step(n uint64) {
 			digger.move(DOWN, digger.moveDown, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH, LEFT, digger.moveLeft, digger.moveRight)
 		}
 	}
+
 	if p, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_A]; ok && p != digger.processedTimeStamp {
 		digger.processedTimeStamp = p
 		digger.fire()
 	}
+
+	for e := digger.scene.emeralds.Front(); e != nil; e = e.Next() {
+		if Collide(digger.getHitBox(), e.Value.(*Emerald).getHitBox()) {
+			e.Value.(*Emerald).Destroy()
+			digger.scene.emeralds.Remove(e)
+		}
+	}
 }
 
 func (digger *Digger) fire() {
-	digger.scene.renderables.PushBack(NewFire(digger, digger.scene))
+	digger.scene.fire = NewFire(digger, digger.scene)
 }
 
 func (digger *Digger) move(
@@ -151,7 +159,7 @@ func (digger *Digger) Render() {
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-		ctx.RendererIns.DrawRect(digger.getHitBox())
+		DrawRectLines(digger.getHitBox())
 	}
 
 	ctx.RendererIns.CopyEx(digger.sprites[digger.spritePointer], nil, &dstRect, angle,

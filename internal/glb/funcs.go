@@ -57,18 +57,50 @@ func logn(n, b float64) float64 {
 }
 
 func DrawText(txt string, x int32, y int32, color sdl.Color) (int32, int32) {
-	textSurface, _ := ctx.FontIns.RenderUTF8Blended(txt, color)
+	textSurface, err := ctx.FontIns.RenderUTF8Blended(txt, color)
+	if err != nil {
+		println(err.Error())
+	}
 	defer textSurface.Free()
-	textTexture, _ := ctx.RendererIns.CreateTextureFromSurface(textSurface)
-	ctx.RendererIns.Copy(textTexture, nil,
-		&sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H})
+	textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
+	if err != nil {
+		println(err.Error())
+	}
 	defer textTexture.Destroy()
-	return textSurface.W, textSurface.H
+	if textSurface != nil && textTexture != nil {
+		ctx.RendererIns.Copy(textTexture, nil, &sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H})
+		return textSurface.W, textSurface.H
+	} else {
+		return 0, 0
+	}
+
 }
 
-func DrawRect(x int32, y int32, width int32, height int32) {
-	ctx.RendererIns.DrawLine(x, y, x+width, y)
-	ctx.RendererIns.DrawLine(x+width, y, x+width, y+height)
-	ctx.RendererIns.DrawLine(x+width, y+height, x, y+height)
-	ctx.RendererIns.DrawLine(x, y+height, x, y)
+// Renderer.DrawRect is not available in some older versions of SDL2.
+// This is a workaround to solve hanging on my PocketGo2v2
+func DrawRectLines(rect *sdl.Rect) {
+	ctx.RendererIns.DrawLine(rect.X, rect.Y, rect.X+rect.W, rect.Y)
+	ctx.RendererIns.DrawLine(rect.X+rect.W, rect.Y, rect.X+rect.W, rect.Y+rect.H)
+	ctx.RendererIns.DrawLine(rect.X+rect.W, rect.Y+rect.H, rect.X, rect.Y+rect.H)
+	ctx.RendererIns.DrawLine(rect.X, rect.Y+rect.H, rect.X, rect.Y)
+}
+
+func Collide(rect1 *sdl.Rect, rect2 *sdl.Rect) bool {
+	x1 := rect1.X
+	y1 := rect1.Y
+	x2 := x1 + rect1.W
+	y2 := y1 + rect1.H
+	x3 := rect2.X
+	y3 := rect2.Y
+	x4 := x3 + rect2.W
+	y4 := y3 + rect2.H
+	// If one rectangle is on left side of other
+	if x1 > x4 || x3 > x2 {
+		return false
+	}
+	// If one rectangle is above other
+	if y2 < y3 || y4 < y1 {
+		return false
+	}
+	return true
 }

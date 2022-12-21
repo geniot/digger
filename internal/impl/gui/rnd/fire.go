@@ -93,13 +93,27 @@ func (fire *Fire) Step(n uint64) {
 		} else if fire.direction == RIGHT {
 			fire.offsetX += 1
 		}
-		if fire.scene.field.collides(fire.getHitBox(), fire.direction) {
+		if fire.scene.field.collide(fire.getHitBox(), fire.direction) {
 			fire.isMoving = false
 		}
+		for e := fire.scene.emeralds.Front(); e != nil; e = e.Next() {
+			if Collide(fire.getHitBox(), e.Value.(*Emerald).getHitBox()) {
+				fire.isMoving = false
+			}
+		}
+		for e := fire.scene.bags.Front(); e != nil; e = e.Next() {
+			if Collide(fire.getHitBox(), e.Value.(*Bag).getHitBox()) {
+				fire.isMoving = false
+			}
+		}
+	}
+
+	if fire.isFinished {
+		fire.Destroy()
 	}
 }
 
-func (fire Fire) getHitBox() *sdl.Rect {
+func (fire *Fire) getHitBox() *sdl.Rect {
 	return &sdl.Rect{fire.offsetX + 6, fire.offsetY + 6, fire.width, fire.height}
 }
 
@@ -107,13 +121,17 @@ func (fire *Fire) Destroy() {
 	for i := 0; i < len(fire.sprites); i++ {
 		fire.sprites[i].Destroy()
 	}
+	for i := 0; i < len(fire.spritesExpl); i++ {
+		fire.spritesExpl[i].Destroy()
+	}
+	fire.scene.fire = nil
 }
 
 /**
  * VIEW
  */
 
-func (fire Fire) Render() {
+func (fire *Fire) Render() {
 	dstRect := sdl.Rect{fire.offsetX, fire.offsetY, CELL_WIDTH, CELL_HEIGHT}
 	flip := sdl.FLIP_NONE
 	if fire.direction == RIGHT {
@@ -132,6 +150,6 @@ func (fire Fire) Render() {
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-		ctx.RendererIns.DrawRect(fire.getHitBox())
+		DrawRectLines(fire.getHitBox())
 	}
 }

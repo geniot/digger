@@ -2,18 +2,21 @@ package rnd
 
 import (
 	"container/list"
-	"github.com/geniot/digger/internal/api"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
-	"github.com/veandco/go-sdl2/sdl"
 	"strings"
 )
 
 type Scene struct {
-	level       int
-	field       *Field
-	digger      *Digger
-	renderables *list.List
+	level    int
+	field    *Field
+	digger   *Digger
+	fire     *Fire
+	emeralds *list.List
+	bags     *list.List
+
+	debugGrid  *DebugGrid
+	fpsCounter *FpsCounter
 }
 
 /**
@@ -26,19 +29,17 @@ func NewScene() *Scene {
 	scn.level = 1
 	scn.field = NewField(scn)
 	scn.digger = NewDigger(scn)
-
-	scn.renderables = list.New()
-	scn.renderables.PushBack(scn.field)
-	scn.renderables.PushBack(scn.digger)
+	scn.emeralds = list.New()
+	scn.bags = list.New()
 
 	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {
 		row := rows[y]
 		for x := 0; x < len(row); x++ {
 			if row[x] == 'C' {
-				scn.renderables.PushBack(NewEmerald(x, y, scn))
+				scn.emeralds.PushBack(NewEmerald(x, y, scn))
 			} else if row[x] == 'B' {
-				scn.renderables.PushBack(NewBag(x, y, scn))
+				scn.bags.PushBack(NewBag(x, y, scn))
 			} else if row[x] == 'S' {
 				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
 				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
@@ -58,10 +59,8 @@ func NewScene() *Scene {
 		}
 	}
 
-	if IS_DEBUG_ON {
-		scn.renderables.PushBack(NewDebugGrid())
-		scn.renderables.PushBack(NewFpsCounter())
-	}
+	scn.debugGrid = NewDebugGrid()
+	scn.fpsCounter = NewFpsCounter()
 
 	return scn
 }
@@ -75,40 +74,10 @@ func (scene *Scene) isTunnel(ch uint8) bool {
  */
 
 func (scene *Scene) Step(n uint64) {
-	for e := scene.renderables.Front(); e != nil; e = e.Next() {
-		e.Value.(api.IRenderable).Step(n)
-		if _, ok := e.Value.(*Emerald); ok {
-			if collide(scene.digger.getHitBox(), e.Value.(*Emerald).getHitBox()) {
-				e.Value.(*Emerald).Destroy()
-				scene.renderables.Remove(e)
-			}
-		} else if _, ok = e.Value.(*Fire); ok {
-			if e.Value.(*Fire).isFinished {
-				e.Value.(*Fire).Destroy()
-				scene.renderables.Remove(e)
-			}
-		}
+	scene.digger.Step(n)
+	if scene.fire != nil {
+		scene.fire.Step(n)
 	}
-}
-
-func collide(rect1 *sdl.Rect, rect2 *sdl.Rect) bool {
-	x1 := rect1.X
-	y1 := rect1.Y
-	x2 := x1 + rect1.W
-	y2 := y1 + rect1.H
-	x3 := rect2.X
-	y3 := rect2.Y
-	x4 := x3 + rect2.W
-	y4 := y3 + rect2.H
-	// If one rectangle is on left side of other
-	if x1 > x4 || x3 > x2 {
-		return false
-	}
-	// If one rectangle is above other
-	if y2 < y3 || y4 < y1 {
-		return false
-	}
-	return true
 }
 
 /**
@@ -116,7 +85,19 @@ func collide(rect1 *sdl.Rect, rect2 *sdl.Rect) bool {
  */
 
 func (scene *Scene) Render() {
-	for e := scene.renderables.Front(); e != nil; e = e.Next() {
-		e.Value.(api.IRenderable).Render()
+	scene.field.Render()
+	scene.digger.Render()
+	if scene.fire != nil {
+		scene.fire.Render()
+	}
+	for e := scene.emeralds.Front(); e != nil; e = e.Next() {
+		e.Value.(*Emerald).Render()
+	}
+	for e := scene.bags.Front(); e != nil; e = e.Next() {
+		e.Value.(*Bag).Render()
+	}
+	if IS_DEBUG_ON {
+		scene.debugGrid.Render()
+		scene.fpsCounter.Render()
 	}
 }
