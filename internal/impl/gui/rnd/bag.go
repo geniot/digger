@@ -26,12 +26,13 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg := &Bag{}
 	bg.scene = scn
 	bg.texture = resources.LoadTexture("csbag.png")
+
 	bg.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
-	bg.width = 11
-	bg.height = 11
+	bg.width = 16
+	bg.height = 15
 
-	bg.collisionObject = resolv.NewObject(float64(bg.offsetX), float64(bg.offsetY), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
+	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+2), float64(bg.offsetY+3), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
 	bg.collisionObject.Data = bg
 	scn.collisionSpace.Add(bg.collisionObject)
 
@@ -43,7 +44,7 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
  */
 
 func (bag *Bag) getHitBox() *sdl.Rect {
-	return &sdl.Rect{bag.offsetX + 4, bag.offsetY + 5, bag.width, bag.height}
+	return &sdl.Rect{bag.offsetX + 2, bag.offsetY + 3, bag.width, bag.height}
 }
 
 func (bag *Bag) Destroy() {

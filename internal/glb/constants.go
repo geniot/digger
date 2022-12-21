@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	IS_DEBUG_ON    = false
+	IS_DEBUG_ON = false
+
 	APP_NAME       = "Digger"
 	APP_VERSION    = "0.1"
 	CONF_FILE_NAME = ".digger.properties"
