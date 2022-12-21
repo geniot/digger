@@ -5,6 +5,7 @@ import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -25,6 +26,8 @@ type Fire struct {
 	direction  api.Direction
 	isMoving   bool
 	isFinished bool
+
+	collisionObject *resolv.Object
 
 	scene *Scene
 }
@@ -62,6 +65,8 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 	} else if fr.direction == DOWN {
 		fr.offsetY += CELL_WIDTH / 2
 	}
+
+	fr.collisionObject = resolv.NewObject(float64(fr.offsetX), float64(fr.offsetY), float64(fr.width), float64(fr.height), FIRE_COLLISION_TAG)
 	return fr
 }
 
@@ -96,16 +101,16 @@ func (fire *Fire) Step(n uint64) {
 		if fire.scene.field.collide(fire.getHitBox(), fire.direction) {
 			fire.isMoving = false
 		}
-		for e := fire.scene.emeralds.Front(); e != nil; e = e.Next() {
-			if Collide(fire.getHitBox(), e.Value.(*Emerald).getHitBox()) {
-				fire.isMoving = false
-			}
-		}
-		for e := fire.scene.bags.Front(); e != nil; e = e.Next() {
-			if Collide(fire.getHitBox(), e.Value.(*Bag).getHitBox()) {
-				fire.isMoving = false
-			}
-		}
+		//for e := fire.scene.emeralds.Front(); e != nil; e = e.Next() {
+		//	if Collide(fire.getHitBox(), e.Value.(*Emerald).getHitBox()) {
+		//		fire.isMoving = false
+		//	}
+		//}
+		//for e := fire.scene.bags.Front(); e != nil; e = e.Next() {
+		//	if Collide(fire.getHitBox(), e.Value.(*Bag).getHitBox()) {
+		//		fire.isMoving = false
+		//	}
+		//}
 	}
 
 	if fire.isFinished {

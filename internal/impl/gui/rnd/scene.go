@@ -1,19 +1,21 @@
 package rnd
 
 import (
-	"container/list"
+	mapset "github.com/deckarep/golang-set/v2"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/solarlune/resolv"
 	"strings"
 )
 
 type Scene struct {
-	level    int
-	field    *Field
-	digger   *Digger
-	fire     *Fire
-	emeralds *list.List
-	bags     *list.List
+	level          int
+	field          *Field
+	digger         *Digger
+	fire           *Fire
+	emeralds       mapset.Set[*Emerald]
+	bags           mapset.Set[*Bag]
+	collisionSpace *resolv.Space
 
 	debugGrid  *DebugGrid
 	fpsCounter *FpsCounter
@@ -27,19 +29,21 @@ func NewScene() *Scene {
 
 	scn := &Scene{}
 	scn.level = 1
+	scn.collisionSpace = resolv.NewSpace(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, 1, 1)
+
 	scn.field = NewField(scn)
 	scn.digger = NewDigger(scn)
-	scn.emeralds = list.New()
-	scn.bags = list.New()
+	scn.emeralds = mapset.NewSet[*Emerald]()
+	scn.bags = mapset.NewSet[*Bag]()
 
 	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {
 		row := rows[y]
 		for x := 0; x < len(row); x++ {
 			if row[x] == 'C' {
-				scn.emeralds.PushBack(NewEmerald(x, y, scn))
+				scn.emeralds.Add(NewEmerald(x, y, scn))
 			} else if row[x] == 'B' {
-				scn.bags.PushBack(NewBag(x, y, scn))
+				scn.bags.Add(NewBag(x, y, scn))
 			} else if row[x] == 'S' {
 				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
 				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
@@ -90,11 +94,11 @@ func (scene *Scene) Render() {
 	if scene.fire != nil {
 		scene.fire.Render()
 	}
-	for e := scene.emeralds.Front(); e != nil; e = e.Next() {
-		e.Value.(*Emerald).Render()
+	for emerald := range scene.emeralds.Iter() {
+		emerald.Render()
 	}
-	for e := scene.bags.Front(); e != nil; e = e.Next() {
-		e.Value.(*Bag).Render()
+	for bag := range scene.bags.Iter() {
+		bag.Render()
 	}
 	if IS_DEBUG_ON {
 		scene.debugGrid.Render()

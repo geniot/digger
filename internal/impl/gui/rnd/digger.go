@@ -5,6 +5,7 @@ import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -18,6 +19,8 @@ type Digger struct {
 	spritePointer    int
 	spritePointerInc int
 	sprites          []*sdl.Texture
+
+	collisionObject *resolv.Object
 
 	processedTimeStamp int64
 
@@ -45,6 +48,10 @@ func NewDigger(scn *Scene) *Digger {
 	dg.direction = RIGHT
 	dg.spritePointer = 0
 	dg.spritePointerInc = 1
+
+	dg.collisionObject = resolv.NewObject(float64(dg.offsetX+2), float64(dg.offsetY+2), float64(dg.width), float64(dg.height), DIGGER_COLLISION_TAG)
+	dg.collisionObject.Data = dg
+	scn.collisionSpace.Add(dg.collisionObject)
 
 	return dg
 }
@@ -78,12 +85,12 @@ func (digger *Digger) Step(n uint64) {
 		digger.fire()
 	}
 
-	for e := digger.scene.emeralds.Front(); e != nil; e = e.Next() {
-		if Collide(digger.getHitBox(), e.Value.(*Emerald).getHitBox()) {
-			e.Value.(*Emerald).Destroy()
-			digger.scene.emeralds.Remove(e)
-		}
-	}
+	//for e := digger.scene.emeralds.Front(); e != nil; e = e.Next() {
+	//	if Collide(digger.getHitBox(), e.Value.(*Emerald).getHitBox()) {
+	//		e.Value.(*Emerald).Destroy()
+	//		digger.scene.emeralds.Remove(e)
+	//	}
+	//}
 }
 
 func (digger *Digger) fire() {
@@ -113,26 +120,51 @@ func (digger *Digger) move(
 func (digger *Digger) moveRight() {
 	if digger.offsetX < CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
 		digger.direction = RIGHT
-		digger.offsetX += 1
+		if digger.canMove(1, 0) {
+			digger.offsetX += 1
+			digger.collisionObject.X = float64(digger.offsetX + 2)
+		}
 	}
 }
 func (digger *Digger) moveLeft() {
 	if digger.offsetX > CELLS_OFFSET {
 		digger.direction = LEFT
-		digger.offsetX -= 1
+		if digger.canMove(-1, 0) {
+			digger.offsetX -= 1
+			digger.collisionObject.X = float64(digger.offsetX + 2)
+		}
 	}
 }
 func (digger *Digger) moveUp() {
 	if digger.offsetY > FIELD_OFFSET_Y+CELLS_OFFSET {
 		digger.direction = UP
-		digger.offsetY -= 1
+		if digger.canMove(0, -1) {
+			digger.offsetY -= 1
+			digger.collisionObject.Y = float64(digger.offsetY + 2)
+		}
 	}
 }
 func (digger *Digger) moveDown() {
 	if digger.offsetY < FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1) {
 		digger.direction = DOWN
-		digger.offsetY += 1
+		if digger.canMove(0, 1) {
+			digger.offsetY += 1
+			digger.collisionObject.Y = float64(digger.offsetY + 2)
+		}
 	}
+}
+
+func (digger *Digger) canMove(x float64, y float64) bool {
+	if collision := digger.collisionObject.Check(x, y); collision != nil {
+		if em, ok := collision.Objects[0].Data.(*Emerald); ok {
+			em.Destroy()
+			digger.scene.collisionSpace.Remove(collision.Objects[0])
+			digger.scene.emeralds.Remove(em)
+		} else if _, ok = collision.Objects[0].Data.(*Bag); ok {
+			return false
+		}
+	}
+	return true
 }
 
 func (digger *Digger) getHitBox() *sdl.Rect {

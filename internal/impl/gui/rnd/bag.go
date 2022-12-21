@@ -4,16 +4,18 @@ import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Bag struct {
-	offsetX int32
-	offsetY int32
-	width   int32
-	height  int32
-	texture *sdl.Texture
-	scene   *Scene
+	offsetX         int32
+	offsetY         int32
+	width           int32
+	height          int32
+	texture         *sdl.Texture
+	collisionObject *resolv.Object
+	scene           *Scene
 }
 
 /**
@@ -21,14 +23,19 @@ type Bag struct {
  */
 
 func NewBag(cX int, cY int, scn *Scene) *Bag {
-	em := &Bag{}
-	em.scene = scn
-	em.texture = resources.LoadTexture("csbag.png")
-	em.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
-	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
-	em.width = 11
-	em.height = 11
-	return em
+	bg := &Bag{}
+	bg.scene = scn
+	bg.texture = resources.LoadTexture("csbag.png")
+	bg.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
+	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
+	bg.width = 11
+	bg.height = 11
+
+	bg.collisionObject = resolv.NewObject(float64(bg.offsetX), float64(bg.offsetY), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
+	bg.collisionObject.Data = bg
+	scn.collisionSpace.Add(bg.collisionObject)
+
+	return bg
 }
 
 /**

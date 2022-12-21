@@ -4,18 +4,20 @@ import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
+	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Emerald struct {
-	offsetX     int32
-	offsetY     int32
-	width       int32
-	height      int32
-	texture     *sdl.Texture
-	textureMask *sdl.Surface
-	scene       *Scene
+	offsetX         int32
+	offsetY         int32
+	width           int32
+	height          int32
+	texture         *sdl.Texture
+	textureMask     *sdl.Surface
+	collisionObject *resolv.Object
+	scene           *Scene
 }
 
 /**
@@ -31,6 +33,11 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
 	em.width = 10
 	em.height = 8
+
+	em.collisionObject = resolv.NewObject(float64(em.offsetX+5), float64(em.offsetY+7), float64(em.width), float64(em.height), EMERALD_COLLISION_TAG)
+	em.collisionObject.Data = em
+	scn.collisionSpace.Add(em.collisionObject)
+
 	em.eatField()
 	return em
 }
