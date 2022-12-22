@@ -85,14 +85,17 @@ func (bag *Bag) move() {
 }
 
 func (bag *Bag) canMove(dir Direction) bool {
+	if dir == UP || dir == DOWN {
+		return false
+	}
 	if !bag.scene.field.isWithinBounds(dir, bag.offsetX, bag.offsetY) {
 		return false
 	}
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	if collision := bag.collisionObject.Check(float64(x), 0); collision != nil {
-		if bag, ok1 := collision.Objects[0].Data.(*Bag); ok1 {
-			bag.push(dir)
-			return false
+		if bg, ok := collision.Objects[0].Data.(*Bag); ok {
+			bg.push(dir)
+			return bg.canMove(dir)
 		}
 	}
 	return true

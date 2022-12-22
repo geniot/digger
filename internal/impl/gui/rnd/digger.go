@@ -76,7 +76,7 @@ func (digger *Digger) Step(n uint64) {
 	if n%DIGGER_SPEED_RATE == 0 {
 		if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
 			if digger.direction == RIGHT {
-				if digger.canMove(RIGHT) {
+				if cM, _ := digger.canMoveShouldTurn(RIGHT); cM {
 					digger.move(RIGHT)
 				}
 			} else if digger.direction == LEFT {
@@ -84,15 +84,19 @@ func (digger *Digger) Step(n uint64) {
 			} else {
 				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
 					if digger.direction == UP {
-						if digger.canMove(UP) {
+						cM, sT := digger.canMoveShouldTurn(UP)
+						if cM {
 							digger.move(UP)
-						} else {
+						}
+						if sT {
 							digger.direction = DOWN
 						}
 					} else if digger.direction == DOWN {
-						if digger.canMove(DOWN) {
+						cM, sT := digger.canMoveShouldTurn(DOWN)
+						if cM {
 							digger.move(DOWN)
-						} else {
+						}
+						if sT {
 							digger.direction = UP
 						}
 					}
@@ -102,7 +106,7 @@ func (digger *Digger) Step(n uint64) {
 			}
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
 			if digger.direction == LEFT {
-				if digger.canMove(LEFT) {
+				if cM, _ := digger.canMoveShouldTurn(LEFT); cM {
 					digger.move(LEFT)
 				}
 			} else if digger.direction == RIGHT {
@@ -110,15 +114,19 @@ func (digger *Digger) Step(n uint64) {
 			} else {
 				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
 					if digger.direction == UP {
-						if digger.canMove(UP) {
+						cM, sT := digger.canMoveShouldTurn(UP)
+						if cM {
 							digger.move(UP)
-						} else {
+						}
+						if sT {
 							digger.direction = DOWN
 						}
 					} else {
-						if digger.canMove(DOWN) {
+						cM, sT := digger.canMoveShouldTurn(DOWN)
+						if cM {
 							digger.move(DOWN)
-						} else {
+						}
+						if sT {
 							digger.direction = UP
 						}
 					}
@@ -128,7 +136,7 @@ func (digger *Digger) Step(n uint64) {
 			}
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok {
 			if digger.direction == UP {
-				if digger.canMove(UP) {
+				if cM, _ := digger.canMoveShouldTurn(UP); cM {
 					digger.move(UP)
 				}
 			} else if digger.direction == DOWN {
@@ -136,15 +144,19 @@ func (digger *Digger) Step(n uint64) {
 			} else {
 				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
 					if digger.direction == LEFT {
-						if digger.canMove(LEFT) {
+						cM, sT := digger.canMoveShouldTurn(LEFT)
+						if cM {
 							digger.move(LEFT)
-						} else {
+						}
+						if sT {
 							digger.direction = RIGHT
 						}
 					} else {
-						if digger.canMove(RIGHT) {
+						cM, sT := digger.canMoveShouldTurn(RIGHT)
+						if cM {
 							digger.move(RIGHT)
-						} else {
+						}
+						if sT {
 							digger.direction = LEFT
 						}
 					}
@@ -154,7 +166,7 @@ func (digger *Digger) Step(n uint64) {
 			}
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
 			if digger.direction == DOWN {
-				if digger.canMove(DOWN) {
+				if cM, _ := digger.canMoveShouldTurn(DOWN); cM {
 					digger.move(DOWN)
 				}
 			} else if digger.direction == UP {
@@ -162,15 +174,19 @@ func (digger *Digger) Step(n uint64) {
 			} else {
 				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
 					if digger.direction == LEFT {
-						if digger.canMove(LEFT) {
+						cM, sT := digger.canMoveShouldTurn(LEFT)
+						if cM {
 							digger.move(LEFT)
-						} else {
+						}
+						if sT {
 							digger.direction = RIGHT
 						}
 					} else {
-						if digger.canMove(RIGHT) {
+						cM, sT := digger.canMoveShouldTurn(RIGHT)
+						if cM {
 							digger.move(RIGHT)
-						} else {
+						}
+						if sT {
 							digger.direction = LEFT
 						}
 					}
@@ -202,9 +218,9 @@ func (digger *Digger) move(dir Direction) {
 	digger.collisionObject.Update()
 }
 
-func (digger *Digger) canMove(dir Direction) bool {
+func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 	if !digger.scene.field.isWithinBounds(dir, digger.offsetX, digger.offsetY) {
-		return false
+		return false, false
 	}
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
@@ -213,10 +229,10 @@ func (digger *Digger) canMove(dir Direction) bool {
 			em.Destroy()
 		} else if bag, ok2 := collision.Objects[0].Data.(*Bag); ok2 {
 			bag.push(dir)
-			return false
+			return false, !bag.canMove(dir)
 		}
 	}
-	return true
+	return true, false
 }
 
 func (digger *Digger) getHitBox() *sdl.Rect {
