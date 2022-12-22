@@ -16,6 +16,9 @@ type Digger struct {
 	height    int32
 	direction api.Direction
 
+	innerOffsetX int32
+	innerOffsetY int32
+
 	spritePointer    int
 	spritePointerInc int
 	sprites          []*sdl.Texture
@@ -49,7 +52,10 @@ func NewDigger(scn *Scene) *Digger {
 	dg.spritePointer = 0
 	dg.spritePointerInc = 1
 
-	dg.collisionObject = resolv.NewObject(float64(dg.offsetX+2), float64(dg.offsetY+2), float64(dg.width), float64(dg.height), DIGGER_COLLISION_TAG)
+	dg.innerOffsetX = 2
+	dg.innerOffsetY = 2
+
+	dg.collisionObject = resolv.NewObject(float64(dg.offsetX+dg.innerOffsetX), float64(dg.offsetY+dg.innerOffsetY), float64(dg.width), float64(dg.height), DIGGER_COLLISION_TAG)
 	dg.collisionObject.Data = dg
 	scn.collisionSpace.Add(dg.collisionObject)
 
@@ -190,28 +196,28 @@ func (digger *Digger) moveRight() {
 	if digger.offsetX < CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
 		digger.direction = RIGHT
 		digger.offsetX += 1
-		digger.collisionObject.X = float64(digger.offsetX + 2)
+		digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
 	}
 }
 func (digger *Digger) moveLeft() {
 	if digger.offsetX > CELLS_OFFSET {
 		digger.direction = LEFT
 		digger.offsetX -= 1
-		digger.collisionObject.X = float64(digger.offsetX + 2)
+		digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
 	}
 }
 func (digger *Digger) moveUp() {
 	if digger.offsetY > FIELD_OFFSET_Y+CELLS_OFFSET {
 		digger.direction = UP
 		digger.offsetY -= 1
-		digger.collisionObject.Y = float64(digger.offsetY + 2)
+		digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 	}
 }
 func (digger *Digger) moveDown() {
 	if digger.offsetY < FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1) {
 		digger.direction = DOWN
 		digger.offsetY += 1
-		digger.collisionObject.Y = float64(digger.offsetY + 2)
+		digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 	}
 }
 
@@ -221,8 +227,6 @@ func (digger *Digger) canMove(dir api.Direction) bool {
 	if collision := digger.collisionObject.Check(float64(x), float64(y)); collision != nil {
 		if em, ok := collision.Objects[0].Data.(*Emerald); ok {
 			em.Destroy()
-			digger.scene.collisionSpace.Remove(collision.Objects[0])
-			digger.scene.emeralds.Remove(em)
 		} else if _, ok = collision.Objects[0].Data.(*Bag); ok {
 			return false
 		}
@@ -231,7 +235,7 @@ func (digger *Digger) canMove(dir api.Direction) bool {
 }
 
 func (digger *Digger) getHitBox() *sdl.Rect {
-	return &sdl.Rect{digger.offsetX + 2, digger.offsetY + 2, digger.width, digger.height}
+	return &sdl.Rect{digger.offsetX + digger.innerOffsetX, digger.offsetY + digger.innerOffsetY, digger.width, digger.height}
 }
 
 /**

@@ -10,10 +10,12 @@ import (
 )
 
 type Fire struct {
-	offsetX int32
-	offsetY int32
-	width   int32
-	height  int32
+	offsetX      int32
+	offsetY      int32
+	width        int32
+	height       int32
+	innerOffsetX int32
+	innerOffsetY int32
 
 	spritePointer    int
 	spritePointerInc int
@@ -42,6 +44,7 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 
 	fr.width = 8
 	fr.height = 8
+
 	fr.spritePointer = 0
 	fr.spritePointerInc = 1
 	fr.sprites = []*sdl.Texture{resources.LoadTexture("cfire1.png"), resources.LoadTexture("cfire2.png"), resources.LoadTexture("cfire3.png")}
@@ -51,6 +54,8 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 
 	fr.offsetX = digger.offsetX
 	fr.offsetY = digger.offsetY
+	fr.innerOffsetX = 6
+	fr.innerOffsetY = 6
 	fr.direction = digger.direction
 
 	fr.isMoving = true
@@ -66,8 +71,15 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 		fr.offsetY += CELL_WIDTH / 2
 	}
 
-	fr.collisionObject = resolv.NewObject(float64(fr.offsetX), float64(fr.offsetY), float64(fr.width), float64(fr.height), FIRE_COLLISION_TAG)
+	fr.collisionObject = resolv.NewObject(float64(fr.offsetX+fr.innerOffsetX), float64(fr.offsetY+fr.innerOffsetY), float64(fr.width), float64(fr.height), FIRE_COLLISION_TAG)
+	fr.collisionObject.Data = fr
+	scn.collisionSpace.Add(fr.collisionObject)
+
 	return fr
+}
+
+func (fire *Fire) getHitBox() *sdl.Rect {
+	return &sdl.Rect{fire.offsetX + fire.innerOffsetX, fire.offsetY + fire.innerOffsetY, fire.width, fire.height}
 }
 
 /**
@@ -90,27 +102,37 @@ func (fire *Fire) Step(n uint64) {
 	}
 	if n%FIRE_SPEED_RATE == 0 && fire.isMoving {
 		if fire.direction == UP {
-			fire.offsetY -= 1
+			if fire.canMove(UP) {
+				fire.offsetY -= 1
+				fire.collisionObject.Y = float64(fire.offsetY + fire.innerOffsetY)
+			} else {
+				fire.isMoving = false
+			}
 		} else if fire.direction == DOWN {
-			fire.offsetY += 1
+			if fire.canMove(DOWN) {
+				fire.offsetY += 1
+				fire.collisionObject.Y = float64(fire.offsetY + fire.innerOffsetY)
+			} else {
+				fire.isMoving = false
+			}
 		} else if fire.direction == LEFT {
-			fire.offsetX -= 1
+			if fire.canMove(LEFT) {
+				fire.offsetX -= 1
+				fire.collisionObject.X = float64(fire.offsetX + fire.innerOffsetX)
+			} else {
+				fire.isMoving = false
+			}
 		} else if fire.direction == RIGHT {
-			fire.offsetX += 1
+			if fire.canMove(RIGHT) {
+				fire.offsetX += 1
+				fire.collisionObject.X = float64(fire.offsetX + fire.innerOffsetX)
+			} else {
+				fire.isMoving = false
+			}
 		}
 		if fire.scene.field.collide(fire.getHitBox(), fire.direction) {
 			fire.isMoving = false
 		}
-		//for e := fire.scene.emeralds.Front(); e != nil; e = e.Next() {
-		//	if Collide(fire.getHitBox(), e.Value.(*Emerald).getHitBox()) {
-		//		fire.isMoving = false
-		//	}
-		//}
-		//for e := fire.scene.bags.Front(); e != nil; e = e.Next() {
-		//	if Collide(fire.getHitBox(), e.Value.(*Bag).getHitBox()) {
-		//		fire.isMoving = false
-		//	}
-		//}
 	}
 
 	if fire.isFinished {
@@ -118,8 +140,17 @@ func (fire *Fire) Step(n uint64) {
 	}
 }
 
-func (fire *Fire) getHitBox() *sdl.Rect {
-	return &sdl.Rect{fire.offsetX + 6, fire.offsetY + 6, fire.width, fire.height}
+func (fire *Fire) canMove(dir api.Direction) bool {
+	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
+	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
+	if collision := fire.collisionObject.Check(float64(x), float64(y)); collision != nil {
+		if _, ok := collision.Objects[0].Data.(*Emerald); ok {
+			return false
+		} else if _, ok = collision.Objects[0].Data.(*Bag); ok {
+			return false
+		}
+	}
+	return true
 }
 
 func (fire *Fire) Destroy() {
@@ -130,6 +161,7 @@ func (fire *Fire) Destroy() {
 		fire.spritesExpl[i].Destroy()
 	}
 	fire.scene.fire = nil
+	fire.scene.collisionSpace.Remove(fire.collisionObject)
 }
 
 /**
