@@ -4,7 +4,7 @@ although I used the original source code for reference.
 
 The main difference with the original game is that this Digger has pixel perfect precision. 
 
-- all animation is smooth (except sprites - which I borrowed)
+- all animation is smooth (except sprites - which I borrowed from the 1983 Windmill game)
 
 # Build
 

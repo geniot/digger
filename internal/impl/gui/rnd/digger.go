@@ -77,7 +77,7 @@ func (digger *Digger) Step(n uint64) {
 		if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
 			if digger.direction == RIGHT {
 				if digger.canMove(RIGHT) {
-					digger.moveRight()
+					digger.move(RIGHT)
 				}
 			} else if digger.direction == LEFT {
 				digger.direction = RIGHT
@@ -85,13 +85,13 @@ func (digger *Digger) Step(n uint64) {
 				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
 					if digger.direction == UP {
 						if digger.canMove(UP) {
-							digger.moveUp()
+							digger.move(UP)
 						} else {
 							digger.direction = DOWN
 						}
 					} else if digger.direction == DOWN {
 						if digger.canMove(DOWN) {
-							digger.moveDown()
+							digger.move(DOWN)
 						} else {
 							digger.direction = UP
 						}
@@ -103,7 +103,7 @@ func (digger *Digger) Step(n uint64) {
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
 			if digger.direction == LEFT {
 				if digger.canMove(LEFT) {
-					digger.moveLeft()
+					digger.move(LEFT)
 				}
 			} else if digger.direction == RIGHT {
 				digger.direction = LEFT
@@ -111,13 +111,13 @@ func (digger *Digger) Step(n uint64) {
 				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
 					if digger.direction == UP {
 						if digger.canMove(UP) {
-							digger.moveUp()
+							digger.move(UP)
 						} else {
 							digger.direction = DOWN
 						}
 					} else {
 						if digger.canMove(DOWN) {
-							digger.moveDown()
+							digger.move(DOWN)
 						} else {
 							digger.direction = UP
 						}
@@ -129,7 +129,7 @@ func (digger *Digger) Step(n uint64) {
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok {
 			if digger.direction == UP {
 				if digger.canMove(UP) {
-					digger.moveUp()
+					digger.move(UP)
 				}
 			} else if digger.direction == DOWN {
 				digger.direction = UP
@@ -137,13 +137,13 @@ func (digger *Digger) Step(n uint64) {
 				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
 					if digger.direction == LEFT {
 						if digger.canMove(LEFT) {
-							digger.moveLeft()
+							digger.move(LEFT)
 						} else {
 							digger.direction = RIGHT
 						}
 					} else {
 						if digger.canMove(RIGHT) {
-							digger.moveRight()
+							digger.move(RIGHT)
 						} else {
 							digger.direction = LEFT
 						}
@@ -155,7 +155,7 @@ func (digger *Digger) Step(n uint64) {
 		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
 			if digger.direction == DOWN {
 				if digger.canMove(DOWN) {
-					digger.moveDown()
+					digger.move(DOWN)
 				}
 			} else if digger.direction == UP {
 				digger.direction = DOWN
@@ -163,13 +163,13 @@ func (digger *Digger) Step(n uint64) {
 				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
 					if digger.direction == LEFT {
 						if digger.canMove(LEFT) {
-							digger.moveLeft()
+							digger.move(LEFT)
 						} else {
 							digger.direction = RIGHT
 						}
 					} else {
 						if digger.canMove(RIGHT) {
-							digger.moveRight()
+							digger.move(RIGHT)
 						} else {
 							digger.direction = LEFT
 						}
@@ -191,27 +191,13 @@ func (digger *Digger) fire() {
 	digger.scene.fire = NewFire(digger, digger.scene)
 }
 
-func (digger *Digger) moveRight() {
-	digger.direction = RIGHT
-	digger.offsetX += 1
+func (digger *Digger) move(dir Direction) {
+	digger.direction = dir
+	x := If(dir == RIGHT, int32(1), If(dir == LEFT, int32(-1), 0))
+	y := If(dir == DOWN, int32(1), If(dir == UP, int32(-1), 0))
+	digger.offsetX += x
+	digger.offsetY += y
 	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
-	digger.collisionObject.Update()
-}
-func (digger *Digger) moveLeft() {
-	digger.direction = LEFT
-	digger.offsetX -= 1
-	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
-	digger.collisionObject.Update()
-}
-func (digger *Digger) moveUp() {
-	digger.direction = UP
-	digger.offsetY -= 1
-	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-	digger.collisionObject.Update()
-}
-func (digger *Digger) moveDown() {
-	digger.direction = DOWN
-	digger.offsetY += 1
 	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 	digger.collisionObject.Update()
 }
