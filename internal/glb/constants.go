@@ -17,6 +17,7 @@ const (
 	TICK               float64 = 1.0 / 200.0
 	SPRITE_UPDATE_RATE         = 18
 	DIGGER_SPEED_RATE          = 4 //less is faster
+	BAG_PUSH_RATE_RATE         = 10
 	FIRE_SPEED_RATE            = 2
 
 	SCREEN_LOGICAL_WIDTH  = 320

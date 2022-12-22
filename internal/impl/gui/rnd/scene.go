@@ -82,6 +82,9 @@ func (scene *Scene) Step(n uint64) {
 	if scene.fire != nil {
 		scene.fire.Step(n)
 	}
+	for bag := range scene.bags.Iter() {
+		bag.Step(n)
+	}
 }
 
 /**

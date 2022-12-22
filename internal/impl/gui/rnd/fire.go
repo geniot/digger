@@ -56,7 +56,7 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 	fr.innerOffsetY = 6
 	fr.direction = digger.direction
 
-	fr.state = MOVING
+	fr.state = FIRE_MOVING
 
 	if fr.direction == RIGHT {
 		fr.offsetX += CELL_WIDTH / 2
@@ -85,7 +85,7 @@ func (fire *Fire) getHitBox() *sdl.Rect {
 
 func (fire *Fire) Step(n uint64) {
 	if n%SPRITE_UPDATE_RATE == 0 {
-		if fire.state == MOVING {
+		if fire.state == FIRE_MOVING {
 			fire.spritePointer += fire.spritePointerInc
 			if fire.spritePointer == len(fire.sprites)-1 || fire.spritePointer == 0 {
 				fire.spritePointerInc = -fire.spritePointerInc
@@ -93,46 +93,50 @@ func (fire *Fire) Step(n uint64) {
 		} else {
 			fire.spriteExplPointer += fire.spriteExplPointerInc
 			if fire.spriteExplPointer == len(fire.spritesExpl) {
-				fire.state = FINISHED
+				fire.state = FIRE_FINISHED
 			}
 		}
 	}
-	if n%FIRE_SPEED_RATE == 0 && fire.state == MOVING {
+	if n%FIRE_SPEED_RATE == 0 && fire.state == FIRE_MOVING {
 		if fire.direction == UP {
 			if fire.canMove(UP) {
 				fire.offsetY -= 1
 				fire.collisionObject.Y = float64(fire.offsetY + fire.innerOffsetY)
+				fire.collisionObject.Update()
 			} else {
-				fire.state = STOPPED
+				fire.state = FIRE_STOPPED
 			}
 		} else if fire.direction == DOWN {
 			if fire.canMove(DOWN) {
 				fire.offsetY += 1
 				fire.collisionObject.Y = float64(fire.offsetY + fire.innerOffsetY)
+				fire.collisionObject.Update()
 			} else {
-				fire.state = STOPPED
+				fire.state = FIRE_STOPPED
 			}
 		} else if fire.direction == LEFT {
 			if fire.canMove(LEFT) {
 				fire.offsetX -= 1
 				fire.collisionObject.X = float64(fire.offsetX + fire.innerOffsetX)
+				fire.collisionObject.Update()
 			} else {
-				fire.state = STOPPED
+				fire.state = FIRE_STOPPED
 			}
 		} else if fire.direction == RIGHT {
 			if fire.canMove(RIGHT) {
 				fire.offsetX += 1
 				fire.collisionObject.X = float64(fire.offsetX + fire.innerOffsetX)
+				fire.collisionObject.Update()
 			} else {
-				fire.state = STOPPED
+				fire.state = FIRE_STOPPED
 			}
 		}
 		if fire.scene.field.collide(fire.getHitBox(), fire.direction) {
-			fire.state = STOPPED
+			fire.state = FIRE_STOPPED
 		}
 	}
 
-	if fire.state == FINISHED {
+	if fire.state == FIRE_FINISHED {
 		fire.Destroy()
 	}
 }
@@ -179,7 +183,7 @@ func (fire *Fire) Render() {
 		angle = 270
 	}
 
-	ctx.RendererIns.CopyEx(If(fire.state == MOVING, fire.sprites[fire.spritePointer], fire.spritesExpl[fire.spriteExplPointer]), nil, &dstRect, angle,
+	ctx.RendererIns.CopyEx(If(fire.state == FIRE_MOVING, fire.sprites[fire.spritePointer], fire.spritesExpl[fire.spriteExplPointer]), nil, &dstRect, angle,
 		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
 
 	if IS_DEBUG_ON {

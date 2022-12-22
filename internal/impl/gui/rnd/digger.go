@@ -41,7 +41,7 @@ func NewDigger(scn *Scene) *Digger {
 
 	//same for all levels
 	cellX := 7
-	cellY := 9
+	cellY := 6 //9
 
 	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
 	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
@@ -192,41 +192,41 @@ func (digger *Digger) fire() {
 }
 
 func (digger *Digger) moveRight() {
-	if digger.offsetX < CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
-		digger.direction = RIGHT
-		digger.offsetX += 1
-		digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
-	}
+	digger.direction = RIGHT
+	digger.offsetX += 1
+	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
+	digger.collisionObject.Update()
 }
 func (digger *Digger) moveLeft() {
-	if digger.offsetX > CELLS_OFFSET {
-		digger.direction = LEFT
-		digger.offsetX -= 1
-		digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
-	}
+	digger.direction = LEFT
+	digger.offsetX -= 1
+	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
+	digger.collisionObject.Update()
 }
 func (digger *Digger) moveUp() {
-	if digger.offsetY > FIELD_OFFSET_Y+CELLS_OFFSET {
-		digger.direction = UP
-		digger.offsetY -= 1
-		digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-	}
+	digger.direction = UP
+	digger.offsetY -= 1
+	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+	digger.collisionObject.Update()
 }
 func (digger *Digger) moveDown() {
-	if digger.offsetY < FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1) {
-		digger.direction = DOWN
-		digger.offsetY += 1
-		digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-	}
+	digger.direction = DOWN
+	digger.offsetY += 1
+	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+	digger.collisionObject.Update()
 }
 
 func (digger *Digger) canMove(dir Direction) bool {
+	if !digger.scene.field.isWithinBounds(dir, digger.offsetX, digger.offsetY) {
+		return false
+	}
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
 	if collision := digger.collisionObject.Check(float64(x), float64(y)); collision != nil {
-		if em, ok := collision.Objects[0].Data.(*Emerald); ok {
+		if em, ok1 := collision.Objects[0].Data.(*Emerald); ok1 {
 			em.Destroy()
-		} else if _, ok = collision.Objects[0].Data.(*Bag); ok {
+		} else if bag, ok2 := collision.Objects[0].Data.(*Bag); ok2 {
+			bag.push(dir)
 			return false
 		}
 	}

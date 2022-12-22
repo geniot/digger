@@ -9,12 +9,17 @@ import (
 )
 
 type Bag struct {
-	offsetX         int32
-	offsetY         int32
-	width           int32
-	height          int32
+	offsetX      int32
+	offsetY      int32
+	width        int32
+	height       int32
+	innerOffsetX int32
+	innerOffsetY int32
+
 	texture         *sdl.Texture
 	collisionObject *resolv.Object
+	pushDir         Direction
+	state           BagState
 	scene           *Scene
 }
 
@@ -31,8 +36,12 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
 	bg.width = 16
 	bg.height = 15
+	bg.innerOffsetX = 2
+	bg.innerOffsetY = 3
 
-	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+2), float64(bg.offsetY+3), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
+	bg.state = BAG_SET
+
+	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+bg.innerOffsetX), float64(bg.offsetY+bg.innerOffsetY), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
 	bg.collisionObject.Data = bg
 	scn.collisionSpace.Add(bg.collisionObject)
 
@@ -44,11 +53,49 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
  */
 
 func (bag *Bag) getHitBox() *sdl.Rect {
-	return &sdl.Rect{bag.offsetX + 2, bag.offsetY + 3, bag.width, bag.height}
+	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + bag.innerOffsetY, bag.width, bag.height}
 }
 
 func (bag *Bag) Destroy() {
 	bag.texture.Destroy()
+}
+
+func (bag *Bag) Step(n uint64) {
+	if n%BAG_PUSH_RATE_RATE == 0 {
+		if bag.canMove(bag.pushDir) {
+			if bag.state == BAG_PUSHED {
+				bag.state = BAG_MOVING
+				bag.move()
+			} else if bag.state == BAG_MOVING {
+				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
+					bag.move()
+				} else {
+					bag.state = BAG_SET
+				}
+			}
+		}
+
+	}
+}
+
+func (bag *Bag) move() {
+	bag.offsetX += If(bag.pushDir == RIGHT, int32(1), If(bag.pushDir == LEFT, int32(-1), 0))
+	bag.collisionObject.X = float64(bag.offsetX + bag.innerOffsetX)
+	bag.collisionObject.Update()
+}
+
+func (bag *Bag) canMove(dir Direction) bool {
+	if !bag.scene.field.isWithinBounds(dir, bag.offsetX, bag.offsetY) {
+		return false
+	}
+	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
+	if collision := bag.collisionObject.Check(float64(x), 0); collision != nil {
+		if bag, ok1 := collision.Objects[0].Data.(*Bag); ok1 {
+			bag.push(dir)
+			return false
+		}
+	}
+	return true
 }
 
 /**
@@ -62,4 +109,9 @@ func (bag *Bag) Render() {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
 		DrawRectLines(bag.getHitBox())
 	}
+}
+
+func (bag *Bag) push(dir Direction) {
+	bag.pushDir = dir
+	bag.state = BAG_PUSHED
 }
