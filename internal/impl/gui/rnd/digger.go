@@ -1,7 +1,6 @@
 package rnd
 
 import (
-	"github.com/geniot/digger/internal/api"
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
@@ -14,7 +13,7 @@ type Digger struct {
 	offsetY   int32
 	width     int32
 	height    int32
-	direction api.Direction
+	direction Direction
 
 	innerOffsetX int32
 	innerOffsetY int32
@@ -221,7 +220,7 @@ func (digger *Digger) moveDown() {
 	}
 }
 
-func (digger *Digger) canMove(dir api.Direction) bool {
+func (digger *Digger) canMove(dir Direction) bool {
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
 	if collision := digger.collisionObject.Check(float64(x), float64(y)); collision != nil {

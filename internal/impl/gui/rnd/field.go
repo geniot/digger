@@ -1,7 +1,6 @@
 package rnd
 
 import (
-	"github.com/geniot/digger/internal/api"
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
 	"github.com/geniot/digger/resources"
@@ -124,7 +123,7 @@ func (field *Field) eatHorizontal(x int, y int, isRightCont bool, isLeftCont boo
 	}
 }
 
-func (field *Field) collide(rect *sdl.Rect, dir api.Direction) bool {
+func (field *Field) collide(rect *sdl.Rect, dir Direction) bool {
 	xDelta := rect.W / 2
 	yDelta := rect.H / 2
 

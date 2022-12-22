@@ -2,14 +2,13 @@ package glb
 
 import (
 	"fmt"
-	"github.com/geniot/digger/internal/api"
 	"github.com/geniot/digger/internal/ctx"
 	"github.com/veandco/go-sdl2/sdl"
 	"math"
 	"strconv"
 )
 
-func Opposite(dir api.Direction) api.Direction {
+func Opposite(dir Direction) Direction {
 	if dir == UP {
 		return DOWN
 	} else if dir == DOWN {

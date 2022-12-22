@@ -1,7 +1,6 @@
 package glb
 
 import (
-	"github.com/geniot/digger/internal/api"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -69,11 +68,6 @@ const (
 	GCW_BUTTON_L3 = sdl.K_KP_DIVIDE
 	//GCW_BUTTON_R3    = sdl.K_KP_PERIOD
 	//GCW_BUTTON_POWER = sdl.K_HOME
-
-	UP    api.Direction = 0
-	DOWN  api.Direction = 1
-	LEFT  api.Direction = 2
-	RIGHT api.Direction = 3
 )
 
 var (
