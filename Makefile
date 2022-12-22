@@ -10,9 +10,8 @@ build:
 
 mips:
 	CC='/opt/gcw0-toolchain/usr/bin/mipsel-gcw0-linux-uclibc-gcc' \
-	CGO_CFLAGS='-I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/libpng16 -D_REENTRANT' \
 	 CGO_ENABLED=1 \
-	 CGO_LDFLAGS='-L/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/lib -lSDL2 -lpng16' \
+	 CGO_LDFLAGS='-lSDL2 -lpng16' \
 	 GOARCH=mipsle \
 	 GOMIPS=softfloat \
 	 GOOS=linux \
