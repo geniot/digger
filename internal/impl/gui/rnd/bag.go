@@ -16,6 +16,8 @@ type Bag struct {
 	innerOffsetX int32
 	innerOffsetY int32
 
+	moveAttempts int
+
 	texture         *sdl.Texture
 	collisionObject *resolv.Object
 	pushDir         Direction
@@ -40,6 +42,7 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg.innerOffsetY = 3
 
 	bg.state = BAG_SET
+	bg.moveAttempts = 0
 
 	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+bg.innerOffsetX), float64(bg.offsetY+bg.innerOffsetY), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
 	bg.collisionObject.Data = bg
@@ -62,23 +65,34 @@ func (bag *Bag) Destroy() {
 
 func (bag *Bag) Step(n uint64) {
 	if n%BAG_PUSH_RATE_RATE == 0 {
-		if bag.canMove(bag.pushDir) {
-			if bag.state == BAG_PUSHED {
-				bag.state = BAG_MOVING
+		if bag.state == BAG_PUSHED {
+			bag.state = BAG_MOVING
+			if bag.canMove(bag.pushDir) {
 				bag.move()
-			} else if bag.state == BAG_MOVING {
+			}
+		} else if bag.state == BAG_MOVING {
+			if bag.canMove(bag.pushDir) {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
 					bag.move()
 				} else {
 					bag.state = BAG_SET
 				}
+			} else {
+				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
+					if bag.moveAttempts > 10 {
+						bag.moveAttempts = 0
+						bag.pushDir = Opposite(bag.pushDir)
+					}
+				} else {
+					bag.state = BAG_SET
+				}
 			}
 		}
-
 	}
 }
 
 func (bag *Bag) move() {
+	bag.moveAttempts = 0
 	bag.offsetX += If(bag.pushDir == RIGHT, int32(1), If(bag.pushDir == LEFT, int32(-1), 0))
 	bag.collisionObject.X = float64(bag.offsetX + bag.innerOffsetX)
 	bag.collisionObject.Update()
@@ -93,9 +107,15 @@ func (bag *Bag) canMove(dir Direction) bool {
 	}
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	if collision := bag.collisionObject.Check(float64(x), 0); collision != nil {
-		if bg, ok := collision.Objects[0].Data.(*Bag); ok {
-			bg.push(dir)
-			return bg.canMove(dir)
+		for i := 0; i < len(collision.Objects); i++ {
+			if bg, ok1 := collision.Objects[i].Data.(*Bag); ok1 {
+				bg.push(dir)
+				bag.moveAttempts += 1
+				return false //bg.canMove(dir)
+			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
+				bag.moveAttempts += 1
+				return false
+			}
 		}
 	}
 	return true

@@ -7,13 +7,13 @@ although I used the original graphics.
 
 From the player's perspective the main difference with the original game is that this Digger has pixel perfect precision. 
 
-- all animations are smooth (except sprites - which I borrowed from the 1983 Windmill game)
+- all animations are smooth (except sprites - which I borrowed from the original 1983 Windmill game)
 - all object collisions are pixel-based and calculated within a [Resolv](github.com/solarlune/resolv) Space
 - collision with the field is based on [SDL_GetRGBA](https://wiki.libsdl.org/SDL2/SDL_GetRGBA)  
 
 # Motivation
 
-I created this clone to learn Go, SDL2, some nuances of embedded programming and game development.
+I started this project to learn [Go](https://go.dev/), [SDL2](https://www.libsdl.org/), some nuances of embedded programming and game development.
 
 # Build
 
@@ -37,7 +37,7 @@ To build the OPK file for my [PocketGo2](https://wagnerstechtalk.com/pg2/) I use
 
 `make opk`
 
-See the Makefile.
+See the Makefile. It can only be done on Linux.
 
 # Links
 1. OpenDingux Software list: https://github.com/retrogamehandheld/OpenDingux
@@ -46,13 +46,10 @@ See the Makefile.
 4. Toolchain for it: https://github.com/Ninoh-FOX/toolchain
 
 # Roadmap
-1. Digger can fire. 
-2. Fireball hits the wall.
 2. Bag starts to shake. 
 3. Bag can fall. Multiple bags can fall.
 4. Bag can turn to gold or stay a bag.
 3. Digger can collect gold.
-4. Digger can move bags (one or many).
 4. Digger can be killed by a bag.
 5. Nobbin chases digger.
 6. Nobbin can move bags.
@@ -61,4 +58,3 @@ See the Makefile.
 8. Hobbin chases digger.
 9. Hobbin eats everything: bags, emeralds and field.
 11. Hobbin can be killed by fire or a bag.
-12. 

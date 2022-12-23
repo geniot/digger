@@ -41,7 +41,7 @@ func NewDigger(scn *Scene) *Digger {
 
 	//same for all levels
 	cellX := 7
-	cellY := 6 //9
+	cellY := 9
 
 	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
 	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
@@ -225,11 +225,13 @@ func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
 	if collision := digger.collisionObject.Check(float64(x), float64(y)); collision != nil {
-		if em, ok1 := collision.Objects[0].Data.(*Emerald); ok1 {
-			em.Destroy()
-		} else if bag, ok2 := collision.Objects[0].Data.(*Bag); ok2 {
-			bag.push(dir)
-			return false, !bag.canMove(dir)
+		for i := 0; i < len(collision.Objects); i++ {
+			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
+				em.Destroy()
+			} else if bag, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
+				bag.push(dir)
+				return false, !bag.canMove(dir)
+			}
 		}
 	}
 	return true, false

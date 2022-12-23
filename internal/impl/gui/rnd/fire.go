@@ -145,10 +145,12 @@ func (fire *Fire) canMove(dir Direction) bool {
 	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
 	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
 	if collision := fire.collisionObject.Check(float64(x), float64(y)); collision != nil {
-		if _, ok := collision.Objects[0].Data.(*Emerald); ok {
-			return false
-		} else if _, ok = collision.Objects[0].Data.(*Bag); ok {
-			return false
+		for i := 0; i < len(collision.Objects); i++ {
+			if _, ok := collision.Objects[i].Data.(*Emerald); ok {
+				return false
+			} else if _, ok = collision.Objects[i].Data.(*Bag); ok {
+				return false
+			}
 		}
 	}
 	return true
