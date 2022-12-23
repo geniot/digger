@@ -23,6 +23,7 @@ type Bag struct {
 	spritesShake              []*sdl.Texture
 
 	texture         *sdl.Texture
+	textureFall     *sdl.Texture
 	collisionObject *resolv.Object
 	pushDir         Direction
 	state           BagState
@@ -37,6 +38,7 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg := &Bag{}
 	bg.scene = scn
 	bg.texture = resources.LoadTexture("csbag.png")
+	bg.textureFall = resources.LoadTexture("cfbag.png")
 
 	bg.spriteShakePointer = 0
 	bg.spritesShake = []*sdl.Texture{resources.LoadTexture("csbag.png"), resources.LoadTexture("clbag.png"), resources.LoadTexture("crbag.png")}
@@ -114,7 +116,19 @@ func (bag *Bag) Step(n uint64) {
 				bag.state = BAG_FALLING
 			}
 		}
+
+	case BAG_FALLING:
+		if n%FIRE_SPEED_RATE == 0 {
+			if bag.canFall() {
+				bag.offsetY += 1
+				bag.collisionObject.Y = float64(bag.offsetY + bag.innerOffsetY)
+				bag.collisionObject.Update()
+			} else {
+				bag.state = BAG_SET
+			}
+		}
 	}
+
 }
 
 func (bag *Bag) hasHollowSpaceUnder() bool {
@@ -167,7 +181,7 @@ func (bag *Bag) Render() {
 		dstRect := sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT}
 		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	} else {
-		ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT})
+		ctx.RendererIns.Copy(If(bag.state == BAG_FALLING, bag.textureFall, bag.texture), nil, &sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT})
 	}
 
 	if IS_DEBUG_ON {
@@ -181,4 +195,8 @@ func (bag *Bag) Render() {
 func (bag *Bag) push(dir Direction) {
 	bag.pushDir = dir
 	bag.state = BAG_PUSHED
+}
+
+func (bag *Bag) canFall() bool {
+	return bag.offsetY < SCREEN_LOGICAL_HEIGHT-CELL_HEIGHT*2
 }
