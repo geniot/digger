@@ -40,7 +40,8 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 	em.innerOffsetX = 5
 	em.innerOffsetY = 7
 
-	em.collisionObject = resolv.NewObject(float64(em.offsetX+em.innerOffsetX), float64(em.offsetY+em.innerOffsetY), float64(em.width), float64(em.height), EMERALD_COLLISION_TAG)
+	em.collisionObject = resolv.NewObject(float64(em.offsetX+em.innerOffsetX), float64(em.offsetY+em.innerOffsetY),
+		float64(em.width), float64(em.height), EMERALD_COLLISION_TAG)
 	em.collisionObject.Data = em
 	scn.collisionSpace.Add(em.collisionObject)
 

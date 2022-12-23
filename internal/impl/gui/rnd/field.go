@@ -130,14 +130,16 @@ func (field *Field) isPointField(x int32, y int32) bool {
 
 func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) bool {
 	//screen bounds
-	if dir == RIGHT && offsetX >= CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1) {
-		return false
-	} else if dir == LEFT && offsetX <= CELLS_OFFSET {
-		return false
-	} else if dir == UP && offsetY <= FIELD_OFFSET_Y+CELLS_OFFSET {
-		return false
-	} else if dir == DOWN && offsetY >= FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1) {
-		return false
+	switch dir {
+	case RIGHT:
+		return offsetX < CELLS_OFFSET+CELL_WIDTH*(CELLS_HORIZONTAL-1)
+	case LEFT:
+		return offsetX > CELLS_OFFSET
+	case UP:
+		return offsetY > FIELD_OFFSET_Y+CELLS_OFFSET
+	case DOWN:
+		return offsetY < FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*(CELLS_VERTICAL-1)
+	default:
+		return true
 	}
-	return true
 }

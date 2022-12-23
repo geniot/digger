@@ -273,19 +273,20 @@ func (digger *Digger) Render() {
 func (digger *Digger) eatField() {
 	field := digger.scene.field
 
-	if digger.direction == RIGHT { //RIGHT
+	switch digger.direction {
+	case RIGHT:
 		for i := 0; i <= CELL_WIDTH/2; i++ {
 			field.drawEatRight(digger.offsetX-int32(i), digger.offsetY)
 		}
-	} else if digger.direction == LEFT { //LEFT
+	case LEFT:
 		for i := CELL_WIDTH / 2; i >= 0; i-- {
 			field.drawEatLeft(digger.offsetX+int32(i), digger.offsetY)
 		}
-	} else if digger.direction == UP { //UP
+	case UP:
 		for i := CELL_WIDTH / 2; i >= 0; i-- {
 			field.drawEatUp(digger.offsetX, digger.offsetY+int32(i))
 		}
-	} else if digger.direction == DOWN { //DOWN
+	case DOWN:
 		for i := 0; i <= CELL_WIDTH/2; i++ {
 			field.drawEatDown(digger.offsetX, digger.offsetY-int32(i))
 		}
