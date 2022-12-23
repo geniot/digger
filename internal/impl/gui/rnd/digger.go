@@ -40,8 +40,8 @@ func NewDigger(scn *Scene) *Digger {
 	dg.sprites = []*sdl.Texture{resources.LoadTexture("cldig1.png"), resources.LoadTexture("cldig2.png"), resources.LoadTexture("cldig3.png")}
 
 	//same for all levels
-	cellX := 7
-	cellY := 9
+	cellX := 0
+	cellY := 3
 
 	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
 	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)

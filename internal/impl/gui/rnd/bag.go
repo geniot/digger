@@ -18,9 +18,9 @@ type Bag struct {
 
 	moveAttempts int
 
-	spriteShakePointer    int
-	spriteShakePointerInc int
-	spritesShake          []*sdl.Texture
+	spriteShakePointer        int
+	spritesShakeFrameSequence []int
+	spritesShake              []*sdl.Texture
 
 	texture         *sdl.Texture
 	collisionObject *resolv.Object
@@ -39,8 +39,8 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg.texture = resources.LoadTexture("csbag.png")
 
 	bg.spriteShakePointer = 0
-	bg.spriteShakePointerInc = 1
-	bg.spritesShake = []*sdl.Texture{resources.LoadTexture("clbag.png"), resources.LoadTexture("crbag.png")}
+	bg.spritesShake = []*sdl.Texture{resources.LoadTexture("csbag.png"), resources.LoadTexture("clbag.png"), resources.LoadTexture("crbag.png")}
+	bg.spritesShakeFrameSequence = []int{0, 1, 2, 1, 2}
 
 	bg.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
@@ -52,7 +52,8 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg.state = BAG_SET
 	bg.moveAttempts = 0
 
-	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+bg.innerOffsetX), float64(bg.offsetY+bg.innerOffsetY), float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
+	bg.collisionObject = resolv.NewObject(float64(bg.offsetX+bg.innerOffsetX), float64(bg.offsetY+bg.innerOffsetY),
+		float64(bg.width), float64(bg.height), BAG_COLLISION_TAG)
 	bg.collisionObject.Data = bg
 	scn.collisionSpace.Add(bg.collisionObject)
 
@@ -67,18 +68,27 @@ func (bag *Bag) getHitBox() *sdl.Rect {
 	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + bag.innerOffsetY, bag.width, bag.height}
 }
 
+func (bag *Bag) getFallBox() *sdl.Rect {
+	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + CELL_HEIGHT, bag.width, bag.height}
+}
+
 func (bag *Bag) Destroy() {
 	bag.texture.Destroy()
 }
 
 func (bag *Bag) Step(n uint64) {
-	if n%BAG_PUSH_RATE_RATE == 0 {
-		if bag.state == BAG_PUSHED {
-			bag.state = BAG_MOVING
-			if bag.canMove(bag.pushDir) {
-				bag.move()
-			}
-		} else if bag.state == BAG_MOVING {
+	switch bag.state {
+	case BAG_SET:
+		if bag.hasHollowSpaceUnder() {
+			bag.state = BAG_SHAKING
+		}
+	case BAG_PUSHED:
+		bag.state = BAG_MOVING
+		if bag.canMove(bag.pushDir) {
+			bag.move()
+		}
+	case BAG_MOVING:
+		if n%BAG_PUSH_RATE_RATE == 0 {
 			if bag.canMove(bag.pushDir) {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
 					bag.move()
@@ -96,7 +106,27 @@ func (bag *Bag) Step(n uint64) {
 				}
 			}
 		}
+	case BAG_SHAKING:
+		if n%(SPRITE_UPDATE_RATE*4) == 0 {
+			bag.spriteShakePointer += 1
+			if bag.spriteShakePointer >= len(bag.spritesShakeFrameSequence) {
+				bag.spriteShakePointer = 0
+				bag.state = BAG_FALLING
+			}
+		}
 	}
+}
+
+func (bag *Bag) hasHollowSpaceUnder() bool {
+	fB := bag.getFallBox()
+	for x := fB.X; x < fB.X+fB.W; x++ {
+		for y := fB.Y; y < fB.Y+fB.H; y++ {
+			if !bag.scene.field.isPointField(x, y) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (bag *Bag) move() {
@@ -133,11 +163,18 @@ func (bag *Bag) canMove(dir Direction) bool {
  */
 
 func (bag *Bag) Render() {
-	ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT})
+	if bag.state == BAG_SHAKING {
+		dstRect := sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT}
+		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
+	} else {
+		ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT})
+	}
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
 		DrawRectLines(bag.getHitBox())
+		ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
+		DrawRectLines(bag.getFallBox())
 	}
 }
 
