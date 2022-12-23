@@ -131,7 +131,7 @@ func (fire *Fire) Step(n uint64) {
 				fire.state = FIRE_STOPPED
 			}
 		}
-		if fire.scene.field.collide(fire.getHitBox(), fire.direction) {
+		if fire.collidesWithField() {
 			fire.state = FIRE_STOPPED
 		}
 	}
@@ -139,6 +139,29 @@ func (fire *Fire) Step(n uint64) {
 	if fire.state == FIRE_FINISHED {
 		fire.Destroy()
 	}
+}
+
+func (fire *Fire) collidesWithField() bool {
+	fld := fire.scene.field
+
+	if fire.direction == UP {
+		if fld.isPointField(fire.offsetX+fire.innerOffsetX+fire.width/2, fire.offsetY+fire.innerOffsetY) {
+			return true
+		}
+	} else if fire.direction == DOWN {
+		if fld.isPointField(fire.offsetX+fire.innerOffsetX+fire.width/2, fire.offsetY+fire.innerOffsetY+fire.height) {
+			return true
+		}
+	} else if fire.direction == LEFT {
+		if fld.isPointField(fire.offsetX+fire.innerOffsetX, fire.offsetY+fire.innerOffsetY+fire.height/2) {
+			return true
+		}
+	} else if fire.direction == RIGHT {
+		if fld.isPointField(fire.offsetX+fire.innerOffsetX+fire.width, fire.offsetY+fire.innerOffsetY+fire.height/2) {
+			return true
+		}
+	}
+	return false
 }
 
 func (fire *Fire) canMove(dir Direction) bool {

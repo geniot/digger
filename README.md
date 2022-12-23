@@ -5,7 +5,7 @@
 [Digger](https://www.digger.org/) is a classic game. This clone is a complete rewrite of it, 
 although I used the original graphics.
 
-From the player's perspective the main difference with the original game is that this Digger has pixel-perfect precision. 
+From the player's perspective the main difference with the original game is that this Digger has pixel-perfect precision: 
 
 - all animations are smooth (except sprites - which I borrowed from the original 1983 Windmill game)
 - all object collisions are pixel-based and calculated within a [Resolv](github.com/solarlune/resolv) Space

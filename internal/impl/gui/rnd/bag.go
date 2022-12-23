@@ -18,6 +18,10 @@ type Bag struct {
 
 	moveAttempts int
 
+	spriteShakePointer    int
+	spriteShakePointerInc int
+	spritesShake          []*sdl.Texture
+
 	texture         *sdl.Texture
 	collisionObject *resolv.Object
 	pushDir         Direction
@@ -33,6 +37,10 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg := &Bag{}
 	bg.scene = scn
 	bg.texture = resources.LoadTexture("csbag.png")
+
+	bg.spriteShakePointer = 0
+	bg.spriteShakePointerInc = 1
+	bg.spritesShake = []*sdl.Texture{resources.LoadTexture("clbag.png"), resources.LoadTexture("crbag.png")}
 
 	bg.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
@@ -111,9 +119,8 @@ func (bag *Bag) canMove(dir Direction) bool {
 			if bg, ok1 := collision.Objects[i].Data.(*Bag); ok1 {
 				bg.push(dir)
 				bag.moveAttempts += 1
-				return false //bg.canMove(dir)
+				return false
 			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
-				bag.moveAttempts += 1
 				return false
 			}
 		}

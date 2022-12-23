@@ -123,31 +123,6 @@ func (field *Field) eatHorizontal(x int, y int, isRightCont bool, isLeftCont boo
 	}
 }
 
-func (field *Field) collide(rect *sdl.Rect, dir Direction) bool {
-	xDelta := rect.W / 2
-	yDelta := rect.H / 2
-
-	if dir == UP {
-		if field.isPointField(rect.X+xDelta, rect.Y) {
-			return true
-		}
-	} else if dir == DOWN {
-		if field.isPointField(rect.X+xDelta, rect.Y+rect.H) {
-			return true
-		}
-	} else if dir == LEFT {
-		if field.isPointField(rect.X, rect.Y+yDelta) {
-			return true
-		}
-	} else if dir == RIGHT {
-		if field.isPointField(rect.X+rect.W, rect.Y+yDelta) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (field *Field) isPointField(x int32, y int32) bool {
 	r, g, b, _ := field.background.At(int(x), int(y-FIELD_OFFSET_Y)).RGBA()
 	return r != 0 || g != 0 || b != 0
