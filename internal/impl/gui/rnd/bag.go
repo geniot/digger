@@ -198,5 +198,9 @@ func (bag *Bag) push(dir Direction) {
 }
 
 func (bag *Bag) canFall() bool {
-	return bag.offsetY < SCREEN_LOGICAL_HEIGHT-CELL_HEIGHT*2
+	if (bag.offsetY-FIELD_OFFSET_Y-CELLS_OFFSET)%CELL_HEIGHT == 0 {
+		return bag.hasHollowSpaceUnder()
+	} else {
+		return true
+	}
 }
