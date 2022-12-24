@@ -226,8 +226,12 @@ func (bag *Bag) canMove(dir Direction) bool {
 				bg.push(dir)
 				bag.moveAttempts += 1
 				return false
-			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
-				return false
+			} else if dg, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
+				if bag.state == BAG_FALLING {
+					dg.kill()
+				} else {
+					return false
+				}
 			}
 		}
 	}

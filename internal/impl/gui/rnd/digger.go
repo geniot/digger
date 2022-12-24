@@ -9,11 +9,13 @@ import (
 )
 
 type Digger struct {
-	offsetX   int32
-	offsetY   int32
-	width     int32
-	height    int32
+	offsetX int32
+	offsetY int32
+	width   int32
+	height  int32
+
 	direction Direction
+	state     DiggerState
 
 	innerOffsetX int32
 	innerOffsetY int32
@@ -21,6 +23,12 @@ type Digger struct {
 	spritePointer    int
 	spritePointerInc int
 	sprites          []*sdl.Texture
+
+	dieTexture *sdl.Texture
+
+	spriteGravePointer        int
+	spritesGraveFrameSequence []int
+	spritesGrave              []*sdl.Texture
 
 	collisionObject *resolv.Object
 
@@ -37,7 +45,21 @@ func NewDigger(scn *Scene) *Digger {
 	dg := &Digger{}
 	dg.scene = scn
 
-	dg.sprites = []*sdl.Texture{resources.LoadTexture("cldig1.png"), resources.LoadTexture("cldig2.png"), resources.LoadTexture("cldig3.png")}
+	dg.sprites = []*sdl.Texture{
+		resources.LoadTexture("cldig1.png"),
+		resources.LoadTexture("cldig2.png"),
+		resources.LoadTexture("cldig3.png")}
+	dg.dieTexture = resources.LoadTexture("cddie.png")
+
+	dg.spriteGravePointer = 0
+	dg.spritesGrave = []*sdl.Texture{
+		resources.LoadTexture("cgrave1.png"),
+		resources.LoadTexture("cgrave2.png"),
+		resources.LoadTexture("cgrave3.png"),
+		resources.LoadTexture("cgrave4.png"),
+		resources.LoadTexture("cgrave5.png"),
+	}
+	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4}
 
 	//same for all levels
 	cellX := 0
@@ -47,7 +69,10 @@ func NewDigger(scn *Scene) *Digger {
 	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
 	dg.width = 16
 	dg.height = 16
+
 	dg.direction = RIGHT
+	dg.state = DIGGER_ALIVE
+
 	dg.spritePointer = 0
 	dg.spritePointerInc = 1
 
@@ -65,136 +90,61 @@ func NewDigger(scn *Scene) *Digger {
  * MODEL
  */
 
-func (digger *Digger) Step(n uint64) {
-	if n%SPRITE_UPDATE_RATE == 0 {
-		digger.spritePointer += digger.spritePointerInc
-		if digger.spritePointer == len(digger.sprites)-1 || digger.spritePointer == 0 {
-			digger.spritePointerInc = -digger.spritePointerInc
+func (digger *Digger) handleMove(dir1 Direction, dir2 Direction, dir3 Direction, mod int32) {
+	if digger.direction == dir1 {
+		if cM, _ := digger.canMoveShouldTurn(dir1); cM {
+			digger.move(dir1)
+		}
+	} else if digger.direction == Opposite(dir1) {
+		digger.direction = dir1
+	} else {
+		if mod != 0 {
+			if digger.direction == dir2 {
+				cM, sT := digger.canMoveShouldTurn(dir2)
+				if cM {
+					digger.move(dir2)
+				}
+				if sT {
+					digger.direction = Opposite(dir2)
+				}
+			} else if digger.direction == dir3 {
+				cM, sT := digger.canMoveShouldTurn(dir3)
+				if cM {
+					digger.move(dir3)
+				}
+				if sT {
+					digger.direction = Opposite(dir3)
+				}
+			}
+		} else {
+			digger.direction = dir1
 		}
 	}
+}
 
-	if n%DIGGER_SPEED_RATE == 0 {
-		if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
-			if digger.direction == RIGHT {
-				if cM, _ := digger.canMoveShouldTurn(RIGHT); cM {
-					digger.move(RIGHT)
-				}
-			} else if digger.direction == LEFT {
-				digger.direction = RIGHT
-			} else {
-				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
-					if digger.direction == UP {
-						cM, sT := digger.canMoveShouldTurn(UP)
-						if cM {
-							digger.move(UP)
-						}
-						if sT {
-							digger.direction = DOWN
-						}
-					} else if digger.direction == DOWN {
-						cM, sT := digger.canMoveShouldTurn(DOWN)
-						if cM {
-							digger.move(DOWN)
-						}
-						if sT {
-							digger.direction = UP
-						}
-					}
-				} else {
-					digger.direction = RIGHT
-				}
-			}
-		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
-			if digger.direction == LEFT {
-				if cM, _ := digger.canMoveShouldTurn(LEFT); cM {
-					digger.move(LEFT)
-				}
-			} else if digger.direction == RIGHT {
-				digger.direction = LEFT
-			} else {
-				if (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT != 0 {
-					if digger.direction == UP {
-						cM, sT := digger.canMoveShouldTurn(UP)
-						if cM {
-							digger.move(UP)
-						}
-						if sT {
-							digger.direction = DOWN
-						}
-					} else {
-						cM, sT := digger.canMoveShouldTurn(DOWN)
-						if cM {
-							digger.move(DOWN)
-						}
-						if sT {
-							digger.direction = UP
-						}
-					}
-				} else {
-					digger.direction = LEFT
-				}
-			}
-		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok {
-			if digger.direction == UP {
-				if cM, _ := digger.canMoveShouldTurn(UP); cM {
-					digger.move(UP)
-				}
-			} else if digger.direction == DOWN {
-				digger.direction = UP
-			} else {
-				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
-					if digger.direction == LEFT {
-						cM, sT := digger.canMoveShouldTurn(LEFT)
-						if cM {
-							digger.move(LEFT)
-						}
-						if sT {
-							digger.direction = RIGHT
-						}
-					} else {
-						cM, sT := digger.canMoveShouldTurn(RIGHT)
-						if cM {
-							digger.move(RIGHT)
-						}
-						if sT {
-							digger.direction = LEFT
-						}
-					}
-				} else {
-					digger.direction = UP
-				}
-			}
-		} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
-			if digger.direction == DOWN {
-				if cM, _ := digger.canMoveShouldTurn(DOWN); cM {
-					digger.move(DOWN)
-				}
-			} else if digger.direction == UP {
-				digger.direction = DOWN
-			} else {
-				if (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH != 0 {
-					if digger.direction == LEFT {
-						cM, sT := digger.canMoveShouldTurn(LEFT)
-						if cM {
-							digger.move(LEFT)
-						}
-						if sT {
-							digger.direction = RIGHT
-						}
-					} else {
-						cM, sT := digger.canMoveShouldTurn(RIGHT)
-						if cM {
-							digger.move(RIGHT)
-						}
-						if sT {
-							digger.direction = LEFT
-						}
-					}
-				} else {
-					digger.direction = DOWN
-				}
+func (digger *Digger) Step(n uint64) {
+	switch digger.state {
+	case DIGGER_ALIVE:
+		if n%SPRITE_UPDATE_RATE == 0 {
+			digger.spritePointer += digger.spritePointerInc
+			if digger.spritePointer == len(digger.sprites)-1 || digger.spritePointer == 0 {
+				digger.spritePointerInc = -digger.spritePointerInc
 			}
 		}
+
+		if n%DIGGER_SPEED_RATE == 0 {
+			if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
+				digger.handleMove(RIGHT, UP, DOWN, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT)
+			} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
+				digger.handleMove(LEFT, UP, DOWN, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT)
+			} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok {
+				digger.handleMove(UP, LEFT, RIGHT, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH)
+			} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
+				digger.handleMove(DOWN, LEFT, RIGHT, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH)
+			}
+		}
+	case DIGGER_GRAVE:
+
 	}
 
 	if p, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_A]; ok && p != digger.processedTimeStamp {
@@ -250,28 +200,45 @@ func (digger *Digger) getHitBox() *sdl.Rect {
  */
 
 func (digger *Digger) Render() {
-	dstRect := sdl.Rect{digger.offsetX, digger.offsetY, CELL_WIDTH, CELL_HEIGHT}
-	flip := sdl.FLIP_NONE
-	if digger.direction == RIGHT {
-		flip = sdl.FLIP_HORIZONTAL
-	}
-	angle := 0.0
-	if digger.direction == UP {
-		angle = 90
-	}
-	if digger.direction == DOWN {
-		angle = 270
+	switch digger.state {
+	case DIGGER_ALIVE:
+		flip := sdl.FLIP_NONE
+		if digger.direction == RIGHT {
+			flip = sdl.FLIP_HORIZONTAL
+		}
+		angle := 0.0
+		if digger.direction == UP {
+			angle = 90
+		}
+		if digger.direction == DOWN {
+			angle = 270
+		}
+
+		if IS_DEBUG_ON {
+			ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
+			DrawRectLines(digger.getHitBox())
+		}
+
+		ctx.RendererIns.CopyEx(
+			digger.sprites[digger.spritePointer],
+			nil,
+			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
+			angle,
+			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2},
+			flip)
+
+		digger.eatField()
+	case DIGGER_DIE:
+		ctx.RendererIns.Copy(digger.dieTexture, nil, &sdl.Rect{digger.offsetX, digger.offsetY, CELL_WIDTH, CELL_HEIGHT})
+	case DIGGER_GRAVE:
+		ctx.RendererIns.CopyEx(
+			digger.spritesGrave[digger.spritesGraveFrameSequence[digger.spriteGravePointer]],
+			nil,
+			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
+			0,
+			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	}
 
-	if IS_DEBUG_ON {
-		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-		DrawRectLines(digger.getHitBox())
-	}
-
-	ctx.RendererIns.CopyEx(digger.sprites[digger.spritePointer], nil, &dstRect, angle,
-		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
-
-	digger.eatField()
 }
 
 func (digger *Digger) eatField() {
@@ -295,4 +262,8 @@ func (digger *Digger) eatField() {
 			field.drawEatDown(digger.offsetX, digger.offsetY-int32(i))
 		}
 	}
+}
+
+func (digger *Digger) kill() {
+	digger.state = DIGGER_DIE
 }
