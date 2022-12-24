@@ -1,7 +1,7 @@
 B         HHHHS
    CC  C  V    
 H  CC  C  V    
-V  CC  B  V BBC
+V  CC  BB V BBC
 V  CCV CH V CCC
 HH CC  CH V CCC
  V        V    

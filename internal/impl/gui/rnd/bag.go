@@ -71,7 +71,7 @@ func (bag *Bag) getHitBox() *sdl.Rect {
 }
 
 func (bag *Bag) getFallBox() *sdl.Rect {
-	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + CELL_HEIGHT, bag.width, bag.height}
+	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + +bag.innerOffsetY + CELL_HEIGHT, bag.width, bag.height}
 }
 
 func (bag *Bag) Destroy() {
@@ -86,8 +86,12 @@ func (bag *Bag) Step(n uint64) {
 		}
 	case BAG_PUSHED:
 		bag.state = BAG_MOVING
-		if bag.canMove(bag.pushDir) {
-			bag.move()
+		if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH == 0 && bag.hasHollowSpaceUnder() {
+			bag.state = BAG_FALLING
+		} else {
+			if bag.canMove(bag.pushDir) {
+				bag.move()
+			}
 		}
 	case BAG_MOVING:
 		if n%BAG_PUSH_RATE_RATE == 0 {
@@ -95,7 +99,11 @@ func (bag *Bag) Step(n uint64) {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
 					bag.move()
 				} else {
-					bag.state = BAG_SET
+					if bag.hasHollowSpaceUnder() {
+						bag.state = BAG_FALLING
+					} else {
+						bag.state = BAG_SET
+					}
 				}
 			} else {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
@@ -104,7 +112,11 @@ func (bag *Bag) Step(n uint64) {
 						bag.pushDir = Opposite(bag.pushDir)
 					}
 				} else {
-					bag.state = BAG_SET
+					if bag.hasHollowSpaceUnder() {
+						bag.state = BAG_FALLING
+					} else {
+						bag.state = BAG_SET
+					}
 				}
 			}
 		}
@@ -120,7 +132,15 @@ func (bag *Bag) Step(n uint64) {
 	case BAG_FALLING:
 		if n%FIRE_SPEED_RATE == 0 {
 			if bag.canFall() {
+				if collision := bag.collisionObject.Check(0, 1); collision != nil {
+					for i := 0; i < len(collision.Objects); i++ {
+						if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
+							em.Destroy()
+						}
+					}
+				}
 				bag.offsetY += 1
+				bag.scene.field.drawEatUp(bag.offsetX, bag.offsetY+bag.height-4)
 				bag.collisionObject.Y = float64(bag.offsetY + bag.innerOffsetY)
 				bag.collisionObject.Update()
 			} else {
