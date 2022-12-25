@@ -97,7 +97,7 @@ func (fire *Fire) Step(n uint64) {
 			}
 		}
 	}
-	if n%FIRE_SPEED_RATE == 0 && fire.state == FIRE_MOVING {
+	if n%FIRE_SPEED == 0 && fire.state == FIRE_MOVING {
 		if fire.direction == UP {
 			if fire.canMove(UP) {
 				fire.offsetY -= 1

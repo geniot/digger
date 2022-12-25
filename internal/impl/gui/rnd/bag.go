@@ -118,7 +118,7 @@ func (bag *Bag) Step(n uint64) {
 			}
 		}
 	case BAG_MOVING:
-		if n%BAG_PUSH_RATE_RATE == 0 {
+		if n%BAG_PUSH_SPEED == 0 {
 			if bag.canMove(bag.pushDir) {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
 					bag.move()
@@ -157,7 +157,7 @@ func (bag *Bag) Step(n uint64) {
 		}
 
 	case BAG_FALLING:
-		if n%FIRE_SPEED_RATE == 0 {
+		if n%BAG_FALL_SPEED == 0 {
 			if bag.canFall() {
 				bag.offsetY += 1
 				bag.scene.field.drawEatUp(bag.offsetX, bag.offsetY+bag.height-4)
@@ -226,12 +226,8 @@ func (bag *Bag) canMove(dir Direction) bool {
 				bg.push(dir)
 				bag.moveAttempts += 1
 				return false
-			} else if dg, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
-				if bag.state == BAG_FALLING {
-					dg.kill()
-				} else {
-					return false
-				}
+			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
+				return false
 			}
 		}
 	}
@@ -271,6 +267,8 @@ func (bag *Bag) canFall() bool {
 		for i := 0; i < len(collision.Objects); i++ {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
 				em.Destroy()
+			} else if dg, ok3 := collision.Objects[i].Data.(*Digger); ok3 {
+				dg.kill()
 			} else if bg, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
 				bag.turnToGold()
 				bg.turnToGold()

@@ -93,7 +93,6 @@ func (scene *Scene) Step(n uint64) {
 
 func (scene *Scene) Render() {
 	scene.field.Render()
-	scene.digger.Render()
 	if scene.fire != nil {
 		scene.fire.Render()
 	}
@@ -103,6 +102,8 @@ func (scene *Scene) Render() {
 	for bag := range scene.bags.Iter() {
 		bag.Render()
 	}
+	scene.digger.Render()
+
 	if IS_DEBUG_ON {
 		scene.debugGrid.Render()
 		//scene.fpsCounter.Render()

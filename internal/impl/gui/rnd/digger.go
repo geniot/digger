@@ -63,7 +63,7 @@ func NewDigger(scn *Scene) *Digger {
 
 	//same for all levels
 	cellX := 0
-	cellY := 3
+	cellY := 5
 
 	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
 	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
@@ -132,7 +132,7 @@ func (digger *Digger) Step(n uint64) {
 			}
 		}
 
-		if n%DIGGER_SPEED_RATE == 0 {
+		if n%DIGGER_SPEED == 0 {
 			if _, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_RIGHT]; ok {
 				digger.handleMove(RIGHT, UP, DOWN, (FIELD_OFFSET_Y+CELLS_OFFSET+digger.offsetY)%CELL_HEIGHT)
 			} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_LEFT]; ok {
@@ -141,6 +141,20 @@ func (digger *Digger) Step(n uint64) {
 				digger.handleMove(UP, LEFT, RIGHT, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH)
 			} else if _, ok = ctx.PressedKeysCodesSetIns[GCW_BUTTON_DOWN]; ok {
 				digger.handleMove(DOWN, LEFT, RIGHT, (CELLS_OFFSET+digger.offsetX)%CELL_WIDTH)
+			}
+		}
+	case DIGGER_DIE:
+		if collision := digger.collisionObject.Check(float64(0), float64(0)); collision != nil {
+			for i := 0; i < len(collision.Objects); i++ {
+				if bag, ok := collision.Objects[i].Data.(*Bag); ok {
+					if bag.state == BAG_FALLING {
+						if bag.offsetY > digger.offsetY {
+							digger.offsetY = bag.offsetY
+							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+							digger.collisionObject.Update()
+						}
+					}
+				}
 			}
 		}
 	case DIGGER_GRAVE:
@@ -213,12 +227,6 @@ func (digger *Digger) Render() {
 		if digger.direction == DOWN {
 			angle = 270
 		}
-
-		if IS_DEBUG_ON {
-			ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
-			DrawRectLines(digger.getHitBox())
-		}
-
 		ctx.RendererIns.CopyEx(
 			digger.sprites[digger.spritePointer],
 			nil,
@@ -237,6 +245,11 @@ func (digger *Digger) Render() {
 			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
 			0,
 			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
+	}
+
+	if IS_DEBUG_ON {
+		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
+		DrawRectLines(digger.getHitBox())
 	}
 
 }

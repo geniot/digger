@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	IS_DEBUG_ON = false
+	IS_DEBUG_ON = true
 
 	APP_NAME       = "Digger"
 	APP_VERSION    = "0.1"
@@ -16,9 +16,10 @@ const (
 
 	TICK               float64 = 1.0 / 200.0
 	SPRITE_UPDATE_RATE         = 18
-	DIGGER_SPEED_RATE          = 4 //less is faster
-	BAG_PUSH_RATE_RATE         = 8
-	FIRE_SPEED_RATE            = 2
+	DIGGER_SPEED               = 4 //less is faster
+	BAG_PUSH_SPEED             = 8
+	FIRE_SPEED                 = 2
+	BAG_FALL_SPEED             = 10 //2
 
 	SCREEN_LOGICAL_WIDTH  = 320
 	SCREEN_LOGICAL_HEIGHT = 240
