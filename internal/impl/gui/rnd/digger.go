@@ -25,6 +25,7 @@ type Digger struct {
 	sprites          []*sdl.Texture
 
 	dieTexture *sdl.Texture
+	dieCounter int
 
 	spriteGravePointer        int
 	spritesGraveFrameSequence []int
@@ -50,6 +51,7 @@ func NewDigger(scn *Scene) *Digger {
 		resources.LoadTexture("cldig2.png"),
 		resources.LoadTexture("cldig3.png")}
 	dg.dieTexture = resources.LoadTexture("cddie.png")
+	dg.dieCounter = CELL_HEIGHT / 3
 
 	dg.spriteGravePointer = 0
 	dg.spritesGrave = []*sdl.Texture{
@@ -150,6 +152,13 @@ func (digger *Digger) Step(n uint64) {
 					if bag.state == BAG_FALLING {
 						if bag.offsetY > digger.offsetY {
 							digger.offsetY = bag.offsetY
+							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+							digger.collisionObject.Update()
+						}
+					} else {
+						if n%DIGGER_DIE_SPEED == 0 && digger.dieCounter > 0 {
+							digger.offsetY += 1
+							digger.dieCounter -= 1
 							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 							digger.collisionObject.Update()
 						}
