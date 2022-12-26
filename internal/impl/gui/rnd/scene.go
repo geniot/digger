@@ -15,6 +15,7 @@ type Scene struct {
 	fire           *Fire
 	emeralds       mapset.Set[*Emerald]
 	bags           mapset.Set[*Bag]
+	monsters       mapset.Set[*Monster]
 	collisionSpace *resolv.Space
 
 	debugGrid  *DebugGrid
@@ -35,6 +36,9 @@ func NewScene() *Scene {
 	scn.digger = NewDigger(scn)
 	scn.emeralds = mapset.NewSet[*Emerald]()
 	scn.bags = mapset.NewSet[*Bag]()
+	scn.monsters = mapset.NewSet[*Monster]()
+
+	scn.monsters.Add(NewMonster(scn))
 
 	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {
@@ -85,6 +89,9 @@ func (scene *Scene) Step(n uint64) {
 	for bag := range scene.bags.Iter() {
 		bag.Step(n)
 	}
+	for monster := range scene.monsters.Iter() {
+		monster.Step(n)
+	}
 }
 
 /**
@@ -101,6 +108,9 @@ func (scene *Scene) Render() {
 	}
 	for bag := range scene.bags.Iter() {
 		bag.Render()
+	}
+	for monster := range scene.monsters.Iter() {
+		monster.Render()
 	}
 	scene.digger.Render()
 

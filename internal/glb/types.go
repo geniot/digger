@@ -5,6 +5,7 @@ package glb
 type Direction int64
 
 type DiggerState int64
+type MonsterState int64
 type FireState int64
 type BagState int64
 
@@ -19,6 +20,11 @@ const (
 	DIGGER_ALIVE DiggerState = iota
 	DIGGER_DIE
 	DIGGER_GRAVE
+)
+
+const (
+	MONSTER_NOBBIN MonsterState = iota
+	MONSTER_HOBBIN
 )
 
 const (
