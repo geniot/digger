@@ -1,5 +1,5 @@
 B         HHHHS
-   CC  C  V    
+H  CC  C  V    
 H  CC  C  V    
 V  CC  BB V BBC
 V  CCV CH V CCC

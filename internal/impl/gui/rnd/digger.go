@@ -24,8 +24,9 @@ type Digger struct {
 	spritePointerInc int
 	sprites          []*sdl.Texture
 
-	dieTexture *sdl.Texture
-	dieCounter int
+	dieTexture      *sdl.Texture
+	dieCounter      int
+	diePauseCounter int
 
 	spriteGravePointer        int
 	spritesGraveFrameSequence []int
@@ -50,10 +51,9 @@ func NewDigger(scn *Scene) *Digger {
 		resources.LoadTexture("cldig1.png"),
 		resources.LoadTexture("cldig2.png"),
 		resources.LoadTexture("cldig3.png")}
-	dg.dieTexture = resources.LoadTexture("cddie.png")
-	dg.dieCounter = CELL_HEIGHT / 3
 
-	dg.spriteGravePointer = 0
+	dg.dieTexture = resources.LoadTexture("cddie.png")
+
 	dg.spritesGrave = []*sdl.Texture{
 		resources.LoadTexture("cgrave1.png"),
 		resources.LoadTexture("cgrave2.png"),
@@ -61,31 +61,40 @@ func NewDigger(scn *Scene) *Digger {
 		resources.LoadTexture("cgrave4.png"),
 		resources.LoadTexture("cgrave5.png"),
 	}
-	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4}
+	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4} //making a pause at the end
 
-	//same for all levels
-	cellX := 0
-	cellY := 5
-
-	dg.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
-	dg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
-	dg.width = 16
-	dg.height = 16
-
-	dg.direction = RIGHT
-	dg.state = DIGGER_ALIVE
-
-	dg.spritePointer = 0
 	dg.spritePointerInc = 1
 
 	dg.innerOffsetX = 2
 	dg.innerOffsetY = 2
+	dg.width = 16
+	dg.height = 16
 
 	dg.collisionObject = resolv.NewObject(float64(dg.offsetX+dg.innerOffsetX), float64(dg.offsetY+dg.innerOffsetY), float64(dg.width), float64(dg.height), DIGGER_COLLISION_TAG)
 	dg.collisionObject.Data = dg
 	scn.collisionSpace.Add(dg.collisionObject)
 
+	dg.reborn()
+
 	return dg
+}
+
+func (digger *Digger) reborn() {
+	//same for all levels
+	cellX := 0
+	cellY := 5
+	digger.dieCounter = CELL_HEIGHT / 3
+	digger.diePauseCounter = CELL_HEIGHT
+	digger.spriteGravePointer = 0
+	digger.spritePointer = 0
+
+	digger.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
+	digger.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
+	digger.direction = RIGHT
+	digger.state = DIGGER_ALIVE
+	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
+	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+	digger.collisionObject.Update()
 }
 
 /**
@@ -128,10 +137,7 @@ func (digger *Digger) Step(n uint64) {
 	switch digger.state {
 	case DIGGER_ALIVE:
 		if n%SPRITE_UPDATE_RATE == 0 {
-			digger.spritePointer += digger.spritePointerInc
-			if digger.spritePointer == len(digger.sprites)-1 || digger.spritePointer == 0 {
-				digger.spritePointerInc = -digger.spritePointerInc
-			}
+			digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.sprites))
 		}
 
 		if n%DIGGER_SPEED == 0 {
@@ -149,25 +155,39 @@ func (digger *Digger) Step(n uint64) {
 		if collision := digger.collisionObject.Check(float64(0), float64(0)); collision != nil {
 			for i := 0; i < len(collision.Objects); i++ {
 				if bag, ok := collision.Objects[i].Data.(*Bag); ok {
-					if bag.state == BAG_FALLING {
+					if bag.state == BAG_FALLING { //fall with the bag
 						if bag.offsetY > digger.offsetY {
 							digger.offsetY = bag.offsetY
 							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 							digger.collisionObject.Update()
 						}
 					} else {
-						if n%DIGGER_DIE_SPEED == 0 && digger.dieCounter > 0 {
-							digger.offsetY += 1
-							digger.dieCounter -= 1
-							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-							digger.collisionObject.Update()
+						if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
+							if digger.dieCounter > 0 {
+								digger.offsetY += 1
+								digger.dieCounter -= 1
+								digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+								digger.collisionObject.Update()
+							} else {
+								if digger.diePauseCounter > 0 {
+									digger.diePauseCounter -= 1
+								} else {
+									digger.state = DIGGER_GRAVE
+								}
+							}
 						}
 					}
 				}
 			}
 		}
 	case DIGGER_GRAVE:
-
+		if n%DIGGER_GRAVE_SPEED == 0 {
+			if digger.spriteGravePointer < len(digger.spritesGraveFrameSequence)-1 {
+				digger.spriteGravePointer += 1
+			} else {
+				digger.reborn()
+			}
+		}
 	}
 
 	if p, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_A]; ok && p != digger.processedTimeStamp {
@@ -251,7 +271,7 @@ func (digger *Digger) Render() {
 		ctx.RendererIns.CopyEx(
 			digger.spritesGrave[digger.spritesGraveFrameSequence[digger.spriteGravePointer]],
 			nil,
-			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
+			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY - CELL_HEIGHT/3, W: CELL_WIDTH, H: CELL_HEIGHT},
 			0,
 			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	}

@@ -86,10 +86,7 @@ func (fire *Fire) getHitBox() *sdl.Rect {
 func (fire *Fire) Step(n uint64) {
 	if n%SPRITE_UPDATE_RATE == 0 {
 		if fire.state == FIRE_MOVING {
-			fire.spritePointer += fire.spritePointerInc
-			if fire.spritePointer == len(fire.sprites)-1 || fire.spritePointer == 0 {
-				fire.spritePointerInc = -fire.spritePointerInc
-			}
+			fire.spritePointer, fire.spritePointerInc = GetNextSpritePointerAndInc(fire.spritePointer, fire.spritePointerInc, len(fire.sprites))
 		} else {
 			fire.spriteExplPointer += fire.spriteExplPointerInc
 			if fire.spriteExplPointer == len(fire.spritesExpl) {

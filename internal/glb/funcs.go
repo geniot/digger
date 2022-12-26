@@ -103,3 +103,18 @@ func Collide(rect1 *sdl.Rect, rect2 *sdl.Rect) bool {
 	}
 	return true
 }
+
+func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
+	nextSpritePointerInc := spritePointerInc
+	nextSpritePointer := currentPointer + spritePointerInc
+	if nextSpritePointer >= spritesLen {
+		nextSpritePointer = spritesLen - 1
+	}
+	if nextSpritePointer < 0 {
+		nextSpritePointer = 0
+	}
+	if nextSpritePointer == spritesLen-1 || nextSpritePointer == 0 {
+		nextSpritePointerInc = -spritePointerInc
+	}
+	return nextSpritePointer, nextSpritePointerInc
+}

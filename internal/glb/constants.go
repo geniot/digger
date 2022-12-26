@@ -17,7 +17,8 @@ const (
 	TICK               float64 = 1.0 / 200.0
 	SPRITE_UPDATE_RATE         = 18
 	DIGGER_SPEED               = 4 //less is faster
-	DIGGER_DIE_SPEED           = 4
+	DIGGER_DIE_SPEED           = 8
+	DIGGER_GRAVE_SPEED         = SPRITE_UPDATE_RATE * 2
 	BAG_PUSH_SPEED             = 8
 	FIRE_SPEED                 = 2
 	BAG_FALL_SPEED             = 2
