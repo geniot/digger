@@ -122,6 +122,7 @@ func (field *Field) drawEatRight(x int32, y int32) {
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
+	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatLeft(x int32, y int32) {
@@ -130,6 +131,7 @@ func (field *Field) drawEatLeft(x int32, y int32) {
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
+	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatUp(x int32, y int32) {
@@ -138,6 +140,7 @@ func (field *Field) drawEatUp(x int32, y int32) {
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
 	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
+	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatDown(x int32, y int32) {
@@ -146,6 +149,7 @@ func (field *Field) drawEatDown(x int32, y int32) {
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
 	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
+	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) eatEmerald(emerald *Emerald) {
@@ -154,4 +158,25 @@ func (field *Field) eatEmerald(emerald *Emerald) {
 		emerald.offsetY - FIELD_OFFSET_Y,
 		CELL_WIDTH, CELL_HEIGHT}
 	emerald.textureMask.Blit(nil, field.background, &targetRect)
+	field.updateChaseWorld(targetRect)
+}
+
+// translating rects to our grid, updating grid if necessary
+func (field *Field) updateChaseWorld(rects ...sdl.Rect) {
+	for i := 0; i < len(rects); i++ {
+		rect := rects[i]
+		//we change 1-2 cells max with one rect
+		x1 := (rect.X - CELLS_OFFSET) / CELL_WIDTH
+		y1 := (rect.Y - FIELD_OFFSET_Y - CELLS_OFFSET) / CELL_WIDTH
+		x2 := (rect.X + rect.W - CELLS_OFFSET) / CELL_WIDTH
+		y2 := (rect.Y + rect.H - FIELD_OFFSET_Y - CELLS_OFFSET) / CELL_WIDTH
+		field.updateChaseTiles(x1, y1)
+		if x2 != x1 || y2 != y1 {
+			field.updateChaseTiles(x2, y2)
+		}
+	}
+}
+
+func (field *Field) updateChaseTiles(x int32, y int32) {
+
 }
