@@ -3,14 +3,17 @@ package rnd
 import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/resources"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type DebugGrid struct {
+	texture *sdl.Texture
+	scene   *Scene
 }
 
-func NewDebugGrid() *DebugGrid {
-	return &DebugGrid{}
+func NewDebugGrid(scn *Scene) *DebugGrid {
+	return &DebugGrid{resources.LoadTexture("dbg_field.png"), scn}
 }
 
 func (debugGrid *DebugGrid) Render() {
@@ -36,4 +39,17 @@ func (debugGrid *DebugGrid) Render() {
 			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET,
 			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
 	}
+
+	for x := 0; x < CELLS_HORIZONTAL*3; x++ {
+		for y := 0; y < CELLS_VERTICAL*3; y++ {
+			tile := debugGrid.scene.chaseWorld.Tile(x, y)
+			if tile.Kind == KindField {
+				ctx.RendererIns.Copy(debugGrid.texture, nil, &sdl.Rect{
+					int32(CELLS_OFFSET + x*CELL_WIDTH/3),
+					int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT/3),
+					CELL_WIDTH / 3, CELL_HEIGHT / 3})
+			}
+		}
+	}
+
 }

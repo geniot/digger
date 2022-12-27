@@ -27,6 +27,23 @@ func (w World) SetTile(t *Tile, x, y int) {
 	t.W = w
 }
 
+func (w World) SetTiles(kinds [9]int, x, y int) {
+	realX := x * 3
+	realY := y * 3
+
+	w.SetTile(&Tile{kinds[0], realX, realY, w}, realX, realY)
+	w.SetTile(&Tile{kinds[1], realX + 1, realY, w}, realX+1, realY)
+	w.SetTile(&Tile{kinds[2], realX + 2, realY, w}, realX+2, realY)
+
+	w.SetTile(&Tile{kinds[3], realX, realY + 1, w}, realX, realY+1)
+	w.SetTile(&Tile{kinds[4], realX + 1, realY + 1, w}, realX+1, realY+1)
+	w.SetTile(&Tile{kinds[5], realX + 2, realY + 1, w}, realX+2, realY+1)
+
+	w.SetTile(&Tile{kinds[6], realX, realY + 2, w}, realX, realY+2)
+	w.SetTile(&Tile{kinds[7], realX + 1, realY + 2, w}, realX+1, realY+2)
+	w.SetTile(&Tile{kinds[8], realX + 2, realY + 2, w}, realX+2, realY+2)
+}
+
 // FirstOfKind gets the first tile on the board of a kind, used to get the from
 // and to tiles as there should only be one of each.
 func (w World) FirstOfKind(kind int) *Tile {
@@ -70,6 +87,26 @@ func (w World) RenderPath(path []astar.Pather) string {
 			if pathLocs[fmt.Sprintf("%d,%d", x, y)] {
 				r = KindRunes[KindPath]
 			} else if t != nil {
+				r = KindRunes[t.Kind]
+			}
+			rows[y] += string(r)
+		}
+	}
+	return strings.Join(rows, "\n")
+}
+
+func (w World) Render() string {
+	width := len(w)
+	if width == 0 {
+		return ""
+	}
+	height := len(w[0])
+	rows := make([]string, height)
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			t := w.Tile(x, y)
+			r := ' '
+			if t != nil {
 				r = KindRunes[t.Kind]
 			}
 			rows[y] += string(r)

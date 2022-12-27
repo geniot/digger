@@ -32,3 +32,23 @@ var KindCosts = map[int]float64{
 	KindFrom:   1.0,
 	KindTo:     1.0,
 }
+
+var AllField = [9]int{
+	KindField, KindField, KindField,
+	KindField, KindField, KindField,
+	KindField, KindField, KindField}
+
+var SField = [9]int{
+	KindField, KindTunnel, KindField,
+	KindTunnel, KindTunnel, KindTunnel,
+	KindField, KindTunnel, KindField}
+
+var VField = [9]int{
+	KindField, KindTunnel, KindField,
+	KindField, KindTunnel, KindField,
+	KindField, KindTunnel, KindField}
+
+var HField = [9]int{
+	KindField, KindField, KindField,
+	KindTunnel, KindTunnel, KindTunnel,
+	KindField, KindField, KindField}

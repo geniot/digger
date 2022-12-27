@@ -9,14 +9,16 @@ import (
 )
 
 type Scene struct {
-	level          int
-	field          *Field
-	digger         *Digger
-	fire           *Fire
-	emeralds       mapset.Set[*Emerald]
-	bags           mapset.Set[*Bag]
-	monsters       mapset.Set[*Monster]
+	level    int
+	field    *Field
+	digger   *Digger
+	fire     *Fire
+	emeralds mapset.Set[*Emerald]
+	bags     mapset.Set[*Bag]
+	monsters mapset.Set[*Monster]
+
 	collisionSpace *resolv.Space
+	chaseWorld     *World
 
 	debugGrid  *DebugGrid
 	fpsCounter *FpsCounter
@@ -31,6 +33,7 @@ func NewScene() *Scene {
 	scn := &Scene{}
 	scn.level = 1
 	scn.collisionSpace = resolv.NewSpace(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, 1, 1)
+	scn.chaseWorld = &World{}
 
 	scn.field = NewField(scn)
 	scn.digger = NewDigger(scn)
@@ -42,8 +45,10 @@ func NewScene() *Scene {
 
 	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {
-		row := rows[y]
+		row := strings.TrimSuffix(rows[y], "\n")
+		row = strings.TrimSuffix(rows[y], "\r")
 		for x := 0; x < len(row); x++ {
+			scn.chaseWorld.SetTiles(AllField, x, y)
 			if row[x] == 'C' {
 				scn.emeralds.Add(NewEmerald(x, y, scn))
 			} else if row[x] == 'B' {
@@ -55,20 +60,24 @@ func NewScene() *Scene {
 				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
 				scn.field.eatVertical(x, y, isUpCont, isDownCont)
 				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+				scn.chaseWorld.SetTiles(SField, x, y)
 			} else if row[x] == 'V' {
 				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
 				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
 				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+				scn.chaseWorld.SetTiles(VField, x, y)
 			} else if row[x] == 'H' {
 				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
 				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
 				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+				scn.chaseWorld.SetTiles(HField, x, y)
 			}
 		}
 	}
 
-	scn.debugGrid = NewDebugGrid()
+	scn.debugGrid = NewDebugGrid(scn)
 	scn.fpsCounter = NewFpsCounter()
+	println(scn.chaseWorld.Render())
 
 	return scn
 }
