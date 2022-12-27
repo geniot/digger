@@ -22,7 +22,7 @@ type Scene struct {
 	chaseWorld     *ChaseWorld
 
 	debugGrid  *DebugGrid
-	fpsCounter *FpsCounter
+	fpsCounter *DebugFpsCounter
 }
 
 /**

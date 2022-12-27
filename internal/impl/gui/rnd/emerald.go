@@ -57,7 +57,7 @@ func (emerald *Emerald) getHitBox() *sdl.Rect {
 }
 
 func (emerald *Emerald) Destroy() {
-	emerald.eatField()
+	emerald.scene.field.eatEmerald(emerald)
 	emerald.textureMask.Free()
 	emerald.texture.Destroy()
 	emerald.scene.collisionSpace.Remove(emerald.collisionObject)
@@ -76,12 +76,4 @@ func (emerald *Emerald) Render() {
 		DrawRectLines(emerald.getHitBox())
 	}
 
-}
-
-func (emerald *Emerald) eatField() {
-	targetRect := sdl.Rect{
-		emerald.offsetX,
-		emerald.offsetY - FIELD_OFFSET_Y,
-		CELL_WIDTH, CELL_HEIGHT}
-	emerald.textureMask.Blit(nil, emerald.scene.field.background, &targetRect)
 }

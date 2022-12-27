@@ -63,38 +63,6 @@ func (field *Field) Render() {
 	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
 }
 
-func (field *Field) drawEatRight(x int32, y int32) {
-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{x + CELL_WIDTH - field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
-	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
-}
-
-func (field *Field) drawEatLeft(x int32, y int32) {
-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{x + field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
-	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
-}
-
-func (field *Field) drawEatUp(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
-	targetTunnelRect := sdl.Rect{x, y - CELL_HEIGHT + field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
-	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
-}
-
-func (field *Field) drawEatDown(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
-	targetTunnelRect := sdl.Rect{x, y - field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
-	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
-}
-
 func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
 	oX := int32(CELLS_OFFSET + x*CELL_WIDTH)
 	oY := int32(CELLS_OFFSET + y*CELL_HEIGHT + CELL_HEIGHT)
@@ -142,4 +110,48 @@ func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) 
 	default:
 		return true
 	}
+}
+
+/*
+	EAT FIELD
+*/
+
+func (field *Field) drawEatRight(x int32, y int32) {
+	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
+	targetTunnelRect := sdl.Rect{x + CELL_WIDTH - field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
+}
+
+func (field *Field) drawEatLeft(x int32, y int32) {
+	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
+	targetTunnelRect := sdl.Rect{x + field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
+}
+
+func (field *Field) drawEatUp(x int32, y int32) {
+	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
+	targetTunnelRect := sdl.Rect{x, y - CELL_HEIGHT + field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
+	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
+}
+
+func (field *Field) drawEatDown(x int32, y int32) {
+	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
+	targetTunnelRect := sdl.Rect{x, y - field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
+	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
+}
+
+func (field *Field) eatEmerald(emerald *Emerald) {
+	targetRect := sdl.Rect{
+		emerald.offsetX,
+		emerald.offsetY - FIELD_OFFSET_Y,
+		CELL_WIDTH, CELL_HEIGHT}
+	emerald.textureMask.Blit(nil, field.background, &targetRect)
 }

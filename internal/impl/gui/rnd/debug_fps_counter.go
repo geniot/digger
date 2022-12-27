@@ -6,18 +6,18 @@ import (
 	"strconv"
 )
 
-type FpsCounter struct {
+type DebugFpsCounter struct {
 	startTicks    uint32
 	frameCount    uint32
 	currentSecond uint32
 	currentFPS    uint32
 }
 
-func NewFpsCounter() *FpsCounter {
-	return &FpsCounter{sdl.GetTicks(), 0, sdl.GetTicks() / 1000, 0}
+func NewFpsCounter() *DebugFpsCounter {
+	return &DebugFpsCounter{sdl.GetTicks(), 0, sdl.GetTicks() / 1000, 0}
 }
 
-func (fpsCounter *FpsCounter) Render() {
+func (fpsCounter *DebugFpsCounter) Render() {
 	fpsCounter.frameCount += 1
 	currentTicks := sdl.GetTicks()
 	newFps := uint32(0)
