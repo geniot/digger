@@ -1,4 +1,4 @@
-package glb
+package chs
 
 // Kind* constants refer to tile kinds for input and output.
 const (

@@ -1,16 +1,18 @@
-package glb
+package chs
 
-import "github.com/beefsack/go-astar"
+import (
+	"github.com/beefsack/go-astar"
+)
 
-type Tile struct {
+type ChaseTile struct {
 	Kind int
 	X, Y int
-	W    World
+	W    ChaseWorld
 }
 
 // PathNeighbors returns the neighbors of the tile, excluding blockers and
 // tiles off the edge of the board.
-func (t *Tile) PathNeighbors() []astar.Pather {
+func (t *ChaseTile) PathNeighbors() []astar.Pather {
 	neighbors := []astar.Pather{}
 	for _, offset := range [][]int{
 		{-1, 0},
@@ -27,15 +29,15 @@ func (t *Tile) PathNeighbors() []astar.Pather {
 }
 
 // PathNeighborCost returns the movement cost of the directly neighboring tile.
-func (t *Tile) PathNeighborCost(to astar.Pather) float64 {
-	toT := to.(*Tile)
+func (t *ChaseTile) PathNeighborCost(to astar.Pather) float64 {
+	toT := to.(*ChaseTile)
 	return KindCosts[toT.Kind]
 }
 
 // PathEstimatedCost uses Manhattan distance to estimate orthogonal distance
 // between non-adjacent nodes.
-func (t *Tile) PathEstimatedCost(to astar.Pather) float64 {
-	toT := to.(*Tile)
+func (t *ChaseTile) PathEstimatedCost(to astar.Pather) float64 {
+	toT := to.(*ChaseTile)
 	absX := toT.X - t.X
 	if absX < 0 {
 		absX = -absX

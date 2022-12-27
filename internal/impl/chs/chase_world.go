@@ -1,4 +1,4 @@
-package glb
+package chs
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-type World map[int]map[int]*Tile
+type ChaseWorld map[int]map[int]*ChaseTile
 
-// Tile gets the tile at the given coordinates in the world.
-func (w World) Tile(x, y int) *Tile {
+// Tile ChaseTile gets the tile at the given coordinates in the world.
+func (w ChaseWorld) Tile(x, y int) *ChaseTile {
 	if w[x] == nil {
 		return nil
 	}
@@ -17,9 +17,9 @@ func (w World) Tile(x, y int) *Tile {
 }
 
 // SetTile sets a tile at the given coordinates in the world.
-func (w World) SetTile(t *Tile, x, y int) {
+func (w ChaseWorld) SetTile(t *ChaseTile, x, y int) {
 	if w[x] == nil {
-		w[x] = map[int]*Tile{}
+		w[x] = map[int]*ChaseTile{}
 	}
 	w[x][y] = t
 	t.X = x
@@ -27,26 +27,9 @@ func (w World) SetTile(t *Tile, x, y int) {
 	t.W = w
 }
 
-func (w World) SetTiles(kinds [9]int, x, y int) {
-	realX := x * 3
-	realY := y * 3
-
-	w.SetTile(&Tile{kinds[0], realX, realY, w}, realX, realY)
-	w.SetTile(&Tile{kinds[1], realX + 1, realY, w}, realX+1, realY)
-	w.SetTile(&Tile{kinds[2], realX + 2, realY, w}, realX+2, realY)
-
-	w.SetTile(&Tile{kinds[3], realX, realY + 1, w}, realX, realY+1)
-	w.SetTile(&Tile{kinds[4], realX + 1, realY + 1, w}, realX+1, realY+1)
-	w.SetTile(&Tile{kinds[5], realX + 2, realY + 1, w}, realX+2, realY+1)
-
-	w.SetTile(&Tile{kinds[6], realX, realY + 2, w}, realX, realY+2)
-	w.SetTile(&Tile{kinds[7], realX + 1, realY + 2, w}, realX+1, realY+2)
-	w.SetTile(&Tile{kinds[8], realX + 2, realY + 2, w}, realX+2, realY+2)
-}
-
 // FirstOfKind gets the first tile on the board of a kind, used to get the from
 // and to tiles as there should only be one of each.
-func (w World) FirstOfKind(kind int) *Tile {
+func (w ChaseWorld) FirstOfKind(kind int) *ChaseTile {
 	for _, row := range w {
 		for _, t := range row {
 			if t.Kind == kind {
@@ -58,17 +41,17 @@ func (w World) FirstOfKind(kind int) *Tile {
 }
 
 // From gets the from tile from the world.
-func (w World) From() *Tile {
+func (w ChaseWorld) From() *ChaseTile {
 	return w.FirstOfKind(KindFrom)
 }
 
 // To gets the to tile from the world.
-func (w World) To() *Tile {
+func (w ChaseWorld) To() *ChaseTile {
 	return w.FirstOfKind(KindTo)
 }
 
 // RenderPath renders a path on top of a world.
-func (w World) RenderPath(path []astar.Pather) string {
+func (w ChaseWorld) RenderPath(path []astar.Pather) string {
 	width := len(w)
 	if width == 0 {
 		return ""
@@ -76,7 +59,7 @@ func (w World) RenderPath(path []astar.Pather) string {
 	height := len(w[0])
 	pathLocs := map[string]bool{}
 	for _, p := range path {
-		pT := p.(*Tile)
+		pT := p.(*ChaseTile)
 		pathLocs[fmt.Sprintf("%d,%d", pT.X, pT.Y)] = true
 	}
 	rows := make([]string, height)
@@ -95,7 +78,7 @@ func (w World) RenderPath(path []astar.Pather) string {
 	return strings.Join(rows, "\n")
 }
 
-func (w World) Render() string {
+func (w ChaseWorld) Render() string {
 	width := len(w)
 	if width == 0 {
 		return ""
@@ -116,15 +99,15 @@ func (w World) Render() string {
 }
 
 // ParseWorld parses a textual representation of a world into a world map.
-func ParseWorld(input string) World {
-	w := World{}
+func ParseWorld(input string) ChaseWorld {
+	w := ChaseWorld{}
 	for y, row := range strings.Split(strings.TrimSpace(input), "\n") {
 		for x, raw := range row {
 			kind, ok := RuneKinds[raw]
 			if !ok {
 				kind = KindField
 			}
-			w.SetTile(&Tile{
+			w.SetTile(&ChaseTile{
 				Kind: kind,
 			}, x, y)
 		}
