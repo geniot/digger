@@ -85,7 +85,7 @@ func (bag *Bag) getHitBox() *sdl.Rect {
 }
 
 func (bag *Bag) getFallBox() *sdl.Rect {
-	return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + +bag.innerOffsetY + CELL_HEIGHT, bag.width, bag.height}
+	return &sdl.Rect{bag.offsetX + bag.innerOffsetX*2, bag.offsetY + bag.innerOffsetY + CELL_HEIGHT, bag.width - bag.innerOffsetX*2, bag.height - bag.innerOffsetY}
 }
 
 func (bag *Bag) Destroy() {
@@ -195,14 +195,9 @@ func (bag *Bag) turnToGold() {
 
 func (bag *Bag) hasHollowSpaceUnder() bool {
 	fB := bag.getFallBox()
-	for x := fB.X; x < fB.X+fB.W; x++ {
-		for y := fB.Y; y < fB.Y+fB.H; y++ {
-			if !bag.scene.field.isPointField(x, y) {
-				return true
-			}
-		}
-	}
-	return false
+	return !bag.scene.field.isPointField(fB.X, fB.Y+fB.H/2) ||
+		!bag.scene.field.isPointField(fB.X+fB.W, fB.Y+fB.H/2) ||
+		!bag.scene.field.isPointField(fB.X+fB.W/2, fB.Y+fB.H)
 }
 
 func (bag *Bag) move() {
