@@ -6,6 +6,7 @@ import (
 	"github.com/geniot/digger/resources"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
+	"runtime"
 )
 
 type Digger struct {
@@ -172,6 +173,7 @@ func (digger *Digger) Step(n uint64) {
 								if digger.diePauseCounter > 0 {
 									digger.diePauseCounter -= 1
 								} else {
+									runtime.GC()
 									digger.state = DIGGER_GRAVE
 								}
 							}
