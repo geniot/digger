@@ -1,0 +1,427 @@
+Index: internal/api/interfaces.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/api/interfaces.go b/internal/api/interfaces.go
+--- a/internal/api/interfaces.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/api/interfaces.go	(date 1672241030035)
+@@ -11,6 +11,7 @@
+ 
+ type IScene interface {
+ 	Render()
++	OnWindowShown()
+ 	Step(n uint64)
+ }
+ 
+Index: internal/impl/gui/window.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/window.go b/internal/impl/gui/window.go
+--- a/internal/impl/gui/window.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/impl/gui/window.go	(date 1672240722919)
+@@ -26,13 +26,13 @@
+ 	w.iconSurface, _ = img.LoadRW(resources.GetResource(ICON_FILE_NAME), true)
+ 	w.sdlWindow.SetIcon(w.iconSurface)
+ 
+-	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
+-		sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
++	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1, sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED|sdl.RENDERER_TARGETTEXTURE)
+ 	ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+ 	//sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "0")
+ 
+ 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
+ 
++	//delayed window show is necessary to avoid the initial white background
+ 	go w.show()
+ 
+ 	return &w
+Index: internal/impl/gui/loop/event_loop.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/loop/event_loop.go b/internal/impl/gui/loop/event_loop.go
+--- a/internal/impl/gui/loop/event_loop.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/impl/gui/loop/event_loop.go	(date 1672241348239)
+@@ -7,6 +7,7 @@
+ )
+ 
+ type EventLoopImpl struct {
++	hasPublishedInitialWindowShownEvent bool
+ }
+ 
+ func NewEventLoop() *EventLoopImpl {
+@@ -29,7 +30,12 @@
+ 			break
+ 
+ 		case *sdl.WindowEvent:
+-			if t.Event == sdl.WINDOWEVENT_CLOSE {
++			if t.Event == sdl.WINDOWEVENT_SHOWN {
++				if !eventLoop.hasPublishedInitialWindowShownEvent {
++					eventLoop.hasPublishedInitialWindowShownEvent = true
++					ctx.SceneIns.OnWindowShown()
++				}
++			} else if t.Event == sdl.WINDOWEVENT_CLOSE {
+ 				ctx.WindowIns.SaveWindowState()
+ 			}
+ 			break
+Index: resources/resources.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/resources/resources.go b/resources/resources.go
+--- a/resources/resources.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/resources/resources.go	(date 1672231106405)
+@@ -4,6 +4,7 @@
+ 	"bytes"
+ 	"embed"
+ 	"github.com/geniot/digger/internal/ctx"
++	"github.com/geniot/digger/internal/glb"
+ 	"github.com/veandco/go-sdl2/img"
+ 	"github.com/veandco/go-sdl2/sdl"
+ 	"strconv"
+@@ -34,11 +35,18 @@
+ }
+ 
+ func LoadTexture(fileName string) *sdl.Texture {
+-	surface, _ := img.LoadRW(GetResource(fileName), true)
++	return LoadSurfTexture(fileName).T
++}
++
++func LoadSurfTexture(fileName string) *glb.SurfTexture {
++	surface, err := img.LoadRW(GetResource(fileName), true)
++	if err != nil {
++		println(err.Error())
++	}
+ 	defer surface.Free()
+ 	txt, err := ctx.RendererIns.CreateTextureFromSurface(surface)
+ 	if err != nil {
+ 		println(err.Error())
+ 	}
+-	return txt
++	return &glb.SurfTexture{T: txt, W: surface.W, H: surface.H}
+ }
+Index: internal/impl/gui/rnd/field.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
+--- a/internal/impl/gui/rnd/field.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/impl/gui/rnd/field.go	(date 1672241644277)
+@@ -4,19 +4,19 @@
+ 	"github.com/geniot/digger/internal/ctx"
+ 	. "github.com/geniot/digger/internal/glb"
+ 	"github.com/geniot/digger/resources"
+-	"github.com/veandco/go-sdl2/img"
+ 	"github.com/veandco/go-sdl2/sdl"
+ )
+ 
+ type Field struct {
+-	horizontalBlob *sdl.Surface
+-	verticalBlob   *sdl.Surface
+-	endLeftBlob    *sdl.Surface
+-	endRightBlob   *sdl.Surface
+-	endUpBlob      *sdl.Surface
+-	endDownBlob    *sdl.Surface
+-	background     *sdl.Surface
+-	scene          *Scene
++	horizontalBlob *SurfTexture
++	verticalBlob   *SurfTexture
++	endLeftBlob    *SurfTexture
++	endRightBlob   *SurfTexture
++	endUpBlob      *SurfTexture
++	endDownBlob    *SurfTexture
++	background     *sdl.Texture
++
++	scene *Scene
+ }
+ 
+ /**
+@@ -27,30 +27,31 @@
+ 	fld := &Field{}
+ 	fld.scene = scn
+ 
+-	fld.horizontalBlob, _ = img.LoadRW(resources.GetResource("blob1.png"), true)
+-	fld.verticalBlob, _ = img.LoadRW(resources.GetResource("blob2.png"), true)
+-	fld.endLeftBlob, _ = img.LoadRW(resources.GetResource("blob3.png"), true)
+-	fld.endRightBlob, _ = img.LoadRW(resources.GetResource("blob4.png"), true)
+-	fld.endUpBlob, _ = img.LoadRW(resources.GetResource("blob5.png"), true)
+-	fld.endDownBlob, _ = img.LoadRW(resources.GetResource("blob6.png"), true)
++	fld.horizontalBlob = resources.LoadSurfTexture("blob1.png")
++	fld.verticalBlob = resources.LoadSurfTexture("blob2.png")
++	fld.endLeftBlob = resources.LoadSurfTexture("blob3.png")
++	fld.endRightBlob = resources.LoadSurfTexture("blob4.png")
++	fld.endUpBlob = resources.LoadSurfTexture("blob5.png")
++	fld.endDownBlob = resources.LoadSurfTexture("blob6.png")
++
++	return fld
++}
+ 
+-	bgrTile, _ := img.LoadRW(resources.GetResource("cback1.png"), true)
+-	defer bgrTile.Free()
+-	info, _ := ctx.RendererIns.GetInfo()
+-	fld.background, _ = sdl.CreateRGBSurfaceWithFormat(0,
+-		SCREEN_LOGICAL_WIDTH,
+-		SCREEN_LOGICAL_HEIGHT,
+-		32, uint32(info.TextureFormats[0]))
++func (field *Field) OnRenderInit() {
++	bgrTile := resources.LoadSurfTexture("cback1.png")
+ 
++	field.background, _ = ctx.RendererIns.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT-FIELD_OFFSET_Y)
++
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
++
++	sourceRect := &sdl.Rect{X: 0, Y: 0, W: bgrTile.W, H: bgrTile.H}
+ 	for i := 0; i < SCREEN_LOGICAL_WIDTH/int(bgrTile.W); i++ {
+ 		for j := 0; j < SCREEN_LOGICAL_HEIGHT/int(bgrTile.H); j++ {
+-			bgrTile.Blit(
+-				&sdl.Rect{0, 0, bgrTile.W, bgrTile.H},
+-				fld.background,
+-				&sdl.Rect{int32(i * int(bgrTile.W)), int32(j * int(bgrTile.H)), bgrTile.W, bgrTile.H})
++			dstRect := &sdl.Rect{X: int32(i * int(bgrTile.W)), Y: int32(j * int(bgrTile.H)), W: bgrTile.W, H: bgrTile.H}
++			ctx.RendererIns.Copy(bgrTile.T, sourceRect, dstRect)
+ 		}
+ 	}
+-	return fld
+ }
+ 
+ /**
+@@ -58,9 +59,9 @@
+  */
+ 
+ func (field *Field) Render() {
+-	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
+-	defer bgrTexture.Destroy()
+-	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
++	ctx.RendererIns.Copy(field.background,
++		nil,
++		&sdl.Rect{X: 0, Y: FIELD_OFFSET_Y, W: SCREEN_LOGICAL_WIDTH, H: SCREEN_LOGICAL_HEIGHT - FIELD_OFFSET_Y})
+ }
+ 
+ func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
+@@ -92,8 +93,16 @@
+ }
+ 
+ func (field *Field) isPointField(x int32, y int32) bool {
+-	r, g, b, _ := field.background.At(int(x), int(y-FIELD_OFFSET_Y)).RGBA()
+-	return r != 0 || g != 0 || b != 0
++	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	//
++	//ctx.RendererIns.SetRenderTarget(field.background)
++	//pixelRect := &sdl.Rect{X: x, Y: y, W: 1, H: 1}
++	//bbs := [4]byte{0, 0, 0, 0}
++	//pixels := unsafe.Pointer(&bbs[0])
++	//ctx.RendererIns.ReadPixels(pixelRect, sdl.PIXELFORMAT_RGBA8888, pixels, SCREEN_LOGICAL_WIDTH*4)
++	//return bbs[0] != 0 || bbs[1] != 0 || bbs[2] != 0
++	return true
+ }
+ 
+ func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) bool {
+@@ -117,52 +126,77 @@
+ */
+ 
+ func (field *Field) drawEatRight(x int32, y int32) {
+-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
+-	targetTunnelRect := sdl.Rect{x + CELL_WIDTH - field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+-	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+-	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
+-	field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	//
++	//sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
++	//targetTunnelRect := &sdl.Rect{X: x + CELL_WIDTH - field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//targetEndRect := &sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//
++	//ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
++	//ctx.RendererIns.Copy(field.endRightBlob.T, nil, targetTunnelRect)
++	//
++	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
+ }
+ 
+ func (field *Field) drawEatLeft(x int32, y int32) {
+-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
+-	targetTunnelRect := sdl.Rect{x + field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+-	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+-	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
+-	field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	//
++	//sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
++	//targetTunnelRect := &sdl.Rect{X: x + field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//targetEndRect := &sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//
++	//ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
++	//ctx.RendererIns.Copy(field.endLeftBlob.T, nil, targetTunnelRect)
++	//
++	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
+ }
+ 
+ func (field *Field) drawEatUp(x int32, y int32) {
+-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
+-	targetTunnelRect := sdl.Rect{x, y - CELL_HEIGHT + field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+-	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
+-	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
+-	field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	//
++	//sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	//targetTunnelRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT + field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//targetEndRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//
++	//ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
++	//ctx.RendererIns.Copy(field.endUpBlob.T, nil, targetTunnelRect)
++	//
++	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
+ }
+ 
+ func (field *Field) drawEatDown(x int32, y int32) {
+-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
+-	targetTunnelRect := sdl.Rect{x, y - field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+-	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
+-	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
+-	field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	//
++	//sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	//targetTunnelRect := &sdl.Rect{X: x, Y: y - field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//targetEndRect := &sdl.Rect{X: x, Y: y - 3, W: CELL_WIDTH, H: CELL_HEIGHT}
++	//
++	//ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
++	//ctx.RendererIns.Copy(field.endDownBlob.T, nil, targetTunnelRect)
++	//
++	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
+ }
+ 
+ func (field *Field) eatEmerald(emerald *Emerald) {
+-	targetRect := sdl.Rect{
+-		emerald.offsetX,
+-		emerald.offsetY - FIELD_OFFSET_Y,
+-		CELL_WIDTH, CELL_HEIGHT}
+-	emerald.textureMask.Blit(nil, field.background, &targetRect)
++	origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++
++	targetRect := &sdl.Rect{
++		X: emerald.offsetX,
++		Y: emerald.offsetY - FIELD_OFFSET_Y,
++		W: CELL_WIDTH, H: CELL_HEIGHT}
++
++	ctx.RendererIns.Copy(emerald.textureMask, nil, targetRect)
++
+ 	field.updateChaseWorld(targetRect)
+ }
+ 
+ // translating rects to our grid, updating grid if necessary
+-func (field *Field) updateChaseWorld(rects ...sdl.Rect) {
++func (field *Field) updateChaseWorld(rects ...*sdl.Rect) {
+ 	for i := 0; i < len(rects); i++ {
+ 		rect := rects[i]
+ 		//we change 1-2 cells max with one rect
+Index: internal/impl/gui/rnd/scene.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/scene.go b/internal/impl/gui/rnd/scene.go
+--- a/internal/impl/gui/rnd/scene.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/impl/gui/rnd/scene.go	(date 1672241062815)
+@@ -88,6 +88,10 @@
+ 	return scn
+ }
+ 
++func (scene *Scene) OnWindowShown() {
++	scene.field.OnRenderInit()
++}
++
+ func (scene *Scene) isTunnel(ch uint8) bool {
+ 	return ch == 'V' || ch == 'H' || ch == 'S'
+ }
+Index: internal/impl/gui/rnd/emerald.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/emerald.go b/internal/impl/gui/rnd/emerald.go
+--- a/internal/impl/gui/rnd/emerald.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/impl/gui/rnd/emerald.go	(date 1672230463854)
+@@ -5,7 +5,6 @@
+ 	. "github.com/geniot/digger/internal/glb"
+ 	"github.com/geniot/digger/resources"
+ 	"github.com/solarlune/resolv"
+-	"github.com/veandco/go-sdl2/img"
+ 	"github.com/veandco/go-sdl2/sdl"
+ )
+ 
+@@ -18,7 +17,7 @@
+ 	innerOffsetY int32
+ 
+ 	texture         *sdl.Texture
+-	textureMask     *sdl.Surface
++	textureMask     *sdl.Texture
+ 	collisionObject *resolv.Object
+ 	scene           *Scene
+ }
+@@ -31,7 +30,7 @@
+ 	em := &Emerald{}
+ 	em.scene = scn
+ 	em.texture = resources.LoadTexture("emerald.png")
+-	em.textureMask, _ = img.LoadRW(resources.GetResource("emerald_mask.png"), true)
++	em.textureMask = resources.LoadTexture("emerald_mask.png")
+ 
+ 	em.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
+ 	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
+@@ -58,7 +57,7 @@
+ 
+ func (emerald *Emerald) Destroy() {
+ 	emerald.scene.field.eatEmerald(emerald)
+-	emerald.textureMask.Free()
++	emerald.textureMask.Destroy()
+ 	emerald.texture.Destroy()
+ 	emerald.scene.collisionSpace.Remove(emerald.collisionObject)
+ 	emerald.scene.emeralds.Remove(emerald)
+Index: internal/glb/types.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/glb/types.go b/internal/glb/types.go
+--- a/internal/glb/types.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
++++ b/internal/glb/types.go	(date 1672230880434)
+@@ -1,14 +1,21 @@
+ package glb
+ 
++import "github.com/veandco/go-sdl2/sdl"
++
+ //https://stackoverflow.com/questions/14426366/what-is-an-idiomatic-way-of-representing-enums-in-go
+ 
+ type Direction int64
+-
+ type DiggerState int64
+ type MonsterState int64
+ type FireState int64
+ type BagState int64
+ 
++type SurfTexture struct {
++	T *sdl.Texture
++	W int32
++	H int32
++}
++
+ const (
+ 	UP Direction = iota
+ 	DOWN
