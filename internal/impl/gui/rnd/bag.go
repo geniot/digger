@@ -104,8 +104,10 @@ func (bag *Bag) Destroy() {
 func (bag *Bag) Step(n uint64) {
 	switch bag.state {
 	case BAG_SET:
-		if bag.hasHollowSpaceUnder() {
-			bag.state = BAG_SHAKING
+		if n%SPRITE_UPDATE_RATE == 0 {
+			if bag.hasHollowSpaceUnder() {
+				bag.state = BAG_SHAKING
+			}
 		}
 	case BAG_PUSHED:
 		bag.state = BAG_MOVING

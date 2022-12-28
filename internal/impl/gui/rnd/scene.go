@@ -131,6 +131,8 @@ func (scene *Scene) Render() {
 
 	if IS_DEBUG_ON {
 		scene.debugGrid.Render()
-		//scene.fpsCounter.Render()
+		//
 	}
+
+	scene.fpsCounter.Render()
 }
