@@ -1,5 +1,7 @@
 package glb
 
+import "github.com/veandco/go-sdl2/sdl"
+
 //https://stackoverflow.com/questions/14426366/what-is-an-idiomatic-way-of-representing-enums-in-go
 
 type Direction int64
@@ -41,3 +43,9 @@ const (
 	BAG_FALLING
 	BAG_GOLD
 )
+
+type SurfTexture struct {
+	W int32
+	H int32
+	T *sdl.Texture
+}

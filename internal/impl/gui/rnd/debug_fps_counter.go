@@ -1,20 +1,28 @@
 package rnd
 
 import (
+	"github.com/geniot/digger/internal/ctx"
 	"github.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )
 
 type DebugFpsCounter struct {
-	startTicks    uint32
-	frameCount    uint32
-	currentSecond uint32
-	currentFPS    uint32
+	startTicks     uint32
+	frameCount     uint32
+	currentSecond  uint32
+	currentFPS     uint32
+	cachedTextures map[string]*glb.SurfTexture
 }
 
 func NewFpsCounter() *DebugFpsCounter {
-	return &DebugFpsCounter{sdl.GetTicks(), 0, sdl.GetTicks() / 1000, 0}
+	dbg := &DebugFpsCounter{}
+	dbg.startTicks = sdl.GetTicks()
+	dbg.frameCount = 0
+	dbg.currentSecond = sdl.GetTicks() / 1000
+	dbg.currentFPS = 0
+	dbg.cachedTextures = make(map[string]*glb.SurfTexture)
+	return dbg
 }
 
 func (fpsCounter *DebugFpsCounter) Render() {
@@ -36,5 +44,11 @@ func (fpsCounter *DebugFpsCounter) Render() {
 		fpsCounter.startTicks = currentTicks
 		fpsCounter.currentSecond = sec
 	}
-	glb.DrawText("FPS: "+strconv.FormatInt(int64(fpsCounter.currentFPS), 10), 5, 5, glb.COLOR_WHITE)
+	txt := "FPS: " + strconv.FormatInt(int64(fpsCounter.currentFPS), 10)
+	texture := fpsCounter.cachedTextures[txt]
+	if texture == nil {
+		texture = glb.DrawText(txt, glb.COLOR_WHITE)
+		fpsCounter.cachedTextures[txt] = texture
+	}
+	ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
 }

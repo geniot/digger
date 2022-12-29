@@ -55,7 +55,7 @@ func logn(n, b float64) float64 {
 	return math.Log(n) / math.Log(b)
 }
 
-func DrawText(txt string, x int32, y int32, color sdl.Color) (int32, int32) {
+func DrawText(txt string, color sdl.Color) *SurfTexture {
 	textSurface, err := ctx.FontIns.RenderUTF8Blended(txt, color)
 	if err != nil {
 		println(err.Error())
@@ -65,14 +65,7 @@ func DrawText(txt string, x int32, y int32, color sdl.Color) (int32, int32) {
 	if err != nil {
 		println(err.Error())
 	}
-	defer textTexture.Destroy()
-	if textSurface != nil && textTexture != nil {
-		ctx.RendererIns.Copy(textTexture, nil, &sdl.Rect{X: x, Y: y, W: textSurface.W, H: textSurface.H})
-		return textSurface.W, textSurface.H
-	} else {
-		return 0, 0
-	}
-
+	return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
 }
 
 // Renderer.DrawRect is not available in some older versions of SDL2.
