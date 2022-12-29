@@ -255,8 +255,12 @@ func (bag *Bag) Render() {
 }
 
 func (bag *Bag) push(dir Direction) {
-	bag.pushDir = dir
-	bag.state = BAG_PUSHED
+	if dir == UP {
+		bag.state = BAG_HOLD
+	} else if dir == LEFT || dir == RIGHT {
+		bag.pushDir = dir
+		bag.state = BAG_PUSHED
+	}
 }
 
 func (bag *Bag) canFall() bool {

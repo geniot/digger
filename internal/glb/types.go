@@ -38,6 +38,7 @@ const (
 const (
 	BAG_SET BagState = iota
 	BAG_PUSHED
+	BAG_HOLD
 	BAG_MOVING
 	BAG_SHAKING
 	BAG_FALLING
