@@ -4,8 +4,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/api/interfaces.go b/internal/api/interfaces.go
---- a/internal/api/interfaces.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/api/interfaces.go	(date 1672241030035)
+--- a/internal/api/interfaces.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/api/interfaces.go	(date 1672271791424)
 @@ -11,6 +11,7 @@
  
  type IScene interface {
@@ -20,8 +20,17 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/impl/gui/window.go b/internal/impl/gui/window.go
---- a/internal/impl/gui/window.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/impl/gui/window.go	(date 1672240722919)
+--- a/internal/impl/gui/window.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/gui/window.go	(date 1672308576634)
+@@ -16,7 +16,7 @@
+ 
+ func NewWindow() *WindowImpl {
+ 	w := WindowImpl{}
+-
++	
+ 	xPos, yPos, width, height := ctx.DeviceIns.GetWindowPosAndSize()
+ 	w.sdlWindow, _ = sdl.CreateWindow(
+ 		APP_NAME+" "+APP_VERSION,
 @@ -26,13 +26,13 @@
  	w.iconSurface, _ = img.LoadRW(resources.GetResource(ICON_FILE_NAME), true)
  	w.sdlWindow.SetIcon(w.iconSurface)
@@ -44,8 +53,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/impl/gui/loop/event_loop.go b/internal/impl/gui/loop/event_loop.go
---- a/internal/impl/gui/loop/event_loop.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/impl/gui/loop/event_loop.go	(date 1672241348239)
+--- a/internal/impl/gui/loop/event_loop.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/gui/loop/event_loop.go	(date 1672309182280)
 @@ -7,6 +7,7 @@
  )
  
@@ -61,21 +70,35 @@ diff --git a/internal/impl/gui/loop/event_loop.go b/internal/impl/gui/loop/event
 -			if t.Event == sdl.WINDOWEVENT_CLOSE {
 +			if t.Event == sdl.WINDOWEVENT_SHOWN {
 +				if !eventLoop.hasPublishedInitialWindowShownEvent {
-+					eventLoop.hasPublishedInitialWindowShownEvent = true
++					//eventLoop.hasPublishedInitialWindowShownEvent = true
 +					ctx.SceneIns.OnWindowShown()
 +				}
 +			} else if t.Event == sdl.WINDOWEVENT_CLOSE {
  				ctx.WindowIns.SaveWindowState()
  			}
  			break
+Index: internal/impl/dev/desktop_device.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/dev/desktop_device.go b/internal/impl/dev/desktop_device.go
+--- a/internal/impl/dev/desktop_device.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/dev/desktop_device.go	(date 1672309262453)
+@@ -45,4 +45,5 @@
+ 
+ func (desktopDevice DesktopDeviceImpl) init() {
+ 	initCommon()
++	sdl.SetHint(sdl.HINT_RENDER_DRIVER, "opengl")
+ }
 Index: resources/resources.go
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/resources/resources.go b/resources/resources.go
---- a/resources/resources.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/resources/resources.go	(date 1672231106405)
+--- a/resources/resources.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/resources/resources.go	(date 1672271791493)
 @@ -4,6 +4,7 @@
  	"bytes"
  	"embed"
@@ -111,14 +134,15 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
---- a/internal/impl/gui/rnd/field.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/impl/gui/rnd/field.go	(date 1672241644277)
-@@ -4,19 +4,19 @@
+--- a/internal/impl/gui/rnd/field.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/gui/rnd/field.go	(date 1672308951060)
+@@ -4,19 +4,20 @@
  	"github.com/geniot/digger/internal/ctx"
  	. "github.com/geniot/digger/internal/glb"
  	"github.com/geniot/digger/resources"
 -	"github.com/veandco/go-sdl2/img"
  	"github.com/veandco/go-sdl2/sdl"
++	"unsafe"
  )
  
  type Field struct {
@@ -142,7 +166,7 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
  }
  
  /**
-@@ -27,30 +27,31 @@
+@@ -27,30 +28,31 @@
  	fld := &Field{}
  	fld.scene = scn
  
@@ -169,7 +193,7 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -		SCREEN_LOGICAL_WIDTH,
 -		SCREEN_LOGICAL_HEIGHT,
 -		32, uint32(info.TextureFormats[0]))
-+func (field *Field) OnRenderInit() {
++func (field *Field) OnWindowShown() {
 +	bgrTile := resources.LoadSurfTexture("cback1.png")
  
 +	field.background, _ = ctx.RendererIns.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT-FIELD_OFFSET_Y)
@@ -192,7 +216,7 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
  }
  
  /**
-@@ -58,9 +59,9 @@
+@@ -58,9 +60,9 @@
   */
  
  func (field *Field) Render() {
@@ -205,22 +229,21 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
  }
  
  func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
-@@ -92,8 +93,16 @@
+@@ -92,8 +94,15 @@
  }
  
  func (field *Field) isPointField(x int32, y int32) bool {
 -	r, g, b, _ := field.background.At(int(x), int(y-FIELD_OFFSET_Y)).RGBA()
 -	return r != 0 || g != 0 || b != 0
-+	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
-+	//
-+	//ctx.RendererIns.SetRenderTarget(field.background)
-+	//pixelRect := &sdl.Rect{X: x, Y: y, W: 1, H: 1}
-+	//bbs := [4]byte{0, 0, 0, 0}
-+	//pixels := unsafe.Pointer(&bbs[0])
-+	//ctx.RendererIns.ReadPixels(pixelRect, sdl.PIXELFORMAT_RGBA8888, pixels, SCREEN_LOGICAL_WIDTH*4)
-+	//return bbs[0] != 0 || bbs[1] != 0 || bbs[2] != 0
-+	return true
++	origTextureTarget := ctx.RendererIns.GetRenderTarget()
++	defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++
++	ctx.RendererIns.SetRenderTarget(field.background)
++	pixelRect := &sdl.Rect{X: x, Y: y, W: 1, H: 1}
++	bbs := [4]byte{0, 0, 0, 0}
++	pixels := unsafe.Pointer(&bbs[0])
++	ctx.RendererIns.ReadPixels(pixelRect, sdl.PIXELFORMAT_RGBA8888, pixels, SCREEN_LOGICAL_WIDTH*4)
++	return bbs[0] != 0 || bbs[1] != 0 || bbs[2] != 0
  }
  
  func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) bool {
@@ -233,18 +256,17 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 -	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 -	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
--	field.updateChaseWorld(targetTunnelRect, targetEndRect)
-+	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
-+	//
-+	//sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
-+	//targetTunnelRect := &sdl.Rect{X: x + CELL_WIDTH - field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//targetEndRect := &sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//
-+	//ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
-+	//ctx.RendererIns.Copy(field.endRightBlob.T, nil, targetTunnelRect)
-+	//
-+	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
++
++	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, Y: 0, W: 1, H: field.horizontalBlob.H}
++	targetTunnelRect := &sdl.Rect{X: x + CELL_WIDTH - field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: 1, H: field.horizontalBlob.H}
++	targetEndRect := &sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: field.endRightBlob.W, H: field.endRightBlob.H}
++
++	ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
++	ctx.RendererIns.Copy(field.endRightBlob.T, nil, targetEndRect)
++
+ 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
  }
  
  func (field *Field) drawEatLeft(x int32, y int32) {
@@ -253,18 +275,17 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 -	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
 -	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
--	field.updateChaseWorld(targetTunnelRect, targetEndRect)
-+	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
-+	//
-+	//sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
-+	//targetTunnelRect := &sdl.Rect{X: x + field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//targetEndRect := &sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//
-+	//ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
-+	//ctx.RendererIns.Copy(field.endLeftBlob.T, nil, targetTunnelRect)
-+	//
-+	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
++
++	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, Y: 0, W: 1, H: field.horizontalBlob.H}
++	targetTunnelRect := &sdl.Rect{X: x + field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: 1, H: field.horizontalBlob.H}
++	targetEndRect := &sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: field.endLeftBlob.W, H: field.endLeftBlob.H}
++
++	ctx.RendererIns.Copy(field.horizontalBlob.T, sourceRect, targetTunnelRect)
++	ctx.RendererIns.Copy(field.endLeftBlob.T, nil, targetEndRect)
++
+ 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
  }
  
  func (field *Field) drawEatUp(x int32, y int32) {
@@ -273,18 +294,17 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 -	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
 -	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
--	field.updateChaseWorld(targetTunnelRect, targetEndRect)
-+	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
-+	//
-+	//sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
-+	//targetTunnelRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT + field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//targetEndRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//
-+	//ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
-+	//ctx.RendererIns.Copy(field.endUpBlob.T, nil, targetTunnelRect)
-+	//
-+	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
++
++	sourceRect := &sdl.Rect{X: 0, Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	targetTunnelRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT + field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	targetEndRect := &sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: field.endUpBlob.W, H: field.endUpBlob.H}
++
++	ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
++	ctx.RendererIns.Copy(field.endUpBlob.T, nil, targetEndRect)
++
+ 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
  }
  
  func (field *Field) drawEatDown(x int32, y int32) {
@@ -293,18 +313,17 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 -	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
 -	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
--	field.updateChaseWorld(targetTunnelRect, targetEndRect)
-+	//origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	//defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
-+	//
-+	//sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
-+	//targetTunnelRect := &sdl.Rect{X: x, Y: y - field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//targetEndRect := &sdl.Rect{X: x, Y: y - 3, W: CELL_WIDTH, H: CELL_HEIGHT}
-+	//
-+	//ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
-+	//ctx.RendererIns.Copy(field.endDownBlob.T, nil, targetTunnelRect)
-+	//
-+	//field.updateChaseWorld(targetTunnelRect, targetEndRect)
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
++
++	sourceRect := &sdl.Rect{X: 0, Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	targetTunnelRect := &sdl.Rect{X: x, Y: y - field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
++	targetEndRect := &sdl.Rect{X: x, Y: y - 3, W: field.endDownBlob.W, H: field.endDownBlob.H}
++
++	ctx.RendererIns.Copy(field.verticalBlob.T, sourceRect, targetTunnelRect)
++	ctx.RendererIns.Copy(field.endDownBlob.T, nil, targetEndRect)
++
+ 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
  }
  
  func (field *Field) eatEmerald(emerald *Emerald) {
@@ -313,8 +332,8 @@ diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
 -		emerald.offsetY - FIELD_OFFSET_Y,
 -		CELL_WIDTH, CELL_HEIGHT}
 -	emerald.textureMask.Blit(nil, field.background, &targetRect)
-+	origTextureTarget := ctx.RendererIns.GetRenderTarget()
-+	defer ctx.RendererIns.SetRenderTarget(origTextureTarget)
++	ctx.RendererIns.SetRenderTarget(field.background)
++	defer ctx.RendererIns.SetRenderTarget(nil)
 +
 +	targetRect := &sdl.Rect{
 +		X: emerald.offsetX,
@@ -338,27 +357,78 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/impl/gui/rnd/scene.go b/internal/impl/gui/rnd/scene.go
---- a/internal/impl/gui/rnd/scene.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/impl/gui/rnd/scene.go	(date 1672241062815)
-@@ -88,6 +88,10 @@
- 	return scn
- }
+--- a/internal/impl/gui/rnd/scene.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/gui/rnd/scene.go	(date 1672307713350)
+@@ -54,38 +54,41 @@
  
-+func (scene *Scene) OnWindowShown() {
-+	scene.field.OnRenderInit()
+ 	scn.monsters.Add(NewMonster(scn))
+ 
+-	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
++	scn.debugGrid = NewDebugGrid(scn)
++	scn.fpsCounter = NewFpsCounter()
++
++	return scn
 +}
 +
- func (scene *Scene) isTunnel(ch uint8) bool {
- 	return ch == 'V' || ch == 'H' || ch == 'S'
++func (scene *Scene) OnWindowShown() {
++	scene.field.OnWindowShown()
++	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scene.level)), "\n")
+ 	for y := 0; y < len(rows); y++ {
+ 		row := strings.TrimSuffix(rows[y], "\n")
+ 		row = strings.TrimSuffix(rows[y], "\r")
+ 		for x := 0; x < len(row); x++ {
+ 			if row[x] == 'C' {
+-				scn.emeralds.Add(NewEmerald(x, y, scn))
++				scene.emeralds.Add(NewEmerald(x, y, scene))
+ 			} else if row[x] == 'B' {
+-				scn.bags.Add(NewBag(x, y, scn))
++				scene.bags.Add(NewBag(x, y, scene))
+ 			} else if row[x] == 'S' {
+-				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+-				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+-				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+-				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+-				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+-				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
++				isUpCont := If(y > 0 && scene.isTunnel(rows[y-1][x]), true, false)
++				isDownCont := If(y < CELLS_VERTICAL-1 && scene.isTunnel(rows[y+1][x]), true, false)
++				isRightCont := If(x < CELLS_HORIZONTAL-1 && scene.isTunnel(row[x+1]), true, false)
++				isLeftCont := If(x > 0 && scene.isTunnel(row[x-1]), true, false)
++				scene.field.eatVertical(x, y, isUpCont, isDownCont)
++				scene.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+ 			} else if row[x] == 'V' {
+-				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+-				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+-				scn.field.eatVertical(x, y, isUpCont, isDownCont)
++				isUpCont := If(y > 0 && scene.isTunnel(rows[y-1][x]), true, false)
++				isDownCont := If(y < CELLS_VERTICAL-1 && scene.isTunnel(rows[y+1][x]), true, false)
++				scene.field.eatVertical(x, y, isUpCont, isDownCont)
+ 			} else if row[x] == 'H' {
+-				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+-				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+-				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
++				isRightCont := If(x < CELLS_HORIZONTAL-1 && scene.isTunnel(row[x+1]), true, false)
++				isLeftCont := If(x > 0 && scene.isTunnel(row[x-1]), true, false)
++				scene.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+ 			}
+ 		}
+ 	}
+-
+-	scn.debugGrid = NewDebugGrid(scn)
+-	scn.fpsCounter = NewFpsCounter()
+-
+-	return scn
  }
+ 
+ func (scene *Scene) isTunnel(ch uint8) bool {
 Index: internal/impl/gui/rnd/emerald.go
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/impl/gui/rnd/emerald.go b/internal/impl/gui/rnd/emerald.go
---- a/internal/impl/gui/rnd/emerald.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/impl/gui/rnd/emerald.go	(date 1672230463854)
+--- a/internal/impl/gui/rnd/emerald.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/impl/gui/rnd/emerald.go	(date 1672274713762)
 @@ -5,7 +5,6 @@
  	. "github.com/geniot/digger/internal/glb"
  	"github.com/geniot/digger/resources"
@@ -400,8 +470,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/internal/glb/types.go b/internal/glb/types.go
---- a/internal/glb/types.go	(revision 9d6eb03ab4fe20bcf6b2d2c1c1fe624c5d0932e9)
-+++ b/internal/glb/types.go	(date 1672230880434)
+--- a/internal/glb/types.go	(revision 30a9ca3a0a02b5d551bf150acdcceeb774dd41bf)
++++ b/internal/glb/types.go	(date 1672271791434)
 @@ -1,14 +1,21 @@
  package glb
  
