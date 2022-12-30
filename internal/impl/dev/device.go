@@ -5,7 +5,6 @@ import (
 	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"os"
 	"runtime"
 	"strings"
 )
@@ -33,9 +32,6 @@ func initCommon() {
 	}
 	sdl.GameControllerEventState(sdl.ENABLE)
 	sdl.JoystickEventState(sdl.ENABLE)
-	guid := sdl.JoystickGetDeviceGUID(0)
-	println(sdl.JoystickGetGUIDString(guid))
-	println(sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG")))
 }
 
 func closeCommon() {
