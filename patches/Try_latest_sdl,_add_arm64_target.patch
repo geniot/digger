@@ -1,0 +1,221 @@
+Subject: [PATCH] Try latest sdl, add arm64 target
+---
+Index: Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Makefile b/Makefile
+--- a/Makefile	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/Makefile	(date 1672406087528)
+@@ -18,10 +18,19 @@
+ 	 PKG_CONFIG='/opt/gcw0-toolchain/usr/bin/pkg-config' \
+ 	 go build -o bin/${PROGRAM_NAME}.gcw github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+ 
++arm64:
++	 CC=aarch64-linux-gnu-gcc \
++	 CGO_ENABLED=1 \
++ 	 CGO_LDFLAGS='-lSDL2 -lpng16' \
++	 GOARCH=arm64 \
++	 GOOS=linux \
++	 go build -o bin/${PROGRAM_NAME}.bin github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
++
+ squash:
+ 	mksquashfs bin/${PROGRAM_NAME}.gcw resources/media/${PROGRAM_NAME}.png resources/default.gcw0.desktop bin/${PROGRAM_NAME}.opk -all-root -no-xattrs -noappend -no-exports
+ 
+-opk: clean mips squash
++pg2: clean mips squash
++rk2020: clean arm64
+ 
+ #on PG2 use opkrun
+ 
+Index: internal/impl/gui/config.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/config.go b/internal/impl/gui/config.go
+--- a/internal/impl/gui/config.go	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/internal/impl/gui/config.go	(date 1672402782768)
+@@ -63,8 +63,8 @@
+ 	if ok {
+ 		windowState, _ = strconv.ParseInt(windowStateStr, 10, 0)
+ 	}
+-	windowState |= sdl.WINDOW_HIDDEN
+-	windowState |= sdl.WINDOW_RESIZABLE
++	windowState |= int64(sdl.WINDOW_HIDDEN)
++	windowState |= int64(sdl.WINDOW_RESIZABLE)
+ 	loadedProps.Set(glb.WINDOW_STATE_KEY, strconv.FormatInt(windowState, 10))
+ 
+ 	cfg.props = loadedProps
+Index: go.mod
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.mod b/go.mod
+--- a/go.mod	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/go.mod	(date 1672402625516)
+@@ -6,14 +6,9 @@
+ 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
+ 	github.com/deckarep/golang-set/v2 v2.1.0
+ 	github.com/magiconair/properties v1.8.6
+-	github.com/pkg/profile v1.7.0
+ 	github.com/solarlune/resolv v0.6.0
+ 	github.com/tevino/abool/v2 v2.1.0
+-	github.com/veandco/go-sdl2 v0.4.27
++	github.com/veandco/go-sdl2 v0.5.0-alpha.4.0.20221222110146-301cbcaab986
+ )
+ 
+-require (
+-	github.com/felixge/fgprof v0.9.3 // indirect
+-	github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
+-	github.com/kvartborg/vector v0.1.2 // indirect
+-)
++require github.com/kvartborg/vector v0.1.2 // indirect
+Index: internal/api/interfaces.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/api/interfaces.go b/internal/api/interfaces.go
+--- a/internal/api/interfaces.go	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/internal/api/interfaces.go	(date 1672402822607)
+@@ -1,5 +1,7 @@
+ package api
+ 
++import "github.com/veandco/go-sdl2/sdl"
++
+ type IApplication interface {
+ 	Start()
+ 	Stop()
+@@ -21,7 +23,7 @@
+ }
+ 
+ type IDevice interface {
+-	GetWindowState() uint32
++	GetWindowState() sdl.WindowFlags
+ 	GetWindowPosAndSize() (int32, int32, int32, int32)
+ 	ProcessKeyActions()
+ 	Stop()
+Index: go.sum
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.sum b/go.sum
+--- a/go.sum	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/go.sum	(date 1672402625520)
+@@ -1,27 +1,16 @@
+ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+ github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482 h1:p4g4uok3+r6Tg6fxXEQUAcMAX/WdK6WhkQW9s0jaT7k=
+ github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482/go.mod h1:Cu3t5VeqE8kXjUBeNXWQprfuaP5UCIc5ggGjgMx9KFc=
+-github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
+-github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
+-github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
+-github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+-github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+-github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+ github.com/deckarep/golang-set/v2 v2.1.0 h1:g47V4Or+DUdzbs8FxCCmgb6VYd+ptPAngjM6dtGktsI=
+ github.com/deckarep/golang-set/v2 v2.1.0/go.mod h1:VAky9rY/yGXJOLEDv3OMci+7wtDpOF4IN+y82NBOac4=
+ github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744/go.mod h1:Eh8I3yvknDYZeCuXH9kRNaPuHEwvXDCk378o9xszmHg=
+-github.com/felixge/fgprof v0.9.3 h1:VvyZxILNuCiUCSXtPtYmmtGvb65nqXh2QFWc0Wpf2/g=
+-github.com/felixge/fgprof v0.9.3/go.mod h1:RdbpDgzqYVh/T9fPELJyV7EYJuHB55UTEULNun8eiPw=
+ github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220806181222-55e207c401ad/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
+-github.com/google/pprof v0.0.0-20211214055906-6f57359322fd h1:1FjCyPC+syAzJ5/2S8fqdZK1R22vvA0J7JZKcuOIQ7Y=
+-github.com/google/pprof v0.0.0-20211214055906-6f57359322fd/go.mod h1:KgnwoLYCZ8IQu3XUZ8Nc/bM9CCZFOyjUNOSygVozoDg=
+ github.com/hajimehoshi/bitmapfont/v2 v2.2.2/go.mod h1:Ua/x9Dkz7M9CU4zr1VHWOqGwjKdXbOTRsH7lWfb1Co0=
+ github.com/hajimehoshi/ebiten/v2 v2.4.12/go.mod h1:BZcqCU4XHmScUi+lsKexocWcf4offMFwfp8dVGIB/G4=
+ github.com/hajimehoshi/file2byteslice v0.0.0-20210813153925-5340248a8f41/go.mod h1:CqqAHp7Dk/AqQiwuhV1yT2334qbA/tFWQW0MD2dGqUE=
+ github.com/hajimehoshi/go-mp3 v0.3.3/go.mod h1:qMJj/CSDxx6CGHiZeCgbiq2DSUkbK0UbtXShQcnfyMM=
+ github.com/hajimehoshi/oto v0.6.1/go.mod h1:0QXGEkbuJRohbJaxr7ZQSxnju7hEhseiPx2hrh6raOI=
+ github.com/hajimehoshi/oto/v2 v2.3.1/go.mod h1:seWLbgHH7AyUMYKfKYT9pg7PhUu9/SisyJvNTT+ASQo=
+-github.com/ianlancetaylor/demangle v0.0.0-20210905161508-09a460cdf81d/go.mod h1:aYm2/VgdVmcIU8iMfdMvDMsRAQjcfZSKFby6HOFvi/w=
+ github.com/jakecoffman/cp v1.2.1/go.mod h1:JjY/Fp6d8E1CHnu74gWNnU0+b9VzEdUVPoJxg2PsTQg=
+ github.com/jezek/xgb v1.0.1/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
+ github.com/jfreymuth/oggvorbis v1.0.4/go.mod h1:1U4pqWmghcoVsCJJ4fRBKv9peUJMBHixthRlBeD6uII=
+@@ -31,21 +20,14 @@
+ github.com/magiconair/properties v1.8.6 h1:5ibWZ6iY0NctNGWo87LalDlEZ6R41TqbbDamhfG/Qzo=
+ github.com/magiconair/properties v1.8.6/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
+ github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8/go.mod h1:HKlIX3XHQyzLZPlr7++PzdhaXEj94dEiJgZDTsxEqUI=
+-github.com/pkg/profile v1.7.0 h1:hnbDkaNWPCLMO9wGLdBFTIZvzDrDfBM2072E1S9gJkA=
+-github.com/pkg/profile v1.7.0/go.mod h1:8Uer0jas47ZQMJ7VD+OHknK4YDY07LPUC6dEvqDjvNo=
+-github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+-github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+ github.com/solarlune/resolv v0.6.0 h1:FUUWXA7RySs1bdr6OCFByi0Vc0JJdlcoEjf1s3FaFII=
+ github.com/solarlune/resolv v0.6.0/go.mod h1:92rrmv+F90KfITUMXZF/iUqWbkM7IRZOdJPWwmstTEU=
+-github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+-github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
+-github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+-github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
+-github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
+ github.com/tevino/abool/v2 v2.1.0 h1:7w+Vf9f/5gmKT4m4qkayb33/92M+Um45F2BkHOR+L/c=
+ github.com/tevino/abool/v2 v2.1.0/go.mod h1:+Lmlqk6bHDWHqN1cbxqhwEAwMPXgc8I1SDEamtseuXY=
+-github.com/veandco/go-sdl2 v0.4.27 h1:p6CbXe7cNxhvR/QhiajEbRpwpCtOuO5VQqqCQW3saUs=
+-github.com/veandco/go-sdl2 v0.4.27/go.mod h1:OROqMhHD43nT4/i9crJukyVecjPNYYuCofep6SNiAjY=
++github.com/veandco/go-sdl2 v0.5.0-alpha.4.0.20221211132336-408ac46089e4 h1:QwApZx95NvrNvwhcTTdyLy85R+P4YPSTnpz8ES9J+9w=
++github.com/veandco/go-sdl2 v0.5.0-alpha.4.0.20221211132336-408ac46089e4/go.mod h1:OROqMhHD43nT4/i9crJukyVecjPNYYuCofep6SNiAjY=
++github.com/veandco/go-sdl2 v0.5.0-alpha.4.0.20221222110146-301cbcaab986 h1:elj6LNMbi36foyi4gUpRuu6BzNyy7wCyHVoyJF5vG1U=
++github.com/veandco/go-sdl2 v0.5.0-alpha.4.0.20221222110146-301cbcaab986/go.mod h1:OROqMhHD43nT4/i9crJukyVecjPNYYuCofep6SNiAjY=
+ github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
+ github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
+ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
+@@ -81,7 +63,6 @@
+ golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20210616045830-e2b7044e8c71/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+-golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20220712014510-0a85c31ab51e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+@@ -101,7 +82,3 @@
+ golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+ golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+ golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+-gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+-gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+-gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+Index: internal/impl/dev/handheld_device.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/dev/handheld_device.go b/internal/impl/dev/handheld_device.go
+--- a/internal/impl/dev/handheld_device.go	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/internal/impl/dev/handheld_device.go	(date 1672402911381)
+@@ -35,7 +35,7 @@
+ 	return 0, 0, 320, 240
+ }
+ 
+-func (handhelpDevice HandheldDeviceImpl) GetWindowState() uint32 {
++func (handhelpDevice HandheldDeviceImpl) GetWindowState() sdl.WindowFlags {
+ 	return sdl.WINDOW_SHOWN | sdl.WINDOW_BORDERLESS
+ }
+ 
+@@ -70,5 +70,5 @@
+ 		println(sdl.JoystickNameForIndex(0))
+ 		handhelpDevice.joystick = sdl.JoystickOpen(0)
+ 	}
+-	sdl.JoystickEventState(sdl.ENABLE)
++	sdl.JoystickEventState(int(sdl.ENABLE))
+ }
+Index: internal/impl/dev/desktop_device.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/dev/desktop_device.go b/internal/impl/dev/desktop_device.go
+--- a/internal/impl/dev/desktop_device.go	(revision 3aec91f411dbbc5643eb86be9658101d77f6ae97)
++++ b/internal/impl/dev/desktop_device.go	(date 1672402911401)
+@@ -32,8 +32,8 @@
+ 		int32(ctx.ConfigIns.Get(WINDOW_HEIGHT_KEY))
+ }
+ 
+-func (desktopDevice DesktopDeviceImpl) GetWindowState() uint32 {
+-	return ctx.ConfigIns.Get(WINDOW_STATE_KEY)
++func (desktopDevice DesktopDeviceImpl) GetWindowState() sdl.WindowFlags {
++	return sdl.WindowFlags(ctx.ConfigIns.Get(WINDOW_STATE_KEY))
+ 	//return sdl.WINDOW_HIDDEN
+ }
+ 
