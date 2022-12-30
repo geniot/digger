@@ -6,7 +6,7 @@ clean:
 	rm bin/${PROGRAM_NAME}* -f
 
 build:
-	go build -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+	go build -gcflags="all=-N -l" -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
 
 mips:
 	CC='/opt/gcw0-toolchain/usr/bin/mipsel-gcw0-linux-uclibc-gcc' \
