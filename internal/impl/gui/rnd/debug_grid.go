@@ -20,10 +20,10 @@ func NewDebugGrid(scn *Scene) *DebugGrid {
 func (debugGrid *DebugGrid) Render() {
 	//whole area
 	ctx.RendererIns.SetDrawColor(255, 0, 0, 255)
-	DrawRectLines(&sdl.Rect{0, 0, SCREEN_LOGICAL_WIDTH - 1, SCREEN_LOGICAL_HEIGHT - 1})
+	DrawRectLines(&sdl.Rect{W: SCREEN_LOGICAL_WIDTH - 1, H: SCREEN_LOGICAL_HEIGHT - 1})
 	//stats
 	ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
-	DrawRectLines(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 3, 20 - 2})
+	DrawRectLines(&sdl.Rect{X: 1, Y: 1, W: SCREEN_LOGICAL_WIDTH - 3, H: 20 - 2})
 
 	ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
 	//horizontal lines
@@ -46,9 +46,9 @@ func (debugGrid *DebugGrid) Render() {
 			tile := debugGrid.scene.chaseWorld.Tile(x, y)
 			if tile.Kind == KindField {
 				ctx.RendererIns.Copy(debugGrid.texture, nil, &sdl.Rect{
-					int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
-					int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
-					CELL_WIDTH / 3, CELL_HEIGHT / 3})
+					X: int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
+					Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
+					W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
 			}
 		}
 	}

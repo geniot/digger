@@ -237,7 +237,7 @@ func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 }
 
 func (digger *Digger) getHitBox() *sdl.Rect {
-	return &sdl.Rect{digger.offsetX + digger.innerOffsetX, digger.offsetY + digger.innerOffsetY, digger.width, digger.height}
+	return &sdl.Rect{X: digger.offsetX + digger.innerOffsetX, Y: digger.offsetY + digger.innerOffsetY, W: digger.width, H: digger.height}
 }
 
 /**
@@ -268,7 +268,7 @@ func (digger *Digger) Render() {
 
 		digger.eatField()
 	case DIGGER_DIE:
-		ctx.RendererIns.Copy(digger.dieTexture, nil, &sdl.Rect{digger.offsetX, digger.offsetY, CELL_WIDTH, CELL_HEIGHT})
+		ctx.RendererIns.Copy(digger.dieTexture, nil, &sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	case DIGGER_GRAVE:
 		ctx.RendererIns.CopyEx(
 			digger.spritesGrave[digger.spritesGraveFrameSequence[digger.spriteGravePointer]],

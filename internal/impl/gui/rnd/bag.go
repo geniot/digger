@@ -78,14 +78,14 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 
 func (bag *Bag) getHitBox() *sdl.Rect {
 	if bag.state == BAG_GOLD {
-		return &sdl.Rect{bag.offsetX + bag.innerOffsetX + 1, bag.offsetY + bag.innerOffsetY + 6, bag.width - 3, bag.height - 6}
+		return &sdl.Rect{X: bag.offsetX + bag.innerOffsetX + 1, Y: bag.offsetY + bag.innerOffsetY + 6, W: bag.width - 3, H: bag.height - 6}
 	} else {
-		return &sdl.Rect{bag.offsetX + bag.innerOffsetX, bag.offsetY + bag.innerOffsetY, bag.width, bag.height}
+		return &sdl.Rect{X: bag.offsetX + bag.innerOffsetX, Y: bag.offsetY + bag.innerOffsetY, W: bag.width, H: bag.height}
 	}
 }
 
 func (bag *Bag) getFallBox() *sdl.Rect {
-	return &sdl.Rect{bag.offsetX + bag.innerOffsetX*2, bag.offsetY + bag.innerOffsetY + CELL_HEIGHT, bag.width - bag.innerOffsetX*2, bag.height - bag.innerOffsetY}
+	return &sdl.Rect{X: bag.offsetX + bag.innerOffsetX*2, Y: bag.offsetY + bag.innerOffsetY + CELL_HEIGHT, W: bag.width - bag.innerOffsetX*2, H: bag.height - bag.innerOffsetY}
 }
 
 func (bag *Bag) Destroy() {
@@ -243,7 +243,7 @@ func (bag *Bag) Render() {
 		dstRect := sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT}
 		ctx.RendererIns.CopyEx(bag.spritesGold[bag.spritesGoldFrameSequence[bag.spriteGoldPointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	} else {
-		ctx.RendererIns.Copy(If(bag.state == BAG_FALLING, bag.textureFall, bag.texture), nil, &sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT})
+		ctx.RendererIns.Copy(If(bag.state == BAG_FALLING, bag.textureFall, bag.texture), nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	}
 
 	if IS_DEBUG_ON {

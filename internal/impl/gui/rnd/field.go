@@ -45,9 +45,9 @@ func NewField(scn *Scene) *Field {
 	for i := 0; i < SCREEN_LOGICAL_WIDTH/int(bgrTile.W); i++ {
 		for j := 0; j < SCREEN_LOGICAL_HEIGHT/int(bgrTile.H); j++ {
 			bgrTile.Blit(
-				&sdl.Rect{0, 0, bgrTile.W, bgrTile.H},
+				&sdl.Rect{W: bgrTile.W, H: bgrTile.H},
 				fld.background,
-				&sdl.Rect{int32(i * int(bgrTile.W)), int32(j * int(bgrTile.H)), bgrTile.W, bgrTile.H})
+				&sdl.Rect{X: int32(i * int(bgrTile.W)), Y: int32(j * int(bgrTile.H)), W: bgrTile.W, H: bgrTile.H})
 		}
 	}
 	return fld
@@ -117,46 +117,46 @@ func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) 
 */
 
 func (field *Field) drawEatRight(x int32, y int32) {
-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{x + CELL_WIDTH - field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
+	targetTunnelRect := sdl.Rect{X: x + CELL_WIDTH - field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x + CELL_WIDTH - field.endRightBlob.W + 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	targetEndRect := sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatLeft(x int32, y int32) {
-	sourceRect := &sdl.Rect{x % field.horizontalBlob.W, 0, 1, field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{x + field.horizontalBlob.W, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
+	targetTunnelRect := sdl.Rect{X: x + field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x - 2, y - CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT}
+	targetEndRect := sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatUp(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
-	targetTunnelRect := sdl.Rect{x, y - CELL_HEIGHT + field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+	sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
+	targetTunnelRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT + field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x, y - CELL_HEIGHT - field.endUpBlob.H + 2, CELL_WIDTH, CELL_HEIGHT}
+	targetEndRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) drawEatDown(x int32, y int32) {
-	sourceRect := &sdl.Rect{0, y % field.verticalBlob.H, field.verticalBlob.W, 1}
-	targetTunnelRect := sdl.Rect{x, y - field.verticalBlob.H, CELL_WIDTH, CELL_HEIGHT}
+	sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
+	targetTunnelRect := sdl.Rect{X: x, Y: y - field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{x, y - 3, CELL_WIDTH, CELL_HEIGHT}
+	targetEndRect := sdl.Rect{X: x, Y: y - 3, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 }
 
 func (field *Field) eatEmerald(emerald *Emerald) {
 	targetRect := sdl.Rect{
-		emerald.offsetX,
-		emerald.offsetY - FIELD_OFFSET_Y,
-		CELL_WIDTH, CELL_HEIGHT}
+		X: emerald.offsetX,
+		Y: emerald.offsetY - FIELD_OFFSET_Y,
+		W: CELL_WIDTH, H: CELL_HEIGHT}
 	emerald.textureMask.Blit(nil, field.background, &targetRect)
 	field.updateChaseWorld(targetRect)
 }

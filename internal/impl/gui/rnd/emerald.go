@@ -53,7 +53,7 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
  */
 
 func (emerald *Emerald) getHitBox() *sdl.Rect {
-	return &sdl.Rect{emerald.offsetX + emerald.innerOffsetX, emerald.offsetY + emerald.innerOffsetY, emerald.width, emerald.height}
+	return &sdl.Rect{X: emerald.offsetX + emerald.innerOffsetX, Y: emerald.offsetY + emerald.innerOffsetY, W: emerald.width, H: emerald.height}
 }
 
 func (emerald *Emerald) Destroy() {
@@ -69,7 +69,7 @@ func (emerald *Emerald) Destroy() {
  */
 
 func (emerald *Emerald) Render() {
-	ctx.RendererIns.Copy(emerald.texture, nil, &sdl.Rect{emerald.offsetX, emerald.offsetY, CELL_WIDTH, CELL_HEIGHT})
+	ctx.RendererIns.Copy(emerald.texture, nil, &sdl.Rect{X: emerald.offsetX, Y: emerald.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)

@@ -83,7 +83,7 @@ func (monster *Monster) Step(n uint64) {
 }
 
 func (monster *Monster) getHitBox() *sdl.Rect {
-	return &sdl.Rect{monster.offsetX + monster.innerOffsetX, monster.offsetY + monster.innerOffsetY, monster.width, monster.height}
+	return &sdl.Rect{X: monster.offsetX + monster.innerOffsetX, Y: monster.offsetY + monster.innerOffsetY, W: monster.width, H: monster.height}
 }
 
 func (monster *Monster) Render() {

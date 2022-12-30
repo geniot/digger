@@ -76,7 +76,7 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 }
 
 func (fire *Fire) getHitBox() *sdl.Rect {
-	return &sdl.Rect{fire.offsetX + fire.innerOffsetX, fire.offsetY + fire.innerOffsetY, fire.width, fire.height}
+	return &sdl.Rect{X: fire.offsetX + fire.innerOffsetX, Y: fire.offsetY + fire.innerOffsetY, W: fire.width, H: fire.height}
 }
 
 /**
