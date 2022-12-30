@@ -33,7 +33,8 @@ func initCommon() {
 	}
 	sdl.GameControllerEventState(sdl.ENABLE)
 	sdl.JoystickEventState(sdl.ENABLE)
-	println(sdl.JoystickGetDeviceGUID(0))
+	guid := sdl.JoystickGetDeviceGUID(0)
+	println(sdl.JoystickGetGUIDString(guid))
 	println(sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG")))
 }
 
