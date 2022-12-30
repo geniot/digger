@@ -2,6 +2,7 @@ package loop
 
 import (
 	"github.com/geniot/digger/internal/ctx"
+	"github.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
 )
@@ -16,6 +17,14 @@ func NewEventLoop() *EventLoopImpl {
 func (eventLoop EventLoopImpl) Run() {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
+
+		case *sdl.JoyButtonEvent:
+			if t.State == sdl.PRESSED {
+				ctx.PressedKeysCodesSetIns[glb.JoyButtonEventsMap[t.Button]] = time.Now().UnixNano()
+			} else { // if t.State == sdl.RELEASED {
+				delete(ctx.PressedKeysCodesSetIns, glb.JoyButtonEventsMap[t.Button])
+			}
+			break
 
 		case *sdl.KeyboardEvent:
 			if t.Repeat > 0 {
