@@ -31,9 +31,9 @@ func initCommon() {
 	if err != nil {
 		println(err.Error())
 	}
-	sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG"))
 	sdl.GameControllerEventState(sdl.ENABLE)
 	sdl.JoystickEventState(sdl.ENABLE)
+	sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG"))
 }
 
 func closeCommon() {
