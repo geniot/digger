@@ -17,6 +17,10 @@ func (eventLoop EventLoopImpl) Run() {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 
+		case *sdl.ControllerButtonEvent:
+			println(t.Button)
+			break
+
 		case *sdl.KeyboardEvent:
 			if t.Repeat > 0 {
 				break
