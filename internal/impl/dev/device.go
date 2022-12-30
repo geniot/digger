@@ -32,6 +32,7 @@ func initCommon() {
 		println(err.Error())
 	}
 	sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG"))
+	sdl.GameControllerEventState(sdl.ENABLE)
 }
 
 func closeCommon() {
