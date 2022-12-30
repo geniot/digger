@@ -70,5 +70,4 @@ func (handhelpDevice *HandheldDeviceImpl) init() {
 		println(sdl.JoystickNameForIndex(0))
 		handhelpDevice.joystick = sdl.JoystickOpen(0)
 	}
-	sdl.JoystickEventState(sdl.ENABLE)
 }

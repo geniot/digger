@@ -33,6 +33,7 @@ func initCommon() {
 	}
 	sdl.GameControllerAddMapping(os.Getenv("SDL_GAMECONTROLLERCONFIG"))
 	sdl.GameControllerEventState(sdl.ENABLE)
+	sdl.JoystickEventState(sdl.ENABLE)
 }
 
 func closeCommon() {
