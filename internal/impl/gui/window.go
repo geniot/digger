@@ -40,7 +40,8 @@ func NewWindow() *WindowImpl {
 }
 
 func (window WindowImpl) Update() {
-	window.sdlWindow.UpdateSurface()
+	window.sdlWindow.UpdateSurfaceRects(ctx.UpdateRects)
+	ctx.UpdateRects = nil
 }
 
 func (window WindowImpl) show() {

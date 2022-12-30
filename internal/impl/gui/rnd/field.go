@@ -16,6 +16,7 @@ type Field struct {
 	endUpBlob      *sdl.Surface
 	endDownBlob    *sdl.Surface
 	background     *sdl.Surface
+	redrawCells    [CELLS_HORIZONTAL][CELLS_VERTICAL]bool
 	scene          *Scene
 }
 
@@ -50,6 +51,13 @@ func NewField(scn *Scene) *Field {
 				&sdl.Rect{int32(i * int(bgrTile.W)), int32(j * int(bgrTile.H)), bgrTile.W, bgrTile.H})
 		}
 	}
+
+	for x := 0; x < CELLS_HORIZONTAL; x++ {
+		for y := 0; y < CELLS_VERTICAL; y++ {
+			fld.redrawCells[x][y] = true
+		}
+	}
+
 	return fld
 }
 
@@ -58,7 +66,26 @@ func NewField(scn *Scene) *Field {
  */
 
 func (field *Field) Render() {
-	field.background.Blit(nil, ctx.SurfaceIns, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+	for x := 0; x < CELLS_HORIZONTAL; x++ {
+		for y := 0; y < CELLS_VERTICAL; y++ {
+			if field.redrawCells[x][y] == true {
+				sourceRect := &sdl.Rect{
+					X: int32(x * CELL_WIDTH),
+					Y: int32(y * CELL_HEIGHT),
+					W: CELL_WIDTH,
+					H: CELL_HEIGHT}
+				destRect := &sdl.Rect{
+					X: int32(x * CELL_WIDTH),
+					Y: FIELD_OFFSET_Y + int32(y*CELL_HEIGHT),
+					W: CELL_WIDTH,
+					H: CELL_HEIGHT}
+				field.background.Blit(sourceRect, ctx.SurfaceIns, destRect)
+				ctx.UpdateRects = append(ctx.UpdateRects, *destRect)
+				field.redrawCells[x][y] = false
+			}
+		}
+	}
+
 	//bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
 	//defer bgrTexture.Destroy()
 	//ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})

@@ -42,3 +42,8 @@ func LoadTexture(fileName string) *sdl.Texture {
 	}
 	return txt
 }
+
+func LoadSurface(fileName string) *sdl.Surface {
+	surface, _ := img.LoadRW(GetResource(fileName), true)
+	return surface
+}

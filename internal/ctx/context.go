@@ -21,6 +21,7 @@ var (
 
 	RendererIns            *sdl.Renderer
 	SurfaceIns             *sdl.Surface
+	UpdateRects            []sdl.Rect
 	FontIns                *ttf.Font
 	PressedKeysCodesSetIns map[sdl.Keycode]int64 = make(map[sdl.Keycode]int64)
 )

@@ -3,6 +3,7 @@ package rnd
 import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
+	"github.com/geniot/digger/resources"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
@@ -22,7 +23,7 @@ type Digger struct {
 
 	spritePointer    int
 	spritePointerInc int
-	sprites          []*sdl.Texture
+	sprites          []*sdl.Surface
 
 	dieTexture      *sdl.Texture
 	dieCounter      int
@@ -47,11 +48,11 @@ func NewDigger(scn *Scene) *Digger {
 	dg := &Digger{}
 	dg.scene = scn
 
-	//dg.sprites = []*sdl.Texture{
-	//	resources.LoadTexture("cldig1.png"),
-	//	resources.LoadTexture("cldig2.png"),
-	//	resources.LoadTexture("cldig3.png")}
-	//
+	dg.sprites = []*sdl.Surface{
+		resources.LoadSurface("cldig1.png"),
+		resources.LoadSurface("cldig2.png"),
+		resources.LoadSurface("cldig3.png")}
+
 	//dg.dieTexture = resources.LoadTexture("cddie.png")
 	//
 	//dg.spritesGrave = []*sdl.Texture{
@@ -246,26 +247,29 @@ func (digger *Digger) getHitBox() *sdl.Rect {
 func (digger *Digger) Render() {
 	switch digger.state {
 	case DIGGER_ALIVE:
-		flip := sdl.FLIP_NONE
-		if digger.direction == RIGHT {
-			flip = sdl.FLIP_HORIZONTAL
-		}
-		angle := 0.0
-		if digger.direction == UP {
-			angle = 90
-		}
-		if digger.direction == DOWN {
-			angle = 270
-		}
-		ctx.RendererIns.CopyEx(
-			digger.sprites[digger.spritePointer],
-			nil,
-			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
-			angle,
-			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2},
-			flip)
+		//flip := sdl.FLIP_NONE
+		//if digger.direction == RIGHT {
+		//	flip = sdl.FLIP_HORIZONTAL
+		//}
+		//angle := 0.0
+		//if digger.direction == UP {
+		//	angle = 90
+		//}
+		//if digger.direction == DOWN {
+		//	angle = 270
+		//}
 
-		digger.eatField()
+		digger.sprites[digger.spritePointer].Blit(nil, ctx.SurfaceIns, &sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+
+		//ctx.RendererIns.CopyEx(
+		//	digger.sprites[digger.spritePointer],
+		//	nil,
+		//	&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
+		//	angle,
+		//	&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2},
+		//	flip)
+
+		//digger.eatField()
 	case DIGGER_DIE:
 		ctx.RendererIns.Copy(digger.dieTexture, nil, &sdl.Rect{digger.offsetX, digger.offsetY, CELL_WIDTH, CELL_HEIGHT})
 	case DIGGER_GRAVE:

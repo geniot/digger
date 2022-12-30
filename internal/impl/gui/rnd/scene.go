@@ -125,7 +125,7 @@ func (scene *Scene) Render() {
 	//for monster := range scene.monsters.Iter() {
 	//	monster.Render()
 	//}
-	//scene.digger.Render()
+	scene.digger.Render()
 	//
 	//if IS_DEBUG_ON {
 	//	scene.debugGrid.Render()
