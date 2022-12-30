@@ -10,7 +10,7 @@ import (
 )
 
 func NewDevice() api.IDevice {
-	if strings.Index(runtime.GOARCH, "mips") == 0 {
+	if strings.Index(runtime.GOARCH, "mips") == 0 || strings.Index(runtime.GOARCH, "arm64") == 0 {
 		return NewHandheldDevice()
 	} else {
 		return NewDesktopDevice()
