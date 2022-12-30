@@ -1,0 +1,534 @@
+Index: internal/api/interfaces.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/api/interfaces.go b/internal/api/interfaces.go
+--- a/internal/api/interfaces.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/api/interfaces.go	(date 1672392901926)
+@@ -7,6 +7,7 @@
+ 
+ type IWindow interface {
+ 	SaveWindowState()
++	Update()
+ }
+ 
+ type IScene interface {
+Index: internal/impl/gui/window.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/window.go b/internal/impl/gui/window.go
+--- a/internal/impl/gui/window.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/window.go	(date 1672392914040)
+@@ -26,9 +26,10 @@
+ 	w.iconSurface, _ = img.LoadRW(resources.GetResource(ICON_FILE_NAME), true)
+ 	w.sdlWindow.SetIcon(w.iconSurface)
+ 
+-	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
+-		sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
+-	ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
++	ctx.SurfaceIns, _ = w.sdlWindow.GetSurface()
++	//ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
++	//	sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
++	//ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+ 	//sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "0")
+ 
+ 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
+@@ -38,6 +39,10 @@
+ 	return &w
+ }
+ 
++func (window WindowImpl) Update() {
++	window.sdlWindow.UpdateSurface()
++}
++
+ func (window WindowImpl) show() {
+ 	window.sdlWindow.Show()
+ 	window.sdlWindow.Raise()
+@@ -47,6 +52,7 @@
+ 	switch t := event.(type) {
+ 	case *sdl.WindowEvent:
+ 		if t.Event == sdl.WINDOWEVENT_RESIZED {
++			ctx.SurfaceIns, _ = window.sdlWindow.GetSurface()
+ 			ctx.RenderLoopIns.Run()
+ 		}
+ 		break
+Index: internal/impl/gui/rnd/monster.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/monster.go b/internal/impl/gui/rnd/monster.go
+--- a/internal/impl/gui/rnd/monster.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/monster.go	(date 1672393712723)
+@@ -3,7 +3,6 @@
+ import (
+ 	"github.com/geniot/digger/internal/ctx"
+ 	. "github.com/geniot/digger/internal/glb"
+-	"github.com/geniot/digger/resources"
+ 	"github.com/solarlune/resolv"
+ 	"github.com/veandco/go-sdl2/sdl"
+ )
+@@ -40,15 +39,15 @@
+ 	mns := &Monster{}
+ 	mns.scene = scn
+ 
+-	mns.spritesNobbin = []*sdl.Texture{
+-		resources.LoadTexture("cnob1.png"),
+-		resources.LoadTexture("cnob2.png"),
+-		resources.LoadTexture("cnob3.png")}
+-
+-	mns.spritesHobbin = []*sdl.Texture{
+-		resources.LoadTexture("clhob1.png"),
+-		resources.LoadTexture("clhob2.png"),
+-		resources.LoadTexture("clhob3.png")}
++	//mns.spritesNobbin = []*sdl.Texture{
++	//	resources.LoadTexture("cnob1.png"),
++	//	resources.LoadTexture("cnob2.png"),
++	//	resources.LoadTexture("cnob3.png")}
++	//
++	//mns.spritesHobbin = []*sdl.Texture{
++	//	resources.LoadTexture("clhob1.png"),
++	//	resources.LoadTexture("clhob2.png"),
++	//	resources.LoadTexture("clhob3.png")}
+ 
+ 	mns.innerOffsetX = 2
+ 	mns.innerOffsetY = 2
+Index: internal/impl/gui/loop/render_loop.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/loop/render_loop.go b/internal/impl/gui/loop/render_loop.go
+--- a/internal/impl/gui/loop/render_loop.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/loop/render_loop.go	(date 1672392901907)
+@@ -2,7 +2,6 @@
+ 
+ import (
+ 	"github.com/geniot/digger/internal/ctx"
+-	"github.com/geniot/digger/internal/glb"
+ )
+ 
+ type RenderLoopImpl struct {
+@@ -13,8 +12,10 @@
+ }
+ 
+ func (renderLoop RenderLoopImpl) Run() {
+-	ctx.RendererIns.SetDrawColor(glb.BGR_COLOR[0], glb.BGR_COLOR[1], glb.BGR_COLOR[2], glb.BGR_COLOR[3])
+-	ctx.RendererIns.Clear()
++	//ctx.RendererIns.SetDrawColor(glb.BGR_COLOR[0], glb.BGR_COLOR[1], glb.BGR_COLOR[2], glb.BGR_COLOR[3])
++	//ctx.RendererIns.Clear()
++	ctx.SurfaceIns.FillRect(nil, 0)
+ 	ctx.SceneIns.Render()
+-	ctx.RendererIns.Present()
++	ctx.WindowIns.Update()
++	//ctx.RendererIns.Present()
+ }
+Index: internal/impl/gui/loop/loop.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/loop/loop.go b/internal/impl/gui/loop/loop.go
+--- a/internal/impl/gui/loop/loop.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/loop/loop.go	(date 1672392563213)
+@@ -3,6 +3,7 @@
+ import (
+ 	"github.com/geniot/digger/internal/ctx"
+ 	"github.com/tevino/abool/v2"
++	"github.com/veandco/go-sdl2/sdl"
+ )
+ 
+ type LoopImpl struct {
+@@ -19,6 +20,7 @@
+ 		ctx.EventLoopIns.Run()
+ 		ctx.PhysicsLoopIns.Run()
+ 		ctx.RenderLoopIns.Run()
++		sdl.Delay(16)
+ 	}
+ }
+ 
+Index: internal/impl/gui/rnd/debug_fps_counter.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/debug_fps_counter.go b/internal/impl/gui/rnd/debug_fps_counter.go
+--- a/internal/impl/gui/rnd/debug_fps_counter.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/debug_fps_counter.go	(date 1672392733611)
+@@ -50,5 +50,6 @@
+ 		texture = glb.DrawText(txt, glb.COLOR_WHITE)
+ 		fpsCounter.cachedTextures[txt] = texture
+ 	}
+-	ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
++	texture.S.Blit(nil, ctx.SurfaceIns, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
++	//ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
+ }
+Index: internal/impl/gui/rnd/field.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
+--- a/internal/impl/gui/rnd/field.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/field.go	(date 1672393903593)
+@@ -35,12 +35,12 @@
+ 	fld.endDownBlob, _ = img.LoadRW(resources.GetResource("blob6.png"), true)
+ 
+ 	bgrTile, _ := img.LoadRW(resources.GetResource("cback1.png"), true)
+-	defer bgrTile.Free()
+-	info, _ := ctx.RendererIns.GetInfo()
++	//defer bgrTile.Free()
++	//info, _ := ctx.RendererIns.GetInfo()
+ 	fld.background, _ = sdl.CreateRGBSurfaceWithFormat(0,
+ 		SCREEN_LOGICAL_WIDTH,
+ 		SCREEN_LOGICAL_HEIGHT,
+-		32, uint32(info.TextureFormats[0]))
++		32, sdl.PIXELFORMAT_RGBA8888)
+ 
+ 	for i := 0; i < SCREEN_LOGICAL_WIDTH/int(bgrTile.W); i++ {
+ 		for j := 0; j < SCREEN_LOGICAL_HEIGHT/int(bgrTile.H); j++ {
+@@ -58,9 +58,10 @@
+  */
+ 
+ func (field *Field) Render() {
+-	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
+-	defer bgrTexture.Destroy()
+-	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
++	field.background.Blit(nil, ctx.SurfaceIns, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
++	//bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
++	//defer bgrTexture.Destroy()
++	//ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+ }
+ 
+ func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
+Index: internal/impl/gui/rnd/scene.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/scene.go b/internal/impl/gui/rnd/scene.go
+--- a/internal/impl/gui/rnd/scene.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/scene.go	(date 1672393538950)
+@@ -4,9 +4,7 @@
+ 	mapset "github.com/deckarep/golang-set/v2"
+ 	. "github.com/geniot/digger/internal/glb"
+ 	. "github.com/geniot/digger/internal/impl/chs"
+-	"github.com/geniot/digger/resources"
+ 	"github.com/solarlune/resolv"
+-	"strings"
+ )
+ 
+ type Scene struct {
+@@ -54,33 +52,33 @@
+ 
+ 	scn.monsters.Add(NewMonster(scn))
+ 
+-	rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
+-	for y := 0; y < len(rows); y++ {
+-		row := strings.TrimSuffix(rows[y], "\n")
+-		row = strings.TrimSuffix(rows[y], "\r")
+-		for x := 0; x < len(row); x++ {
+-			if row[x] == 'C' {
+-				scn.emeralds.Add(NewEmerald(x, y, scn))
+-			} else if row[x] == 'B' {
+-				scn.bags.Add(NewBag(x, y, scn))
+-			} else if row[x] == 'S' {
+-				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+-				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+-				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+-				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+-				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+-				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+-			} else if row[x] == 'V' {
+-				isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
+-				isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
+-				scn.field.eatVertical(x, y, isUpCont, isDownCont)
+-			} else if row[x] == 'H' {
+-				isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
+-				isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
+-				scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
+-			}
+-		}
+-	}
++	//rows := strings.Split(strings.TrimSpace(resources.GetLevel(scn.level)), "\n")
++	//for y := 0; y < len(rows); y++ {
++	//	row := strings.TrimSuffix(rows[y], "\n")
++	//	row = strings.TrimSuffix(rows[y], "\r")
++	//	for x := 0; x < len(row); x++ {
++	//		if row[x] == 'C' {
++	//			scn.emeralds.Add(NewEmerald(x, y, scn))
++	//		} else if row[x] == 'B' {
++	//			scn.bags.Add(NewBag(x, y, scn))
++	//		} else if row[x] == 'S' {
++	//			isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
++	//			isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
++	//			isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
++	//			isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
++	//			scn.field.eatVertical(x, y, isUpCont, isDownCont)
++	//			scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
++	//		} else if row[x] == 'V' {
++	//			isUpCont := If(y > 0 && scn.isTunnel(rows[y-1][x]), true, false)
++	//			isDownCont := If(y < CELLS_VERTICAL-1 && scn.isTunnel(rows[y+1][x]), true, false)
++	//			scn.field.eatVertical(x, y, isUpCont, isDownCont)
++	//		} else if row[x] == 'H' {
++	//			isRightCont := If(x < CELLS_HORIZONTAL-1 && scn.isTunnel(row[x+1]), true, false)
++	//			isLeftCont := If(x > 0 && scn.isTunnel(row[x-1]), true, false)
++	//			scn.field.eatHorizontal(x, y, isRightCont, isLeftCont)
++	//		}
++	//	}
++	//}
+ 
+ 	scn.debugGrid = NewDebugGrid(scn)
+ 	scn.fpsCounter = NewFpsCounter()
+@@ -101,9 +99,9 @@
+ 	if scene.fire != nil {
+ 		scene.fire.Step(n)
+ 	}
+-	for bag := range scene.bags.Iter() {
+-		bag.Step(n)
+-	}
++	//for bag := range scene.bags.Iter() {
++	//	bag.Step(n)
++	//}
+ 	for monster := range scene.monsters.Iter() {
+ 		monster.Step(n)
+ 	}
+@@ -115,24 +113,24 @@
+ 
+ func (scene *Scene) Render() {
+ 	scene.field.Render()
+-	if scene.fire != nil {
+-		scene.fire.Render()
+-	}
+-	for emerald := range scene.emeralds.Iter() {
+-		emerald.Render()
+-	}
+-	for bag := range scene.bags.Iter() {
+-		bag.Render()
+-	}
+-	for monster := range scene.monsters.Iter() {
+-		monster.Render()
+-	}
+-	scene.digger.Render()
+-
+-	if IS_DEBUG_ON {
+-		scene.debugGrid.Render()
+-		//
+-	}
++	//if scene.fire != nil {
++	//	scene.fire.Render()
++	//}
++	//for emerald := range scene.emeralds.Iter() {
++	//	emerald.Render()
++	//}
++	//for bag := range scene.bags.Iter() {
++	//	bag.Render()
++	//}
++	//for monster := range scene.monsters.Iter() {
++	//	monster.Render()
++	//}
++	//scene.digger.Render()
++	//
++	//if IS_DEBUG_ON {
++	//	scene.debugGrid.Render()
++	//	//
++	//}
+ 
+ 	scene.fpsCounter.Render()
+ }
+Index: internal/impl/gui/rnd/debug_grid.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/debug_grid.go b/internal/impl/gui/rnd/debug_grid.go
+--- a/internal/impl/gui/rnd/debug_grid.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/debug_grid.go	(date 1672393786629)
+@@ -1,9 +1,7 @@
+ package rnd
+ 
+ import (
+-	"github.com/geniot/digger/internal/ctx"
+-	. "github.com/geniot/digger/internal/glb"
+-	. "github.com/geniot/digger/internal/impl/chs"
++	//. "github.com/geniot/digger/internal/glb"
+ 	"github.com/geniot/digger/resources"
+ 	"github.com/veandco/go-sdl2/sdl"
+ )
+@@ -19,37 +17,37 @@
+ 
+ func (debugGrid *DebugGrid) Render() {
+ 	//whole area
+-	ctx.RendererIns.SetDrawColor(255, 0, 0, 255)
+-	DrawRectLines(&sdl.Rect{0, 0, SCREEN_LOGICAL_WIDTH - 1, SCREEN_LOGICAL_HEIGHT - 1})
+-	//stats
+-	ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
+-	DrawRectLines(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 3, 20 - 2})
+-
+-	ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
+-	//horizontal lines
+-	for y := 0; y < CELLS_VERTICAL+1; y++ {
+-		x1 := int32(CELLS_OFFSET)
+-		y1 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
+-		x2 := int32(CELLS_OFFSET + CELL_WIDTH*CELLS_HORIZONTAL)
+-		y2 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
+-		ctx.RendererIns.DrawLine(x1, y1, x2, y2)
+-	}
++	//ctx.RendererIns.SetDrawColor(255, 0, 0, 255)
++	//DrawRectLines(&sdl.Rect{0, 0, SCREEN_LOGICAL_WIDTH - 1, SCREEN_LOGICAL_HEIGHT - 1})
++	////stats
++	//ctx.RendererIns.SetDrawColor(0, 0, 255, 255)
++	//DrawRectLines(&sdl.Rect{1, 1, SCREEN_LOGICAL_WIDTH - 3, 20 - 2})
++	//
++	//ctx.RendererIns.SetDrawColor(0, 255, 0, 255)
++	////horizontal lines
++	//for y := 0; y < CELLS_VERTICAL+1; y++ {
++	//	x1 := int32(CELLS_OFFSET)
++	//	y1 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
++	//	x2 := int32(CELLS_OFFSET + CELL_WIDTH*CELLS_HORIZONTAL)
++	//	y2 := int32(FIELD_OFFSET_Y + CELLS_OFFSET + y*CELL_HEIGHT)
++	//	ctx.RendererIns.DrawLine(x1, y1, x2, y2)
++	//}
+ 	//vertical lines
+-	for x := 0; x < CELLS_HORIZONTAL+1; x++ {
+-		ctx.RendererIns.DrawLine(
+-			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET,
+-			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
+-	}
+-
+-	for y := 0; y < CELLS_VERTICAL*2-1; y++ {
+-		for x := 0; x < CELLS_HORIZONTAL*2-1; x++ {
+-			tile := debugGrid.scene.chaseWorld.Tile(x, y)
+-			if tile.Kind == KindField {
+-				ctx.RendererIns.Copy(debugGrid.texture, nil, &sdl.Rect{
+-					int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
+-					int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
+-					CELL_WIDTH / 3, CELL_HEIGHT / 3})
+-			}
+-		}
+-	}
++	//for x := 0; x < CELLS_HORIZONTAL+1; x++ {
++	//	ctx.RendererIns.DrawLine(
++	//		int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET,
++	//		int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
++	//}
++	//
++	//for y := 0; y < CELLS_VERTICAL*2-1; y++ {
++	//	for x := 0; x < CELLS_HORIZONTAL*2-1; x++ {
++	//		tile := debugGrid.scene.chaseWorld.Tile(x, y)
++	//		if tile.Kind == KindField {
++	//			ctx.RendererIns.Copy(debugGrid.texture, nil, &sdl.Rect{
++	//				int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
++	//				int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
++	//				CELL_WIDTH / 3, CELL_HEIGHT / 3})
++	//		}
++	//	}
++	//}
+ }
+Index: internal/glb/funcs.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/glb/funcs.go b/internal/glb/funcs.go
+--- a/internal/glb/funcs.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/glb/funcs.go	(date 1672392737077)
+@@ -60,12 +60,12 @@
+ 	if err != nil {
+ 		println(err.Error())
+ 	}
+-	defer textSurface.Free()
++	//defer textSurface.Free()
+ 	textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
+ 	if err != nil {
+ 		println(err.Error())
+ 	}
+-	return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
++	return &SurfTexture{S: textSurface, T: textTexture, W: textSurface.W, H: textSurface.H}
+ }
+ 
+ // Renderer.DrawRect is not available in some older versions of SDL2.
+Index: internal/impl/gui/rnd/digger.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/digger.go b/internal/impl/gui/rnd/digger.go
+--- a/internal/impl/gui/rnd/digger.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/digger.go	(date 1672393681189)
+@@ -3,7 +3,6 @@
+ import (
+ 	"github.com/geniot/digger/internal/ctx"
+ 	. "github.com/geniot/digger/internal/glb"
+-	"github.com/geniot/digger/resources"
+ 	"github.com/solarlune/resolv"
+ 	"github.com/veandco/go-sdl2/sdl"
+ 	"runtime"
+@@ -48,20 +47,20 @@
+ 	dg := &Digger{}
+ 	dg.scene = scn
+ 
+-	dg.sprites = []*sdl.Texture{
+-		resources.LoadTexture("cldig1.png"),
+-		resources.LoadTexture("cldig2.png"),
+-		resources.LoadTexture("cldig3.png")}
+-
+-	dg.dieTexture = resources.LoadTexture("cddie.png")
+-
+-	dg.spritesGrave = []*sdl.Texture{
+-		resources.LoadTexture("cgrave1.png"),
+-		resources.LoadTexture("cgrave2.png"),
+-		resources.LoadTexture("cgrave3.png"),
+-		resources.LoadTexture("cgrave4.png"),
+-		resources.LoadTexture("cgrave5.png"),
+-	}
++	//dg.sprites = []*sdl.Texture{
++	//	resources.LoadTexture("cldig1.png"),
++	//	resources.LoadTexture("cldig2.png"),
++	//	resources.LoadTexture("cldig3.png")}
++	//
++	//dg.dieTexture = resources.LoadTexture("cddie.png")
++	//
++	//dg.spritesGrave = []*sdl.Texture{
++	//	resources.LoadTexture("cgrave1.png"),
++	//	resources.LoadTexture("cgrave2.png"),
++	//	resources.LoadTexture("cgrave3.png"),
++	//	resources.LoadTexture("cgrave4.png"),
++	//	resources.LoadTexture("cgrave5.png"),
++	//}
+ 	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4} //making a pause at the end
+ 
+ 	dg.spritePointerInc = 1
+Index: internal/ctx/context.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/ctx/context.go b/internal/ctx/context.go
+--- a/internal/ctx/context.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/ctx/context.go	(date 1672392563275)
+@@ -20,6 +20,7 @@
+ 	SceneIns api.IScene
+ 
+ 	RendererIns            *sdl.Renderer
++	SurfaceIns             *sdl.Surface
+ 	FontIns                *ttf.Font
+ 	PressedKeysCodesSetIns map[sdl.Keycode]int64 = make(map[sdl.Keycode]int64)
+ )
+Index: internal/glb/types.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/glb/types.go b/internal/glb/types.go
+--- a/internal/glb/types.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/glb/types.go	(date 1672392737057)
+@@ -49,4 +49,5 @@
+ 	W int32
+ 	H int32
+ 	T *sdl.Texture
++	S *sdl.Surface
+ }
