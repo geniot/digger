@@ -1,0 +1,102 @@
+Subject: [PATCH] Redraw cells
+---
+Index: internal/impl/gui/loop/render_loop.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/loop/render_loop.go b/internal/impl/gui/loop/render_loop.go
+--- a/internal/impl/gui/loop/render_loop.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/loop/render_loop.go	(date 1672351114522)
+@@ -2,7 +2,6 @@
+ 
+ import (
+ 	"github.com/geniot/digger/internal/ctx"
+-	"github.com/geniot/digger/internal/glb"
+ )
+ 
+ type RenderLoopImpl struct {
+@@ -13,8 +12,8 @@
+ }
+ 
+ func (renderLoop RenderLoopImpl) Run() {
+-	ctx.RendererIns.SetDrawColor(glb.BGR_COLOR[0], glb.BGR_COLOR[1], glb.BGR_COLOR[2], glb.BGR_COLOR[3])
+-	ctx.RendererIns.Clear()
++	//ctx.RendererIns.SetDrawColor(glb.BGR_COLOR[0], glb.BGR_COLOR[1], glb.BGR_COLOR[2], glb.BGR_COLOR[3])
++	//ctx.RendererIns.Clear()
+ 	ctx.SceneIns.Render()
+ 	ctx.RendererIns.Present()
+ }
+Index: internal/impl/gui/rnd/field.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/field.go b/internal/impl/gui/rnd/field.go
+--- a/internal/impl/gui/rnd/field.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/field.go	(date 1672352039227)
+@@ -16,6 +16,7 @@
+ 	endUpBlob      *sdl.Surface
+ 	endDownBlob    *sdl.Surface
+ 	background     *sdl.Surface
++	redrawCells    [CELLS_HORIZONTAL][CELLS_VERTICAL]bool
+ 	scene          *Scene
+ }
+ 
+@@ -50,6 +51,13 @@
+ 				&sdl.Rect{int32(i * int(bgrTile.W)), int32(j * int(bgrTile.H)), bgrTile.W, bgrTile.H})
+ 		}
+ 	}
++
++	for x := 0; x < CELLS_HORIZONTAL; x++ {
++		for y := 0; y < CELLS_VERTICAL; y++ {
++			fld.redrawCells[x][y] = true
++		}
++	}
++
+ 	return fld
+ }
+ 
+@@ -60,7 +68,24 @@
+ func (field *Field) Render() {
+ 	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
+ 	defer bgrTexture.Destroy()
+-	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
++	for x := 0; x < CELLS_HORIZONTAL; x++ {
++		for y := 0; y < CELLS_VERTICAL; y++ {
++			if field.redrawCells[x][y] == true {
++				sourceRect := &sdl.Rect{
++					X: int32(x * CELL_WIDTH),
++					Y: int32(y * CELL_HEIGHT),
++					W: CELL_WIDTH,
++					H: CELL_HEIGHT}
++				destRect := &sdl.Rect{
++					X: int32(x * CELL_WIDTH),
++					Y: FIELD_OFFSET_Y + int32(y*CELL_HEIGHT),
++					W: CELL_WIDTH,
++					H: CELL_HEIGHT}
++				ctx.RendererIns.Copy(bgrTexture, sourceRect, destRect)
++				field.redrawCells[x][y] = false
++			}
++		}
++	}
+ }
+ 
+ func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
+Index: internal/impl/gui/rnd/debug_fps_counter.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/impl/gui/rnd/debug_fps_counter.go b/internal/impl/gui/rnd/debug_fps_counter.go
+--- a/internal/impl/gui/rnd/debug_fps_counter.go	(revision fd94a603e5a5460b62bfec215445fd5988d0120d)
++++ b/internal/impl/gui/rnd/debug_fps_counter.go	(date 1672351215808)
+@@ -50,5 +50,7 @@
+ 		texture = glb.DrawText(txt, glb.COLOR_WHITE)
+ 		fpsCounter.cachedTextures[txt] = texture
+ 	}
+-	ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
++	targetRect := &sdl.Rect{X: 0, Y: 0, W: texture.W, H: texture.H}
++	ctx.RendererIns.FillRect(targetRect)
++	ctx.RendererIns.Copy(texture.T, nil, targetRect)
+ }
