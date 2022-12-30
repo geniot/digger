@@ -50,5 +50,6 @@ func (fpsCounter *DebugFpsCounter) Render() {
 		texture = glb.DrawText(txt, glb.COLOR_WHITE)
 		fpsCounter.cachedTextures[txt] = texture
 	}
-	ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
+	texture.S.Blit(nil, ctx.SurfaceIns, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
+	//ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
 }

@@ -35,12 +35,12 @@ func NewField(scn *Scene) *Field {
 	fld.endDownBlob, _ = img.LoadRW(resources.GetResource("blob6.png"), true)
 
 	bgrTile, _ := img.LoadRW(resources.GetResource("cback1.png"), true)
-	defer bgrTile.Free()
-	info, _ := ctx.RendererIns.GetInfo()
+	//defer bgrTile.Free()
+	//info, _ := ctx.RendererIns.GetInfo()
 	fld.background, _ = sdl.CreateRGBSurfaceWithFormat(0,
 		SCREEN_LOGICAL_WIDTH,
 		SCREEN_LOGICAL_HEIGHT,
-		32, uint32(info.TextureFormats[0]))
+		32, sdl.PIXELFORMAT_RGBA8888)
 
 	for i := 0; i < SCREEN_LOGICAL_WIDTH/int(bgrTile.W); i++ {
 		for j := 0; j < SCREEN_LOGICAL_HEIGHT/int(bgrTile.H); j++ {
@@ -58,9 +58,10 @@ func NewField(scn *Scene) *Field {
  */
 
 func (field *Field) Render() {
-	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
-	defer bgrTexture.Destroy()
-	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+	field.background.Blit(nil, ctx.SurfaceIns, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+	//bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
+	//defer bgrTexture.Destroy()
+	//ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
 }
 
 func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {

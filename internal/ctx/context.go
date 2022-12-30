@@ -20,6 +20,7 @@ var (
 	SceneIns api.IScene
 
 	RendererIns            *sdl.Renderer
+	SurfaceIns             *sdl.Surface
 	FontIns                *ttf.Font
 	PressedKeysCodesSetIns map[sdl.Keycode]int64 = make(map[sdl.Keycode]int64)
 )

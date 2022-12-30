@@ -49,4 +49,5 @@ type SurfTexture struct {
 	W int32
 	H int32
 	T *sdl.Texture
+	S *sdl.Surface
 }

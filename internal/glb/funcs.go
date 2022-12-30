@@ -60,12 +60,12 @@ func DrawText(txt string, color sdl.Color) *SurfTexture {
 	if err != nil {
 		println(err.Error())
 	}
-	defer textSurface.Free()
+	//defer textSurface.Free()
 	textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
 	if err != nil {
 		println(err.Error())
 	}
-	return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
+	return &SurfTexture{S: textSurface, T: textTexture, W: textSurface.W, H: textSurface.H}
 }
 
 // Renderer.DrawRect is not available in some older versions of SDL2.

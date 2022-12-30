@@ -26,9 +26,10 @@ func NewWindow() *WindowImpl {
 	w.iconSurface, _ = img.LoadRW(resources.GetResource(ICON_FILE_NAME), true)
 	w.sdlWindow.SetIcon(w.iconSurface)
 
-	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
-		sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
-	ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	ctx.SurfaceIns, _ = w.sdlWindow.GetSurface()
+	//ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,
+	//	sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_ACCELERATED)
+	//ctx.RendererIns.SetLogicalSize(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 	//sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "0")
 
 	sdl.AddEventWatchFunc(w.resizingEventWatcher, nil)
@@ -36,6 +37,10 @@ func NewWindow() *WindowImpl {
 	go w.show()
 
 	return &w
+}
+
+func (window WindowImpl) Update() {
+	window.sdlWindow.UpdateSurface()
 }
 
 func (window WindowImpl) show() {
@@ -47,6 +52,7 @@ func (window WindowImpl) resizingEventWatcher(event sdl.Event, data interface{})
 	switch t := event.(type) {
 	case *sdl.WindowEvent:
 		if t.Event == sdl.WINDOWEVENT_RESIZED {
+			ctx.SurfaceIns, _ = window.sdlWindow.GetSurface()
 			ctx.RenderLoopIns.Run()
 		}
 		break

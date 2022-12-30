@@ -3,6 +3,7 @@ package loop
 import (
 	"github.com/geniot/digger/internal/ctx"
 	"github.com/tevino/abool/v2"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 type LoopImpl struct {
@@ -19,6 +20,7 @@ func (loop LoopImpl) Start() {
 		ctx.EventLoopIns.Run()
 		ctx.PhysicsLoopIns.Run()
 		ctx.RenderLoopIns.Run()
+		sdl.Delay(16)
 	}
 }
 

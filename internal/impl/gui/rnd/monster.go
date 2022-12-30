@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
-	"github.com/geniot/digger/resources"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -40,15 +39,15 @@ func NewMonster(scn *Scene) *Monster {
 	mns := &Monster{}
 	mns.scene = scn
 
-	mns.spritesNobbin = []*sdl.Texture{
-		resources.LoadTexture("cnob1.png"),
-		resources.LoadTexture("cnob2.png"),
-		resources.LoadTexture("cnob3.png")}
-
-	mns.spritesHobbin = []*sdl.Texture{
-		resources.LoadTexture("clhob1.png"),
-		resources.LoadTexture("clhob2.png"),
-		resources.LoadTexture("clhob3.png")}
+	//mns.spritesNobbin = []*sdl.Texture{
+	//	resources.LoadTexture("cnob1.png"),
+	//	resources.LoadTexture("cnob2.png"),
+	//	resources.LoadTexture("cnob3.png")}
+	//
+	//mns.spritesHobbin = []*sdl.Texture{
+	//	resources.LoadTexture("clhob1.png"),
+	//	resources.LoadTexture("clhob2.png"),
+	//	resources.LoadTexture("clhob3.png")}
 
 	mns.innerOffsetX = 2
 	mns.innerOffsetY = 2

@@ -7,6 +7,7 @@ type IApplication interface {
 
 type IWindow interface {
 	SaveWindowState()
+	Update()
 }
 
 type IScene interface {

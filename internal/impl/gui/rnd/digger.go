@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/internal/ctx"
 	. "github.com/geniot/digger/internal/glb"
-	"github.com/geniot/digger/resources"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
@@ -48,20 +47,20 @@ func NewDigger(scn *Scene) *Digger {
 	dg := &Digger{}
 	dg.scene = scn
 
-	dg.sprites = []*sdl.Texture{
-		resources.LoadTexture("cldig1.png"),
-		resources.LoadTexture("cldig2.png"),
-		resources.LoadTexture("cldig3.png")}
-
-	dg.dieTexture = resources.LoadTexture("cddie.png")
-
-	dg.spritesGrave = []*sdl.Texture{
-		resources.LoadTexture("cgrave1.png"),
-		resources.LoadTexture("cgrave2.png"),
-		resources.LoadTexture("cgrave3.png"),
-		resources.LoadTexture("cgrave4.png"),
-		resources.LoadTexture("cgrave5.png"),
-	}
+	//dg.sprites = []*sdl.Texture{
+	//	resources.LoadTexture("cldig1.png"),
+	//	resources.LoadTexture("cldig2.png"),
+	//	resources.LoadTexture("cldig3.png")}
+	//
+	//dg.dieTexture = resources.LoadTexture("cddie.png")
+	//
+	//dg.spritesGrave = []*sdl.Texture{
+	//	resources.LoadTexture("cgrave1.png"),
+	//	resources.LoadTexture("cgrave2.png"),
+	//	resources.LoadTexture("cgrave3.png"),
+	//	resources.LoadTexture("cgrave4.png"),
+	//	resources.LoadTexture("cgrave5.png"),
+	//}
 	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4} //making a pause at the end
 
 	dg.spritePointerInc = 1
