@@ -6,7 +6,13 @@ clean:
 	rm bin/${PROGRAM_NAME}* -f
 
 build:
-	go build -gcflags="all=-N -l" -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+	go build -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+
+build-debug:
+	go build -v -gcflags="all=-N -l" -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+
+debug:
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ~/projects/${PROGRAM_NAME}/bin/${PROGRAM_NAME}
 
 mips:
 	CC='/opt/gcw0-toolchain/usr/bin/mipsel-gcw0-linux-uclibc-gcc' \
