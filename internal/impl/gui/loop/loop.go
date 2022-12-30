@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/geniot/digger/internal/ctx"
+	"github.com/geniot/digger/internal/glb"
 	"github.com/tevino/abool/v2"
 	"os"
 	"time"
@@ -46,6 +47,13 @@ func (loop LoopImpl) StartInput() {
 		typ := binary.LittleEndian.Uint16(b[16:18])
 		code := binary.LittleEndian.Uint16(b[18:20])
 		binary.Read(bytes.NewReader(b[20:]), binary.LittleEndian, &value)
+
+		if value == 1 {
+			ctx.PressedKeysCodesSetIns[glb.RK_2020[code]] = time.Now().UnixNano()
+		} else if value == 0 { // if t.State == sdl.RELEASED {
+			delete(ctx.PressedKeysCodesSetIns, glb.RK_2020[code])
+		}
+
 		fmt.Printf("type: %x\ncode: %d\nvalue: %d\n", typ, code, value)
 	}
 }

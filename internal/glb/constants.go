@@ -85,4 +85,11 @@ var (
 	COLOR_BLACK  = sdl.Color{R: 0, G: 0, B: 0, A: 255}
 
 	BGR_COLOR = [4]uint8{0, 0, 0, 255} //black
+
+	RK_2020 = map[uint16]sdl.Keycode{
+		544: GCW_BUTTON_UP,
+		545: GCW_BUTTON_DOWN,
+		546: GCW_BUTTON_LEFT,
+		547: GCW_BUTTON_RIGHT,
+	}
 )
