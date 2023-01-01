@@ -57,15 +57,18 @@ func logn(n, b float64) float64 {
 
 func DrawText(txt string, color sdl.Color) *SurfTexture {
 	textSurface, err := ctx.FontIns.RenderUTF8Blended(txt, color)
-	if err != nil {
+	if err != nil || textSurface == nil || textSurface.W == 0 || textSurface.W > SCREEN_LOGICAL_WIDTH/4 {
 		println(err.Error())
+		return nil
+	} else {
+		defer textSurface.Free()
+		textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
+		if err != nil {
+			println(err.Error())
+			return nil
+		}
+		return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
 	}
-	defer textSurface.Free()
-	textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
-	if err != nil {
-		println(err.Error())
-	}
-	return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
 }
 
 // Renderer.DrawRect is not available in some older versions of SDL2.

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"github.com/geniot/digger/internal/ctx"
+	"github.com/geniot/digger/internal/glb"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
@@ -34,11 +35,18 @@ func GetLevel(level int) string {
 }
 
 func LoadTexture(fileName string) *sdl.Texture {
-	surface, _ := img.LoadRW(GetResource(fileName), true)
+	return LoadSurfTexture(fileName).T
+}
+
+func LoadSurfTexture(fileName string) *glb.SurfTexture {
+	surface, err := img.LoadRW(GetResource(fileName), true)
+	if err != nil {
+		println(err.Error())
+	}
 	defer surface.Free()
 	txt, err := ctx.RendererIns.CreateTextureFromSurface(surface)
 	if err != nil {
 		println(err.Error())
 	}
-	return txt
+	return &glb.SurfTexture{T: txt, W: surface.W, H: surface.H}
 }
