@@ -215,7 +215,7 @@ diff --git a/internal/impl/gui/rnd/scene.go b/internal/impl/gui/rnd/scene.go
 @@ -4,9 +4,7 @@
  	mapset "github.com/deckarep/golang-set/v2"
  	. "github.com/geniot/digger/internal/glb"
- 	. "github.com/geniot/digger/internal/impl/chs"
+ 	. "github.com/geniot/digger/chs"
 -	"github.com/geniot/digger/resources"
  	"github.com/solarlune/resolv"
 -	"strings"
@@ -353,7 +353,7 @@ diff --git a/internal/impl/gui/rnd/debug_grid.go b/internal/impl/gui/rnd/debug_g
  import (
 -	"github.com/geniot/digger/internal/ctx"
 -	. "github.com/geniot/digger/internal/glb"
--	. "github.com/geniot/digger/internal/impl/chs"
+-	. "github.com/geniot/digger/chs"
 +	//. "github.com/geniot/digger/internal/glb"
  	"github.com/geniot/digger/resources"
  	"github.com/veandco/go-sdl2/sdl"
