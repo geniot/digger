@@ -9,14 +9,16 @@ import (
 )
 
 type Field struct {
-	horizontalBlob *sdl.Surface
-	verticalBlob   *sdl.Surface
-	endLeftBlob    *sdl.Surface
-	endRightBlob   *sdl.Surface
-	endUpBlob      *sdl.Surface
-	endDownBlob    *sdl.Surface
-	background     *sdl.Surface
-	scene          *Scene
+	horizontalBlob    *sdl.Surface
+	verticalBlob      *sdl.Surface
+	endLeftBlob       *sdl.Surface
+	endRightBlob      *sdl.Surface
+	endUpBlob         *sdl.Surface
+	endDownBlob       *sdl.Surface
+	background        *sdl.Surface
+	backgroundTexture *sdl.Texture
+	isChanged         bool
+	scene             *Scene
 }
 
 /**
@@ -50,6 +52,7 @@ func NewField(scn *Scene) *Field {
 				&sdl.Rect{X: int32(i * int(bgrTile.W)), Y: int32(j * int(bgrTile.H)), W: bgrTile.W, H: bgrTile.H})
 		}
 	}
+	fld.isChanged = true
 	return fld
 }
 
@@ -58,9 +61,14 @@ func NewField(scn *Scene) *Field {
  */
 
 func (field *Field) Render() {
-	bgrTexture, _ := ctx.RendererIns.CreateTextureFromSurface(field.background)
-	defer bgrTexture.Destroy()
-	ctx.RendererIns.Copy(bgrTexture, nil, &sdl.Rect{0, FIELD_OFFSET_Y, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT})
+	if field.isChanged {
+		if field.backgroundTexture != nil {
+			field.backgroundTexture.Destroy()
+		}
+		field.backgroundTexture, _ = ctx.RendererIns.CreateTextureFromSurface(field.background)
+		field.isChanged = false
+	}
+	ctx.RendererIns.Copy(field.backgroundTexture, nil, &sdl.Rect{Y: FIELD_OFFSET_Y, W: SCREEN_LOGICAL_WIDTH, H: SCREEN_LOGICAL_HEIGHT})
 }
 
 func (field *Field) eatVertical(x int, y int, isUpCont bool, isDownCont bool) {
@@ -123,6 +131,7 @@ func (field *Field) drawEatRight(x int32, y int32) {
 	targetEndRect := sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
+	field.isChanged = true
 }
 
 func (field *Field) drawEatLeft(x int32, y int32) {
@@ -132,6 +141,7 @@ func (field *Field) drawEatLeft(x int32, y int32) {
 	targetEndRect := sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
+	field.isChanged = true
 }
 
 func (field *Field) drawEatUp(x int32, y int32) {
@@ -141,6 +151,7 @@ func (field *Field) drawEatUp(x int32, y int32) {
 	targetEndRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
+	field.isChanged = true
 }
 
 func (field *Field) drawEatDown(x int32, y int32) {
@@ -150,6 +161,7 @@ func (field *Field) drawEatDown(x int32, y int32) {
 	targetEndRect := sdl.Rect{X: x, Y: y - 3, W: CELL_WIDTH, H: CELL_HEIGHT}
 	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
+	field.isChanged = true
 }
 
 func (field *Field) eatEmerald(emerald *Emerald) {
@@ -159,6 +171,7 @@ func (field *Field) eatEmerald(emerald *Emerald) {
 		W: CELL_WIDTH, H: CELL_HEIGHT}
 	emerald.textureMask.Blit(nil, field.background, &targetRect)
 	field.updateChaseWorld(targetRect)
+	field.isChanged = true
 }
 
 // translating rects to our grid, updating grid if necessary
