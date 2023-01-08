@@ -255,11 +255,16 @@ func (bag *Bag) Render() {
 }
 
 func (bag *Bag) push(dir Direction) {
-	if dir == UP {
-		bag.state = BAG_HOLD
-	} else if dir == LEFT || dir == RIGHT {
-		bag.pushDir = dir
-		bag.state = BAG_PUSHED
+	switch bag.state {
+	case BAG_SET:
+		if dir == UP {
+			bag.state = BAG_HOLD
+		} else if dir == LEFT || dir == RIGHT {
+			bag.pushDir = dir
+			bag.state = BAG_PUSHED
+		}
+	case BAG_GOLD:
+		bag.Destroy()
 	}
 }
 
