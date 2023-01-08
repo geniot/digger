@@ -96,7 +96,7 @@ func NewScene() *Scene {
 	scn.eatSoundPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
 
-	scn.diggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.ogg"), true)
+	scn.diggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
 
 	scn.diggerTune.Play(-1, 10)
 
