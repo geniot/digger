@@ -26,7 +26,7 @@ mips:
 	 go build -o bin/${PROGRAM_NAME}.gcw github.com/geniot/${PROGRAM_NAME}/src/cmd/${PROGRAM_NAME}
 
 squash:
-	mksquashfs bin/${PROGRAM_NAME}.gcw resources/media/${PROGRAM_NAME}.png resources/default.gcw0.desktop bin/${PROGRAM_NAME}.opk -all-root -no-xattrs -noappend -no-exports
+	mksquashfs bin/${PROGRAM_NAME}.gcw src/res/media/${PROGRAM_NAME}.png src/res/default.gcw0.desktop bin/${PROGRAM_NAME}.opk -all-root -no-xattrs -noappend -no-exports
 
 opk: clean mips squash
 
