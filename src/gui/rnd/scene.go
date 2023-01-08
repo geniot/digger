@@ -21,6 +21,7 @@ type Scene struct {
 	bags     mapset.Set[*Bag]
 	monsters mapset.Set[*Monster]
 
+	diggerTune      *mix.Chunk
 	eatSounds       [8]*mix.Chunk
 	eatSoundPointer int
 	lastEat         int64
@@ -94,6 +95,10 @@ func NewScene() *Scene {
 	}
 	scn.eatSoundPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
+
+	scn.diggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.ogg"), true)
+
+	scn.diggerTune.Play(-1, 10)
 
 	scn.debugGrid = NewDebugGrid(scn)
 	scn.fpsCounter = NewFpsCounter()
