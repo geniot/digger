@@ -37,7 +37,8 @@ type Digger struct {
 
 	processedTimeStamp int64
 
-	scene *Scene
+	killerBag *Bag
+	scene     *Scene
 }
 
 /**
@@ -153,9 +154,31 @@ func (digger *Digger) Step(n uint64) {
 			}
 		}
 	case DIGGER_DIE:
-		digger.handleDie(n, 0, 0)
-		digger.handleDie(n, -1, 0)
-		digger.handleDie(n, 1, 0)
+		if digger.killerBag != nil {
+			if digger.killerBag.state == BAG_FALLING { //fall with the bag
+				if digger.killerBag.offsetY > digger.offsetY {
+					digger.offsetY = digger.killerBag.offsetY
+					digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+					digger.collisionObject.Update()
+				}
+			} else {
+				if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
+					if digger.dieCounter > 0 {
+						digger.offsetY += 1
+						digger.dieCounter -= 1
+						digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+						digger.collisionObject.Update()
+					} else {
+						if digger.diePauseCounter > 0 {
+							digger.diePauseCounter -= 1
+						} else {
+							runtime.GC()
+							digger.state = DIGGER_GRAVE
+						}
+					}
+				}
+			}
+		}
 	case DIGGER_GRAVE:
 		if n%DIGGER_GRAVE_SPEED == 0 {
 			if digger.spriteGravePointer < len(digger.spritesGraveFrameSequence)-1 {
@@ -169,38 +192,6 @@ func (digger *Digger) Step(n uint64) {
 	if p, ok := ctx.PressedKeysCodesSetIns[GCW_BUTTON_A]; ok && p != digger.processedTimeStamp {
 		digger.processedTimeStamp = p
 		digger.fire()
-	}
-}
-
-func (digger *Digger) handleDie(n uint64, dx, dy float64) {
-	if collision := digger.collisionObject.Check(dx, dy); collision != nil {
-		for i := 0; i < len(collision.Objects); i++ {
-			if bag, ok := collision.Objects[i].Data.(*Bag); ok {
-				if bag.state == BAG_FALLING { //fall with the bag
-					if bag.offsetY > digger.offsetY {
-						digger.offsetY = bag.offsetY
-						digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-						digger.collisionObject.Update()
-					}
-				} else {
-					if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
-						if digger.dieCounter > 0 {
-							digger.offsetY += 1
-							digger.dieCounter -= 1
-							digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-							digger.collisionObject.Update()
-						} else {
-							if digger.diePauseCounter > 0 {
-								digger.diePauseCounter -= 1
-							} else {
-								runtime.GC()
-								digger.state = DIGGER_GRAVE
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -310,6 +301,7 @@ func (digger *Digger) eatField() {
 	}
 }
 
-func (digger *Digger) kill() {
+func (digger *Digger) kill(kB *Bag) {
 	digger.state = DIGGER_DIE
+	digger.killerBag = kB
 }

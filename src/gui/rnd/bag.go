@@ -237,10 +237,10 @@ func (bag *Bag) canMove(dir Direction) bool {
 
 func (bag *Bag) Render() {
 	if bag.state == BAG_SHAKING {
-		dstRect := sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT}
+		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
 		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	} else if bag.state == BAG_GOLD {
-		dstRect := sdl.Rect{bag.offsetX, bag.offsetY, CELL_WIDTH, CELL_HEIGHT}
+		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
 		ctx.RendererIns.CopyEx(bag.spritesGold[bag.spritesGoldFrameSequence[bag.spriteGoldPointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	} else {
 		ctx.RendererIns.Copy(If(bag.state == BAG_FALLING, bag.textureFall, bag.texture), nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
@@ -264,7 +264,7 @@ func (bag *Bag) push(dir Direction) {
 			bag.state = BAG_PUSHED
 		}
 	case BAG_FALLING:
-		bag.scene.digger.kill()
+		bag.scene.digger.kill(bag)
 	case BAG_GOLD:
 		bag.Destroy()
 	}
@@ -276,7 +276,7 @@ func (bag *Bag) canFall() bool {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
 				em.Destroy()
 			} else if dg, ok3 := collision.Objects[i].Data.(*Digger); ok3 {
-				dg.kill()
+				dg.kill(bag)
 			} else if bg, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
 				bag.turnToGold()
 				bg.turnToGold()
