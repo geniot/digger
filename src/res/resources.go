@@ -7,18 +7,30 @@ import (
 	"github.com/geniot/digger/src/glb"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"io/fs"
 	"strconv"
 )
 
 var (
+	//go:embed audio/*
+	audioList embed.FS
 	//go:embed media/*
 	mediaList embed.FS
 	//go:embed levels/*
 	levelsList embed.FS
 )
 
-func GetResource(fileName string) *sdl.RWops {
+func GetImage(fileName string) *sdl.RWops {
 	file, _ := mediaList.Open("media/" + fileName)
+	return GetResource(file)
+}
+
+func GetAudio(fileName string) *sdl.RWops {
+	file, _ := audioList.Open("audio/" + fileName)
+	return GetResource(file)
+}
+
+func GetResource(file fs.File) *sdl.RWops {
 	stat, _ := file.Stat()
 	size := stat.Size()
 	buf := make([]byte, size)
@@ -39,7 +51,7 @@ func LoadTexture(fileName string) *sdl.Texture {
 }
 
 func LoadSurfTexture(fileName string) *glb.SurfTexture {
-	surface, err := img.LoadRW(GetResource(fileName), true)
+	surface, err := img.LoadRW(GetImage(fileName), true)
 	if err != nil {
 		println(err.Error())
 	}

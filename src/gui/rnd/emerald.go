@@ -31,7 +31,7 @@ func NewEmerald(cX int, cY int, scn *Scene) *Emerald {
 	em := &Emerald{}
 	em.scene = scn
 	em.texture = res.LoadTexture("emerald.png")
-	em.textureMask, _ = img.LoadRW(res.GetResource("emerald_mask.png"), true)
+	em.textureMask, _ = img.LoadRW(res.GetImage("emerald_mask.png"), true)
 
 	em.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	em.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
@@ -57,6 +57,7 @@ func (emerald *Emerald) getHitBox() *sdl.Rect {
 }
 
 func (emerald *Emerald) Destroy() {
+	emerald.scene.soundEat()
 	emerald.scene.field.eatEmerald(emerald)
 	emerald.textureMask.Free()
 	emerald.texture.Destroy()

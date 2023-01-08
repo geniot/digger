@@ -23,7 +23,7 @@ func NewWindow() *WindowImpl {
 		xPos, yPos, width, height,
 		ctx.DeviceIns.GetWindowState())
 
-	w.iconSurface, _ = img.LoadRW(res.GetResource(ICON_FILE_NAME), true)
+	w.iconSurface, _ = img.LoadRW(res.GetImage(ICON_FILE_NAME), true)
 	w.sdlWindow.SetIcon(w.iconSurface)
 
 	ctx.RendererIns, _ = sdl.CreateRenderer(w.sdlWindow, -1,

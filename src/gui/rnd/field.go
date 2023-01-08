@@ -29,14 +29,14 @@ func NewField(scn *Scene) *Field {
 	fld := &Field{}
 	fld.scene = scn
 
-	fld.horizontalBlob, _ = img.LoadRW(res.GetResource("blob1.png"), true)
-	fld.verticalBlob, _ = img.LoadRW(res.GetResource("blob2.png"), true)
-	fld.endLeftBlob, _ = img.LoadRW(res.GetResource("blob3.png"), true)
-	fld.endRightBlob, _ = img.LoadRW(res.GetResource("blob4.png"), true)
-	fld.endUpBlob, _ = img.LoadRW(res.GetResource("blob5.png"), true)
-	fld.endDownBlob, _ = img.LoadRW(res.GetResource("blob6.png"), true)
+	fld.horizontalBlob, _ = img.LoadRW(res.GetImage("blob1.png"), true)
+	fld.verticalBlob, _ = img.LoadRW(res.GetImage("blob2.png"), true)
+	fld.endLeftBlob, _ = img.LoadRW(res.GetImage("blob3.png"), true)
+	fld.endRightBlob, _ = img.LoadRW(res.GetImage("blob4.png"), true)
+	fld.endUpBlob, _ = img.LoadRW(res.GetImage("blob5.png"), true)
+	fld.endDownBlob, _ = img.LoadRW(res.GetImage("blob6.png"), true)
 
-	bgrTile, _ := img.LoadRW(res.GetResource("cback1.png"), true)
+	bgrTile, _ := img.LoadRW(res.GetImage("cback1.png"), true)
 	defer bgrTile.Free()
 	info, _ := ctx.RendererIns.GetInfo()
 	fld.background, _ = sdl.CreateRGBSurfaceWithFormat(0,

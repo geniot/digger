@@ -6,7 +6,10 @@ import (
 	. "github.com/geniot/digger/src/glb"
 	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
+	"github.com/veandco/go-sdl2/mix"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Scene struct {
@@ -17,6 +20,10 @@ type Scene struct {
 	emeralds mapset.Set[*Emerald]
 	bags     mapset.Set[*Bag]
 	monsters mapset.Set[*Monster]
+
+	eatSounds       [8]*mix.Chunk
+	eatSoundPointer int
+	lastEat         int64
 
 	collisionSpace *resolv.Space
 	chaseWorld     *ChaseWorld
@@ -82,6 +89,12 @@ func NewScene() *Scene {
 		}
 	}
 
+	for i := 0; i <= 7; i++ {
+		scn.eatSounds[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)
+	}
+	scn.eatSoundPointer = 0
+	scn.lastEat = time.Now().UnixMilli()
+
 	scn.debugGrid = NewDebugGrid(scn)
 	scn.fpsCounter = NewFpsCounter()
 
@@ -135,4 +148,18 @@ func (scene *Scene) Render() {
 	}
 
 	scene.fpsCounter.Render()
+}
+
+func (scene *Scene) soundEat() {
+	delta := time.Now().UnixMilli() - scene.lastEat
+	if delta < EM_SOUND_DELTA_MS {
+		scene.eatSoundPointer += 1
+		if scene.eatSoundPointer >= len(scene.eatSounds) {
+			scene.eatSoundPointer = 0
+		}
+	} else {
+		scene.eatSoundPointer = 0
+	}
+	scene.lastEat = time.Now().UnixMilli()
+	scene.eatSounds[scene.eatSoundPointer].Play(1, 0)
 }

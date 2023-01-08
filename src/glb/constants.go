@@ -22,6 +22,7 @@ const (
 	BAG_PUSH_SPEED             = 8
 	FIRE_SPEED                 = 2
 	BAG_FALL_SPEED             = 2
+	EM_SOUND_DELTA_MS          = 700
 
 	SCREEN_LOGICAL_WIDTH  = 320
 	SCREEN_LOGICAL_HEIGHT = 240
