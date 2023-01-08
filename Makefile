@@ -6,10 +6,10 @@ clean:
 	rm bin/${PROGRAM_NAME}* -f
 
 build:
-	go build -o bin/${PROGRAM_NAME} github.com/geniot/src/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+	go build -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/src/cmd/${PROGRAM_NAME}
 
 build-debug:
-	go build -v -gcflags="all=-N -l" -o bin/${PROGRAM_NAME} github.com/geniot/src/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+	go build -v -gcflags="all=-N -l" -o bin/${PROGRAM_NAME} github.com/geniot/${PROGRAM_NAME}/src/cmd/${PROGRAM_NAME}
 
 debug:
 	SDL_GAMECONTROLLERCONFIG="190000004b4800000010000000010000,GO-Advance Controller,a:b1,b:b0,back:b10,dpdown:b7,dpleft:b8,dpright:b9,dpup:b6,leftshoulder:b4,lefttrigger:b12,leftx:a0,lefty:a1,rightshoulder:b5,righttrigger:b13,start:b15,x:b2,y:b3,platform:Linux," \
@@ -23,7 +23,7 @@ mips:
 	 GOMIPS=softfloat \
 	 GOOS=linux \
 	 PKG_CONFIG='/opt/gcw0-toolchain/usr/bin/pkg-config' \
-	 go build -o bin/${PROGRAM_NAME}.gcw github.com/geniot/src/${PROGRAM_NAME}/cmd/${PROGRAM_NAME}
+	 go build -o bin/${PROGRAM_NAME}.gcw github.com/geniot/${PROGRAM_NAME}/src/cmd/${PROGRAM_NAME}
 
 squash:
 	mksquashfs bin/${PROGRAM_NAME}.gcw resources/media/${PROGRAM_NAME}.png resources/default.gcw0.desktop bin/${PROGRAM_NAME}.opk -all-root -no-xattrs -noappend -no-exports
