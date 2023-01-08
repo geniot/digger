@@ -89,6 +89,7 @@ func (bag *Bag) getFallBox() *sdl.Rect {
 }
 
 func (bag *Bag) Destroy() {
+	bag.scene.eatGold.Play(-1, 0)
 	bag.texture.Destroy()
 	bag.textureFall.Destroy()
 	for i := 0; i < len(bag.spritesShake); i++ {
@@ -264,7 +265,9 @@ func (bag *Bag) push(dir Direction) {
 			bag.state = BAG_PUSHED
 		}
 	case BAG_FALLING:
-		bag.scene.digger.kill(bag)
+		if bag.scene.digger.offsetY > bag.offsetY { //if we just pushed the bag there is no kill
+			bag.scene.digger.kill(bag)
+		}
 	case BAG_GOLD:
 		bag.Destroy()
 	}
