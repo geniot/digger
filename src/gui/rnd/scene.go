@@ -98,7 +98,7 @@ func NewScene() *Scene {
 
 	scn.diggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
 
-	scn.diggerTune.Play(-1, 10)
+	//scn.diggerTune.Play(-1, 10)
 
 	scn.debugGrid = NewDebugGrid(scn)
 	scn.fpsCounter = NewFpsCounter()

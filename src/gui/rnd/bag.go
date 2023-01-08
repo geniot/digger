@@ -263,6 +263,8 @@ func (bag *Bag) push(dir Direction) {
 			bag.pushDir = dir
 			bag.state = BAG_PUSHED
 		}
+	case BAG_FALLING:
+		bag.scene.digger.kill()
 	case BAG_GOLD:
 		bag.Destroy()
 	}
