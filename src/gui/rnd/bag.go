@@ -77,7 +77,7 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
  */
 
 func (bag *Bag) getHitBox() *sdl.Rect {
-	if bag.state == BAG_GOLD {
+	if bag.state == BAG_GOLD || bag.state == BAG_GOLD_FALLING {
 		return &sdl.Rect{X: bag.offsetX + bag.innerOffsetX + 1, Y: bag.offsetY + bag.innerOffsetY + 6, W: bag.width - 3, H: bag.height - 6}
 	} else {
 		return &sdl.Rect{X: bag.offsetX + bag.innerOffsetX, Y: bag.offsetY + bag.innerOffsetY, W: bag.width, H: bag.height}
@@ -164,24 +164,29 @@ func (bag *Bag) Step(n uint64) {
 			if bag.canFall() {
 				bag.fall()
 			} else {
-				if bag.offsetY-bag.startFallFromY > CELL_HEIGHT {
-					bag.turnToGold()
-				} else {
-					if bag.state != BAG_GOLD {
-						bag.state = BAG_SET
+				if bag.state == BAG_FALLING {
+					if bag.offsetY-bag.startFallFromY > CELL_HEIGHT {
+						bag.turnToGold(BAG_GOLD)
+					} else {
+						if bag.state != BAG_GOLD {
+							bag.state = BAG_SET
+						}
 					}
 				}
+			}
+		}
+	case BAG_GOLD_FALLING:
+		if n%BAG_FALL_SPEED == 0 {
+			if bag.canFall() {
+				bag.fall()
+			} else {
+				bag.state = BAG_GOLD
 			}
 		}
 	case BAG_GOLD:
 		if n%(SPRITE_UPDATE_RATE*4) == 0 {
 			if bag.spriteGoldPointer < len(bag.spritesGoldFrameSequence)-1 {
 				bag.spriteGoldPointer += 1
-			}
-		}
-		if n%BAG_FALL_SPEED == 0 {
-			if bag.canFall() {
-				bag.fall()
 			}
 		}
 	}
@@ -194,11 +199,9 @@ func (bag *Bag) fall() {
 	bag.updateCollisionObject()
 }
 
-func (bag *Bag) turnToGold() {
-	if bag.state != BAG_GOLD {
-		bag.state = BAG_GOLD
-		bag.updateCollisionObject()
-	}
+func (bag *Bag) turnToGold(newState BagState) {
+	bag.state = newState
+	bag.updateCollisionObject()
 }
 
 func (bag *Bag) updateCollisionObject() {
@@ -251,14 +254,18 @@ func (bag *Bag) canMove(dir Direction) bool {
  */
 
 func (bag *Bag) Render() {
-	if bag.state == BAG_SHAKING {
+	switch bag.state {
+	case BAG_SET, BAG_PUSHED, BAG_HOLD, BAG_MOVING:
+		ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+	case BAG_SHAKING:
 		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
-		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
-	} else if bag.state == BAG_GOLD {
-		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
-		ctx.RendererIns.CopyEx(bag.spritesGold[bag.spritesGoldFrameSequence[bag.spriteGoldPointer]], nil, &dstRect, 0, &sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, sdl.FLIP_NONE)
-	} else {
-		ctx.RendererIns.Copy(If(bag.state == BAG_FALLING, bag.textureFall, bag.texture), nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
+	case BAG_FALLING:
+		ctx.RendererIns.Copy(bag.textureFall, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+	case BAG_GOLD_FALLING, BAG_GOLD:
+		ctx.RendererIns.Copy(bag.spritesGold[bag.spritesGoldFrameSequence[bag.spriteGoldPointer]],
+			nil,
+			&sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	}
 
 	if IS_DEBUG_ON {
@@ -295,8 +302,8 @@ func (bag *Bag) canFall() bool {
 			} else if dg, ok3 := collision.Objects[i].Data.(*Digger); ok3 {
 				dg.kill(bag)
 			} else if bg, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
-				bag.turnToGold()
-				bg.turnToGold()
+				bag.turnToGold(BAG_GOLD_FALLING)
+				bg.turnToGold(BAG_GOLD)
 				return false
 			}
 		}
