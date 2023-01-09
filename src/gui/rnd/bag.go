@@ -162,10 +162,7 @@ func (bag *Bag) Step(n uint64) {
 	case BAG_FALLING:
 		if n%BAG_FALL_SPEED == 0 {
 			if bag.canFall() {
-				bag.offsetY += 1
-				bag.scene.field.drawEatUp(bag.offsetX, bag.offsetY+bag.height-4)
-				bag.collisionObject.Y = float64(bag.offsetY + bag.innerOffsetY)
-				bag.collisionObject.Update()
+				bag.fall()
 			} else {
 				if bag.offsetY-bag.startFallFromY > CELL_HEIGHT {
 					bag.turnToGold()
@@ -182,12 +179,29 @@ func (bag *Bag) Step(n uint64) {
 				bag.spriteGoldPointer += 1
 			}
 		}
+		if n%BAG_FALL_SPEED == 0 {
+			if bag.canFall() {
+				bag.fall()
+			}
+		}
 	}
 
 }
 
+func (bag *Bag) fall() {
+	bag.offsetY += 1
+	bag.scene.field.drawEatUp(bag.offsetX, bag.offsetY+bag.height-4)
+	bag.updateCollisionObject()
+}
+
 func (bag *Bag) turnToGold() {
-	bag.state = BAG_GOLD
+	if bag.state != BAG_GOLD {
+		bag.state = BAG_GOLD
+		bag.updateCollisionObject()
+	}
+}
+
+func (bag *Bag) updateCollisionObject() {
 	hitBox := bag.getHitBox()
 	bag.collisionObject.X = float64(hitBox.X)
 	bag.collisionObject.Y = float64(hitBox.Y)
