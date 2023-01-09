@@ -27,6 +27,7 @@ type Bag struct {
 	spritesGold              []*sdl.Texture
 
 	startFallFromY int32
+	startHold      uint64
 
 	texture         *sdl.Texture
 	textureFall     *sdl.Texture
@@ -107,8 +108,13 @@ func (bag *Bag) Step(n uint64) {
 	case BAG_SET:
 		if n%SPRITE_UPDATE_RATE == 0 {
 			if bag.hasHollowSpaceUnder() {
-				bag.state = BAG_SHAKING
+				bag.state = BAG_HOLD
+				bag.startHold = n
 			}
+		}
+	case BAG_HOLD:
+		if n-bag.startHold > HOLD_WAIT_STEPS && !bag.isOnHold() {
+			bag.state = BAG_SHAKING
 		}
 	case BAG_PUSHED:
 		bag.state = BAG_MOVING
@@ -247,6 +253,25 @@ func (bag *Bag) canMove(dir Direction) bool {
 		}
 	}
 	return true
+}
+
+/*
+*
+Checks that the digger is below this bag and is holding it
+*/
+func (bag *Bag) isOnHold() bool {
+	if collision := bag.collisionObject.Check(0, 1); collision != nil {
+		for i := 0; i < len(collision.Objects); i++ {
+			if _, ok1 := collision.Objects[i].Data.(*Digger); ok1 {
+				if _, ok2 := ctx.PressedKeysCodesSetIns[GCW_BUTTON_UP]; ok2 {
+					return true
+				} else {
+					return false
+				}
+			}
+		}
+	}
+	return false
 }
 
 /**
