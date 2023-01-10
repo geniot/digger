@@ -32,7 +32,7 @@ On Linux you would need to install sdl2-dev packages.
 
 On Windows to build the exe file with static linking I use:
 
-`go build -ldflags "-s -w -H=windowsgui" -tags static -o bin\digger.exe github.com/geniot/digger/cmd/digger`
+`go build -ldflags "-s -w -H=windowsgui" -tags static -o bin\digger.exe github.com/geniot/digger/src/cmd/digger`
 
 I use [GoLand](https://www.jetbrains.com/go/) for development.
 
@@ -41,6 +41,15 @@ To build the OPK file for my [PocketGo2](https://wagnerstechtalk.com/pg2/) I use
 `make opk`
 
 See the Makefile. It can only be done on Linux.
+
+# Testing
+
+I only tested the application manually in four environments:
+
+- Windows 10
+- LXLE Linux
+- aarch64 (embedded Linux on my RK2020)
+- mipsel (embedded Linux on my PocketGo2)
 
 # Links
 

@@ -58,7 +58,9 @@ func logn(n, b float64) float64 {
 func DrawText(txt string, color sdl.Color) *SurfTexture {
 	textSurface, err := ctx.FontIns.RenderUTF8Blended(txt, color)
 	if err != nil || textSurface == nil || textSurface.W == 0 || textSurface.W > SCREEN_LOGICAL_WIDTH/4 {
-		println(err.Error())
+		if err != nil {
+			println(err.Error())
+		}
 		return nil
 	} else {
 		defer textSurface.Free()

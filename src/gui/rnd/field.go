@@ -1,6 +1,7 @@
 package rnd
 
 import (
+	"github.com/geniot/digger/src/chs"
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
 	"github.com/geniot/digger/src/res"
@@ -180,9 +181,9 @@ func (field *Field) updateChaseWorld(rects ...sdl.Rect) {
 		rect := rects[i]
 		//we change 1-2 cells max with one rect
 		x1 := (rect.X - CELLS_OFFSET) / CELL_WIDTH
-		y1 := (rect.Y - FIELD_OFFSET_Y - CELLS_OFFSET) / CELL_WIDTH
+		y1 := (rect.Y - CELLS_OFFSET) / CELL_WIDTH
 		x2 := (rect.X + rect.W - CELLS_OFFSET) / CELL_WIDTH
-		y2 := (rect.Y + rect.H - FIELD_OFFSET_Y - CELLS_OFFSET) / CELL_WIDTH
+		y2 := (rect.Y + rect.H - CELLS_OFFSET) / CELL_WIDTH
 		field.updateChaseTiles(x1, y1)
 		if x2 != x1 || y2 != y1 {
 			field.updateChaseTiles(x2, y2)
@@ -191,5 +192,65 @@ func (field *Field) updateChaseWorld(rects ...sdl.Rect) {
 }
 
 func (field *Field) updateChaseTiles(x int32, y int32) {
+	x = If(x >= CELLS_HORIZONTAL, CELLS_HORIZONTAL-1, x)
+	y = If(y >= CELLS_VERTICAL, CELLS_VERTICAL-1, y)
 
+	//left link
+	if x > 0 {
+		if field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH,
+			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT/2,
+			CELL_WIDTH/2,
+			false) {
+			field.scene.chaseWorld.Tile(int((x-1)*2-1), int((y-1)*2)).Kind = chs.KindTunnel
+		}
+	}
+	//right link
+	if x < CELLS_HORIZONTAL {
+		if field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH,
+			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT/2,
+			CELL_WIDTH/2,
+			false) {
+			field.scene.chaseWorld.Tile(int((x-1)*2+1), int((y-1)*2)).Kind = chs.KindTunnel
+		}
+	}
+	//up link
+	if y > 0 {
+		if field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH/2,
+			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT,
+			CELL_HEIGHT/2,
+			true) {
+			field.scene.chaseWorld.Tile(int((x-1)*2), int((y-1)*2-1)).Kind = chs.KindTunnel
+		}
+	}
+	//down link
+	if y < CELLS_VERTICAL {
+		if field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH/2,
+			CELLS_OFFSET+y*CELL_HEIGHT,
+			CELL_HEIGHT/2,
+			true) {
+			field.scene.chaseWorld.Tile(int((x-1)*2), int((y-1)*2+1)).Kind = chs.KindTunnel
+		}
+	}
+}
+
+func (field *Field) isLinkOpen(checkX int32, checkY int32, limit int32, isVertical bool) bool {
+	isLinkOpen := true
+	for i := int32(0); i < limit; i++ {
+		if isVertical {
+			if field.isPointField(checkX, checkY+i+FIELD_OFFSET_Y) || field.isPointField(checkX, checkY-i+FIELD_OFFSET_Y) {
+				isLinkOpen = false
+				break
+			}
+		} else { //horizontal
+			if field.isPointField(checkX+i, checkY+FIELD_OFFSET_Y) || field.isPointField(checkX-i, checkY+FIELD_OFFSET_Y) {
+				isLinkOpen = false
+				break
+			}
+		}
+	}
+	return isLinkOpen
 }
