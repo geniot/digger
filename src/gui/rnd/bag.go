@@ -90,17 +90,8 @@ func (bag *Bag) getFallBox() *sdl.Rect {
 }
 
 func (bag *Bag) Destroy() {
-	bag.scene.eatGold.Play(-1, 0)
-	bag.texture.Destroy()
-	bag.textureFall.Destroy()
-	for i := 0; i < len(bag.spritesShake); i++ {
-		bag.spritesShake[i].Destroy()
-	}
-	for i := 0; i < len(bag.spritesGold); i++ {
-		bag.spritesGold[i].Destroy()
-	}
 	bag.scene.collisionSpace.Remove(bag.collisionObject)
-	bag.scene.bags.Remove(bag)
+	bag.state = BAG_DESTOYED
 }
 
 func (bag *Bag) Step(n uint64) {
@@ -244,9 +235,14 @@ func (bag *Bag) canMove(dir Direction) bool {
 	if collision := bag.collisionObject.Check(float64(x), 0); collision != nil {
 		for i := 0; i < len(collision.Objects); i++ {
 			if bg, ok1 := collision.Objects[i].Data.(*Bag); ok1 {
-				bg.push(dir)
-				bag.moveAttempts += 1
-				return false
+				if bg.state == BAG_GOLD { //bag can be pushed over gold
+					bg.Destroy()
+					return true
+				} else {
+					bg.push(dir)
+					bag.moveAttempts += 1
+					return false
+				}
 			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
 				return false
 			}
@@ -315,6 +311,7 @@ func (bag *Bag) push(dir Direction) {
 			bag.scene.digger.kill(bag)
 		}
 	case BAG_GOLD:
+		bag.scene.eatGold.Play(-1, 0)
 		bag.Destroy()
 	}
 }

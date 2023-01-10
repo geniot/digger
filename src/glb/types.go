@@ -44,6 +44,7 @@ const (
 	BAG_FALLING
 	BAG_GOLD_FALLING
 	BAG_GOLD
+	BAG_DESTOYED
 )
 
 type SurfTexture struct {
