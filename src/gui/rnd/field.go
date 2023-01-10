@@ -197,42 +197,54 @@ func (field *Field) updateChaseTiles(x int32, y int32) {
 
 	//left link
 	if x > 0 {
-		if field.isLinkOpen(
+		tileX := If(x == 1, 1, int((x-1)*2-1))
+		tileY := If(y == 0, 0, int(y*2))
+		tile := field.scene.chaseWorld.Tile(tileX, tileY)
+		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH,
-			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT/2,
-			CELL_WIDTH/2,
+			CELLS_OFFSET+y*CELL_HEIGHT+CELL_HEIGHT/2,
+			CELL_WIDTH*0.8,
 			false) {
-			field.scene.chaseWorld.Tile(int((x-1)*2-1), int((y-1)*2)).Kind = chs.KindTunnel
+			tile.Kind = chs.KindTunnel
 		}
 	}
 	//right link
 	if x < CELLS_HORIZONTAL {
-		if field.isLinkOpen(
+		tileX := If(x == 0, 1, int((x-1)*2+1))
+		tileY := If(y == 0, 0, int(y*2))
+		tile := field.scene.chaseWorld.Tile(tileX, tileY)
+		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH,
-			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT/2,
-			CELL_WIDTH/2,
+			CELLS_OFFSET+y*CELL_HEIGHT+CELL_HEIGHT/2,
+			CELL_WIDTH*0.8,
 			false) {
-			field.scene.chaseWorld.Tile(int((x-1)*2+1), int((y-1)*2)).Kind = chs.KindTunnel
+			tile.Kind = chs.KindTunnel
 		}
 	}
 	//up link
 	if y > 0 {
-		if field.isLinkOpen(
-			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH/2,
+		tileX := If(x == 0, 0, int(x*2))
+		tileY := If(y <= 1, 0, int((y-1)*2-1))
+		tile := field.scene.chaseWorld.Tile(tileX, tileY)
+		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH+CELL_WIDTH/2,
 			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT,
-			CELL_HEIGHT/2,
+			CELL_HEIGHT*0.8,
 			true) {
-			field.scene.chaseWorld.Tile(int((x-1)*2), int((y-1)*2-1)).Kind = chs.KindTunnel
+			tile.Kind = chs.KindTunnel
 		}
 	}
 	//down link
 	if y < CELLS_VERTICAL {
-		if field.isLinkOpen(
-			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH/2,
+		tileX := If(x == 0, 0, int(x*2))
+		tileY := If(y <= 1, 1, int((y-1)*2+1))
+		tile := field.scene.chaseWorld.Tile(tileX, tileY)
+		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
+			CELLS_OFFSET+x*CELL_WIDTH+CELL_WIDTH/2,
 			CELLS_OFFSET+y*CELL_HEIGHT,
-			CELL_HEIGHT/2,
+			CELL_HEIGHT*0.8,
 			true) {
-			field.scene.chaseWorld.Tile(int((x-1)*2), int((y-1)*2+1)).Kind = chs.KindTunnel
+			tile.Kind = chs.KindTunnel
 		}
 	}
 }
