@@ -10,12 +10,18 @@ type DiggerState int64
 type MonsterState int64
 type FireState int64
 type BagState int64
+type SoundChannel int
 
 const (
 	UP Direction = iota
 	DOWN
 	LEFT
 	RIGHT
+)
+
+const (
+	SOUND_MUSIC int = iota
+	SOUND_FIRE
 )
 
 const (

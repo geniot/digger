@@ -174,6 +174,7 @@ func (fire *Fire) canMove(dir Direction) bool {
 
 func (fire *Fire) Destroy() {
 	fire.scene.fire = nil
+	fire.scene.media.soundFire.Volume(0)
 	fire.scene.collisionSpace.Remove(fire.collisionObject)
 }
 

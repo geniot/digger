@@ -176,6 +176,8 @@ func (digger *Digger) Step(n uint64) {
 
 func (digger *Digger) fire() {
 	digger.scene.fire = NewFire(digger, digger.scene)
+	digger.scene.media.soundFire.Volume(100)
+	digger.scene.media.soundFire.Play(SOUND_FIRE, 1)
 }
 
 func (digger *Digger) move(dir Direction) {

@@ -3,7 +3,7 @@
 ![Digger](screenshots/main.png)
 
 [Digger](https://www.digger.org/) is a classic game. This clone is a complete rewrite of it,
-although I used the original graphics.
+although I used the original graphics and sounds.
 
 From the player's perspective the main difference with the original game is that this Digger has pixel-perfect
 precision:
@@ -44,12 +44,12 @@ See the Makefile. It can only be done on Linux.
 
 # Testing
 
-I only tested the application manually in four environments:
+I only tested the game manually in the following environments:
 
-- Windows 10
-- LXLE Linux
-- aarch64 (embedded Linux on my RK2020)
-- mipsel (embedded Linux on my PocketGo2)
+- Windows 10 (desktop)
+- LXLE Linux (desktop)
+- arm64 (embedded Linux on my handheld console RK2020)
+- mipsel (embedded Linux on my handheld console PocketGo2)
 
 # Links
 
@@ -60,9 +60,9 @@ I only tested the application manually in four environments:
 
 # Profile CPU
 
-1. Add `defer profile.Start(profile.CPUProfile).Stop()` as first line of main
-2. Add import for it `import "github.com/pkg/profile"`
-3. Run-close the app, `cpu.pprof` file will be created in a tmp directory
-4. Install `go install github.com/google/pprof@latest` if it's not installed yet
-5. Execute in command line `pprof -top bin/digger_debug.exe <absolute_path_to>/cpu.pprof`
+1. Add `defer profile.Start(profile.CPUProfile).Stop()` as the first line in main
+2. Add import for it: `import "github.com/pkg/profile"`
+3. Run and close the app, `cpu.pprof` will be created in the temporary directory
+4. Install `go install github.com/google/pprof@latest` if it is not yet installed
+5. Run on the command line: `pprof -top bin/digger_debug.exe <absolute_path_to>/cpu.pprof`
 6. You will see a report with method calls that cause most CPU consumption

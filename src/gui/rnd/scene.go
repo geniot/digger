@@ -6,8 +6,6 @@ import (
 	. "github.com/geniot/digger/src/glb"
 	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
-	"github.com/veandco/go-sdl2/mix"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -91,14 +89,8 @@ func NewScene() *Scene {
 		}
 	}
 
-	for i := 0; i <= 7; i++ {
-		scn.media.soundEatEmerald[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)
-	}
 	scn.eatEmeraldPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
-
-	scn.media.soundDiggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
-	scn.media.soundEatGold, _ = mix.LoadWAVRW(res.GetAudio("gold.wav"), true)
 
 	//scn.soundDiggerTune.Play(-1, 10)
 

@@ -5,6 +5,7 @@ import (
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
+	"strconv"
 )
 
 type Media struct {
@@ -14,10 +15,6 @@ type Media struct {
 	bagSpritesGold               []*sdl.Texture
 	bagSpritesShakeFrameSequence []int
 	bagSpritesGoldFrameSequence  []int
-
-	soundDiggerTune *mix.Chunk
-	soundEatEmerald [8]*mix.Chunk
-	soundEatGold    *mix.Chunk
 
 	diggerSprites                   []*sdl.Texture
 	diggerDieTexture                *sdl.Texture
@@ -39,6 +36,11 @@ type Media struct {
 
 	monsterSpritesNobbin []*sdl.Texture
 	monsterSpritesHobbin []*sdl.Texture
+
+	soundDiggerTune *mix.Chunk
+	soundEatEmerald [8]*mix.Chunk
+	soundEatGold    *mix.Chunk
+	soundFire       *mix.Chunk
 }
 
 func NewMedia() *Media {
@@ -87,6 +89,13 @@ func NewMedia() *Media {
 		res.LoadTexture("clhob1.png"),
 		res.LoadTexture("clhob2.png"),
 		res.LoadTexture("clhob3.png")}
+
+	for i := 0; i <= 7; i++ {
+		md.soundEatEmerald[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)
+	}
+	md.soundDiggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
+	md.soundEatGold, _ = mix.LoadWAVRW(res.GetAudio("gold.wav"), true)
+	md.soundFire, _ = mix.LoadWAVRW(res.GetAudio("fire.wav"), true)
 
 	return md
 }
