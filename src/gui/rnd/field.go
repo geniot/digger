@@ -10,12 +10,6 @@ import (
 )
 
 type Field struct {
-	horizontalBlob    *sdl.Surface
-	verticalBlob      *sdl.Surface
-	endLeftBlob       *sdl.Surface
-	endRightBlob      *sdl.Surface
-	endUpBlob         *sdl.Surface
-	endDownBlob       *sdl.Surface
 	background        *sdl.Surface
 	backgroundTexture *sdl.Texture
 	isChanged         bool
@@ -29,13 +23,6 @@ type Field struct {
 func NewField(scn *Scene) *Field {
 	fld := &Field{}
 	fld.scene = scn
-
-	fld.horizontalBlob, _ = img.LoadRW(res.GetImage("blob1.png"), true)
-	fld.verticalBlob, _ = img.LoadRW(res.GetImage("blob2.png"), true)
-	fld.endLeftBlob, _ = img.LoadRW(res.GetImage("blob3.png"), true)
-	fld.endRightBlob, _ = img.LoadRW(res.GetImage("blob4.png"), true)
-	fld.endUpBlob, _ = img.LoadRW(res.GetImage("blob5.png"), true)
-	fld.endDownBlob, _ = img.LoadRW(res.GetImage("blob6.png"), true)
 
 	bgrTile, _ := img.LoadRW(res.GetImage("cback1.png"), true)
 	defer bgrTile.Free()
@@ -126,41 +113,45 @@ func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) 
 */
 
 func (field *Field) drawEatRight(x int32, y int32) {
-	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{X: x + CELL_WIDTH - field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{X: x + CELL_WIDTH - field.endRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.endRightBlob.Blit(nil, field.background, &targetEndRect)
+	media := field.scene.media
+	sourceRect := &sdl.Rect{X: x % media.fieldHorizontalBlob.W, W: 1, H: media.fieldHorizontalBlob.H}
+	targetTunnelRect := sdl.Rect{X: x + CELL_WIDTH - media.fieldHorizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldHorizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{X: x + CELL_WIDTH - media.fieldEndRightBlob.W + 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldEndRightBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 	field.isChanged = true
 }
 
 func (field *Field) drawEatLeft(x int32, y int32) {
-	sourceRect := &sdl.Rect{X: x % field.horizontalBlob.W, W: 1, H: field.horizontalBlob.H}
-	targetTunnelRect := sdl.Rect{X: x + field.horizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.horizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	media := field.scene.media
+	sourceRect := &sdl.Rect{X: x % media.fieldHorizontalBlob.W, W: 1, H: media.fieldHorizontalBlob.H}
+	targetTunnelRect := sdl.Rect{X: x + media.fieldHorizontalBlob.W, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldHorizontalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{X: x - 2, Y: y - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.endLeftBlob.Blit(nil, field.background, &targetEndRect)
+	media.fieldEndLeftBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 	field.isChanged = true
 }
 
 func (field *Field) drawEatUp(x int32, y int32) {
-	sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
-	targetTunnelRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT + field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
-	targetEndRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT - field.endUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.endUpBlob.Blit(nil, field.background, &targetEndRect)
+	media := field.scene.media
+	sourceRect := &sdl.Rect{Y: y % media.fieldVerticalBlob.H, W: media.fieldVerticalBlob.W, H: 1}
+	targetTunnelRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT + media.fieldVerticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldVerticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	targetEndRect := sdl.Rect{X: x, Y: y - CELL_HEIGHT - media.fieldEndUpBlob.H + 2, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldEndUpBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 	field.isChanged = true
 }
 
 func (field *Field) drawEatDown(x int32, y int32) {
-	sourceRect := &sdl.Rect{Y: y % field.verticalBlob.H, W: field.verticalBlob.W, H: 1}
-	targetTunnelRect := sdl.Rect{X: x, Y: y - field.verticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.verticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
+	media := field.scene.media
+	sourceRect := &sdl.Rect{Y: y % media.fieldVerticalBlob.H, W: media.fieldVerticalBlob.W, H: 1}
+	targetTunnelRect := sdl.Rect{X: x, Y: y - media.fieldVerticalBlob.H, W: CELL_WIDTH, H: CELL_HEIGHT}
+	media.fieldVerticalBlob.Blit(sourceRect, field.background, &targetTunnelRect)
 	targetEndRect := sdl.Rect{X: x, Y: y - 3, W: CELL_WIDTH, H: CELL_HEIGHT}
-	field.endDownBlob.Blit(nil, field.background, &targetEndRect)
+	media.fieldEndDownBlob.Blit(nil, field.background, &targetEndRect)
 	field.updateChaseWorld(targetTunnelRect, targetEndRect)
 	field.isChanged = true
 }
@@ -170,7 +161,7 @@ func (field *Field) eatEmerald(emerald *Emerald) {
 		X: emerald.offsetX,
 		Y: emerald.offsetY - FIELD_OFFSET_Y,
 		W: CELL_WIDTH, H: CELL_HEIGHT}
-	emerald.textureMask.Blit(nil, field.background, &targetRect)
+	emerald.scene.media.emeraldTextureMask.Blit(nil, field.background, &targetRect)
 	field.updateChaseWorld(targetRect)
 	field.isChanged = true
 }

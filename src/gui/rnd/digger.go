@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
-	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
@@ -23,15 +22,11 @@ type Digger struct {
 
 	spritePointer    int
 	spritePointerInc int
-	sprites          []*sdl.Texture
 
-	dieTexture      *sdl.Texture
 	dieCounter      int
 	diePauseCounter int
 
-	spriteGravePointer        int
-	spritesGraveFrameSequence []int
-	spritesGrave              []*sdl.Texture
+	spriteGravePointer int
 
 	collisionObject *resolv.Object
 
@@ -48,22 +43,6 @@ type Digger struct {
 func NewDigger(scn *Scene) *Digger {
 	dg := &Digger{}
 	dg.scene = scn
-
-	dg.sprites = []*sdl.Texture{
-		res.LoadTexture("cldig1.png"),
-		res.LoadTexture("cldig2.png"),
-		res.LoadTexture("cldig3.png")}
-
-	dg.dieTexture = res.LoadTexture("cddie.png")
-
-	dg.spritesGrave = []*sdl.Texture{
-		res.LoadTexture("cgrave1.png"),
-		res.LoadTexture("cgrave2.png"),
-		res.LoadTexture("cgrave3.png"),
-		res.LoadTexture("cgrave4.png"),
-		res.LoadTexture("cgrave5.png"),
-	}
-	dg.spritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4} //making a pause at the end
 
 	dg.spritePointerInc = 1
 
@@ -139,7 +118,7 @@ func (digger *Digger) Step(n uint64) {
 	switch digger.state {
 	case DIGGER_ALIVE:
 		if n%SPRITE_UPDATE_RATE == 0 {
-			digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.sprites))
+			digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.scene.media.diggerSprites))
 		}
 
 		if n%DIGGER_SPEED == 0 {
@@ -181,7 +160,7 @@ func (digger *Digger) Step(n uint64) {
 		}
 	case DIGGER_GRAVE:
 		if n%DIGGER_GRAVE_SPEED == 0 {
-			if digger.spriteGravePointer < len(digger.spritesGraveFrameSequence)-1 {
+			if digger.spriteGravePointer < len(digger.scene.media.diggerSpritesGraveFrameSequence)-1 {
 				digger.spriteGravePointer += 1
 			} else {
 				digger.reborn()
@@ -256,7 +235,7 @@ func (digger *Digger) Render() {
 			angle = 270
 		}
 		ctx.RendererIns.CopyEx(
-			digger.sprites[digger.spritePointer],
+			digger.scene.media.diggerSprites[digger.spritePointer],
 			nil,
 			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
 			angle,
@@ -265,10 +244,10 @@ func (digger *Digger) Render() {
 
 		digger.eatField()
 	case DIGGER_DIE:
-		ctx.RendererIns.Copy(digger.dieTexture, nil, &sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+		ctx.RendererIns.Copy(digger.scene.media.diggerDieTexture, nil, &sdl.Rect{X: digger.offsetX, Y: digger.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	case DIGGER_GRAVE:
 		ctx.RendererIns.CopyEx(
-			digger.spritesGrave[digger.spritesGraveFrameSequence[digger.spriteGravePointer]],
+			digger.scene.media.diggerSpritesGrave[digger.scene.media.diggerSpritesGraveFrameSequence[digger.spriteGravePointer]],
 			nil,
 			&sdl.Rect{X: digger.offsetX, Y: digger.offsetY - CELL_HEIGHT/3, W: CELL_WIDTH, H: CELL_HEIGHT},
 			0,

@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
-	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -18,11 +17,9 @@ type Fire struct {
 
 	spritePointer    int
 	spritePointerInc int
-	sprites          []*sdl.Texture
 
-	spriteExplPointer    int
-	spriteExplPointerInc int
-	spritesExpl          []*sdl.Texture
+	spriteExplosionPointer    int
+	spriteExplosionPointerInc int
 
 	direction Direction
 	state     FireState
@@ -45,10 +42,9 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 
 	fr.spritePointer = 0
 	fr.spritePointerInc = 1
-	fr.sprites = []*sdl.Texture{res.LoadTexture("cfire1.png"), res.LoadTexture("cfire2.png"), res.LoadTexture("cfire3.png")}
-	fr.spriteExplPointer = 0
-	fr.spriteExplPointerInc = 1
-	fr.spritesExpl = []*sdl.Texture{res.LoadTexture("cexp1.png"), res.LoadTexture("cexp2.png"), res.LoadTexture("cexp3.png")}
+
+	fr.spriteExplosionPointer = 0
+	fr.spriteExplosionPointerInc = 1
 
 	fr.offsetX = digger.offsetX
 	fr.offsetY = digger.offsetY
@@ -86,10 +82,10 @@ func (fire *Fire) getHitBox() *sdl.Rect {
 func (fire *Fire) Step(n uint64) {
 	if n%SPRITE_UPDATE_RATE == 0 {
 		if fire.state == FIRE_MOVING {
-			fire.spritePointer, fire.spritePointerInc = GetNextSpritePointerAndInc(fire.spritePointer, fire.spritePointerInc, len(fire.sprites))
+			fire.spritePointer, fire.spritePointerInc = GetNextSpritePointerAndInc(fire.spritePointer, fire.spritePointerInc, len(fire.scene.media.fireSprites))
 		} else {
-			fire.spriteExplPointer += fire.spriteExplPointerInc
-			if fire.spriteExplPointer == len(fire.spritesExpl) {
+			fire.spriteExplosionPointer += fire.spriteExplosionPointerInc
+			if fire.spriteExplosionPointer == len(fire.scene.media.fireSpritesExplosion) {
 				fire.state = FIRE_FINISHED
 			}
 		}
@@ -177,12 +173,6 @@ func (fire *Fire) canMove(dir Direction) bool {
 }
 
 func (fire *Fire) Destroy() {
-	for i := 0; i < len(fire.sprites); i++ {
-		fire.sprites[i].Destroy()
-	}
-	for i := 0; i < len(fire.spritesExpl); i++ {
-		fire.spritesExpl[i].Destroy()
-	}
 	fire.scene.fire = nil
 	fire.scene.collisionSpace.Remove(fire.collisionObject)
 }
@@ -205,8 +195,9 @@ func (fire *Fire) Render() {
 		angle = 270
 	}
 
-	ctx.RendererIns.CopyEx(If(fire.state == FIRE_MOVING, fire.sprites[fire.spritePointer], fire.spritesExpl[fire.spriteExplPointer]), nil, &dstRect, angle,
-		&sdl.Point{CELL_WIDTH / 2, CELL_HEIGHT / 2}, flip)
+	ctx.RendererIns.CopyEx(If(fire.state == FIRE_MOVING, fire.scene.media.fireSprites[fire.spritePointer], fire.scene.media.fireSpritesExplosion[fire.spriteExplosionPointer]),
+		nil, &dstRect, angle,
+		&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, flip)
 
 	if IS_DEBUG_ON {
 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)

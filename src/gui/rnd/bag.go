@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
-	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -18,19 +17,12 @@ type Bag struct {
 
 	moveAttempts int
 
-	spriteShakePointer        int
-	spritesShakeFrameSequence []int
-	spritesShake              []*sdl.Texture
-
-	spriteGoldPointer        int
-	spritesGoldFrameSequence []int
-	spritesGold              []*sdl.Texture
+	spriteShakePointer int
+	spriteGoldPointer  int
 
 	startFallFromY int32
 	startHold      uint64
 
-	texture         *sdl.Texture
-	textureFall     *sdl.Texture
 	collisionObject *resolv.Object
 	pushDir         Direction
 	state           BagState
@@ -44,16 +36,9 @@ type Bag struct {
 func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg := &Bag{}
 	bg.scene = scn
-	bg.texture = res.LoadTexture("csbag.png")
-	bg.textureFall = res.LoadTexture("cfbag.png")
 
 	bg.spriteShakePointer = 0
-	bg.spritesShake = []*sdl.Texture{res.LoadTexture("csbag.png"), res.LoadTexture("clbag.png"), res.LoadTexture("crbag.png")}
-	bg.spritesShakeFrameSequence = []int{0, 1, 2, 1, 2}
-
 	bg.spriteGoldPointer = 0
-	bg.spritesGold = []*sdl.Texture{res.LoadTexture("cgold1.png"), res.LoadTexture("cgold2.png"), res.LoadTexture("cgold3.png")}
-	bg.spritesGoldFrameSequence = []int{0, 1, 2}
 
 	bg.offsetX = int32(CELLS_OFFSET + cX*CELL_WIDTH)
 	bg.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cY*CELL_HEIGHT)
@@ -149,7 +134,7 @@ func (bag *Bag) Step(n uint64) {
 	case BAG_SHAKING:
 		if n%(SPRITE_UPDATE_RATE*4) == 0 {
 			bag.spriteShakePointer += 1
-			if bag.spriteShakePointer >= len(bag.spritesShakeFrameSequence) {
+			if bag.spriteShakePointer >= len(bag.scene.media.bagSpritesShakeFrameSequence) {
 				bag.spriteShakePointer = 0
 				bag.state = BAG_FALLING
 				bag.startFallFromY = bag.offsetY
@@ -182,7 +167,7 @@ func (bag *Bag) Step(n uint64) {
 		}
 	case BAG_GOLD:
 		if n%(SPRITE_UPDATE_RATE*4) == 0 {
-			if bag.spriteGoldPointer < len(bag.spritesGoldFrameSequence)-1 {
+			if bag.spriteGoldPointer < len(bag.scene.media.bagSpritesGoldFrameSequence)-1 {
 				bag.spriteGoldPointer += 1
 			}
 		}
@@ -277,14 +262,14 @@ func (bag *Bag) isOnHold() bool {
 func (bag *Bag) Render() {
 	switch bag.state {
 	case BAG_SET, BAG_PUSHED, BAG_HOLD, BAG_MOVING:
-		ctx.RendererIns.Copy(bag.texture, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+		ctx.RendererIns.Copy(bag.scene.media.bagTexture, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	case BAG_SHAKING:
 		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
-		ctx.RendererIns.CopyEx(bag.spritesShake[bag.spritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
+		ctx.RendererIns.CopyEx(bag.scene.media.bagSpritesShake[bag.scene.media.bagSpritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	case BAG_FALLING:
-		ctx.RendererIns.Copy(bag.textureFall, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+		ctx.RendererIns.Copy(bag.scene.media.bagTextureFall, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	case BAG_GOLD_FALLING, BAG_GOLD:
-		ctx.RendererIns.Copy(bag.spritesGold[bag.spritesGoldFrameSequence[bag.spriteGoldPointer]],
+		ctx.RendererIns.Copy(bag.scene.media.bagSpritesGold[bag.scene.media.bagSpritesGoldFrameSequence[bag.spriteGoldPointer]],
 			nil,
 			&sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	}
@@ -311,7 +296,7 @@ func (bag *Bag) push(dir Direction) {
 			bag.scene.digger.kill(bag)
 		}
 	case BAG_GOLD:
-		bag.scene.eatGold.Play(-1, 0)
+		bag.scene.media.soundEatGold.Play(-1, 0)
 		bag.Destroy()
 	}
 }

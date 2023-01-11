@@ -3,7 +3,6 @@ package rnd
 import (
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
-	"github.com/geniot/digger/src/res"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -22,8 +21,6 @@ type Monster struct {
 
 	spritePointer    int
 	spritePointerInc int
-	spritesNobbin    []*sdl.Texture
-	spritesHobbin    []*sdl.Texture
 
 	collisionObject *resolv.Object
 
@@ -39,16 +36,6 @@ type Monster struct {
 func NewMonster(scn *Scene) *Monster {
 	mns := &Monster{}
 	mns.scene = scn
-
-	mns.spritesNobbin = []*sdl.Texture{
-		res.LoadTexture("cnob1.png"),
-		res.LoadTexture("cnob2.png"),
-		res.LoadTexture("cnob3.png")}
-
-	mns.spritesHobbin = []*sdl.Texture{
-		res.LoadTexture("clhob1.png"),
-		res.LoadTexture("clhob2.png"),
-		res.LoadTexture("clhob3.png")}
 
 	mns.innerOffsetX = 2
 	mns.innerOffsetY = 2
@@ -78,7 +65,7 @@ func (monster *Monster) Step(n uint64) {
 		monster.spritePointer, monster.spritePointerInc = GetNextSpritePointerAndInc(
 			monster.spritePointer,
 			monster.spritePointerInc,
-			If(monster.state == MONSTER_NOBBIN, len(monster.spritesNobbin), len(monster.spritesHobbin)))
+			If(monster.state == MONSTER_NOBBIN, len(monster.scene.media.monsterSpritesNobbin), len(monster.scene.media.monsterSpritesHobbin)))
 	}
 }
 
@@ -90,7 +77,7 @@ func (monster *Monster) Render() {
 	switch monster.state {
 	case MONSTER_NOBBIN:
 		ctx.RendererIns.CopyEx(
-			monster.spritesNobbin[monster.spritePointer],
+			monster.scene.media.monsterSpritesNobbin[monster.spritePointer],
 			nil,
 			&sdl.Rect{X: monster.offsetX, Y: monster.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
 			0.0,

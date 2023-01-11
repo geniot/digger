@@ -21,14 +21,12 @@ type Scene struct {
 	bags     mapset.Set[*Bag]
 	monsters mapset.Set[*Monster]
 
-	diggerTune        *mix.Chunk
-	eatEmerald        [8]*mix.Chunk
 	eatEmeraldPointer int
 	lastEat           int64
-	eatGold           *mix.Chunk
 
 	collisionSpace *resolv.Space
 	chaseWorld     *ChaseWorld
+	media          *Media
 
 	debugGrid  *DebugGrid
 	fpsCounter *DebugFpsCounter
@@ -41,6 +39,8 @@ type Scene struct {
 func NewScene() *Scene {
 
 	scn := &Scene{}
+	scn.media = NewMedia()
+
 	scn.level = 1
 	scn.collisionSpace = resolv.NewSpace(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, 1, 1)
 	scn.chaseWorld = &ChaseWorld{}
@@ -92,15 +92,15 @@ func NewScene() *Scene {
 	}
 
 	for i := 0; i <= 7; i++ {
-		scn.eatEmerald[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)
+		scn.media.soundEatEmerald[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)
 	}
 	scn.eatEmeraldPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
 
-	scn.diggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
-	scn.eatGold, _ = mix.LoadWAVRW(res.GetAudio("gold.wav"), true)
+	scn.media.soundDiggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
+	scn.media.soundEatGold, _ = mix.LoadWAVRW(res.GetAudio("gold.wav"), true)
 
-	//scn.diggerTune.Play(-1, 10)
+	//scn.soundDiggerTune.Play(-1, 10)
 
 	scn.debugGrid = NewDebugGrid(scn)
 	scn.fpsCounter = NewFpsCounter()
@@ -161,12 +161,12 @@ func (scene *Scene) soundEat() {
 	delta := time.Now().UnixMilli() - scene.lastEat
 	if delta < EM_SOUND_DELTA_MS {
 		scene.eatEmeraldPointer += 1
-		if scene.eatEmeraldPointer >= len(scene.eatEmerald) {
+		if scene.eatEmeraldPointer >= len(scene.media.soundEatEmerald) {
 			scene.eatEmeraldPointer = 0
 		}
 	} else {
 		scene.eatEmeraldPointer = 0
 	}
 	scene.lastEat = time.Now().UnixMilli()
-	scene.eatEmerald[scene.eatEmeraldPointer].Play(1, 0)
+	scene.media.soundEatEmerald[scene.eatEmeraldPointer].Play(1, 0)
 }
