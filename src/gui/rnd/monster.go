@@ -1,6 +1,7 @@
 package rnd
 
 import (
+	"github.com/beefsack/go-astar"
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
 	"github.com/solarlune/resolv"
@@ -25,6 +26,8 @@ type Monster struct {
 	collisionObject *resolv.Object
 
 	processedTimeStamp int64
+
+	chasePath []astar.Pather
 
 	scene *Scene
 }
@@ -57,6 +60,8 @@ func NewMonster(scn *Scene) *Monster {
 	mns.direction = RIGHT
 	mns.state = MONSTER_NOBBIN
 
+	mns.updateChasePath()
+
 	return mns
 }
 
@@ -66,6 +71,25 @@ func (monster *Monster) Step(n uint64) {
 			monster.spritePointer,
 			monster.spritePointerInc,
 			If(monster.state == MONSTER_NOBBIN, len(monster.scene.media.monsterSpritesNobbin), len(monster.scene.media.monsterSpritesHobbin)))
+	}
+	if n%CHASE_PATH_UPDATE_RATE == 0 {
+		monster.updateChasePath()
+	}
+}
+
+func (monster *Monster) updateChasePath() {
+	fromX := int((monster.offsetX-CELLS_OFFSET+CELL_WIDTH/2)/CELL_WIDTH) * 2
+	fromY := int((monster.offsetY-CELLS_OFFSET-FIELD_OFFSET_Y+CELL_HEIGHT/2)/CELL_WIDTH) * 2
+
+	toX := int((monster.scene.digger.offsetX-CELLS_OFFSET+CELL_WIDTH/2)/CELL_WIDTH) * 2
+	toY := int((monster.scene.digger.offsetY-CELLS_OFFSET-FIELD_OFFSET_Y+CELL_HEIGHT/2)/CELL_HEIGHT) * 2
+
+	from := monster.scene.chaseWorld.Tile(fromX, fromY)
+	to := monster.scene.chaseWorld.Tile(toX, toY)
+
+	path, _, _ := astar.Path(from, to)
+	if path != nil {
+		monster.chasePath = path
 	}
 }
 

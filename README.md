@@ -48,7 +48,7 @@ Only keys:
 Apart from the nostalgia that I'm having from time to time I started this project to learn [Go](https://go.dev/), [SDL2](https://www.libsdl.org/), some nuances of embedded
 programming and game development.
 
-# Build
+# Building
 
 You need go-sdl2 bindings: https://github.com/veandco/go-sdl2
 
@@ -91,7 +91,10 @@ I only tested the game manually in the following environments:
 5. Digger.org: https://www.digger.org/
 6. Wikipedia article: https://en.wikipedia.org/wiki/Digger_(video_game)
 
-# Profile CPU
+# CPU Profiling
+
+At one point I saw a significant frame rate drop on my PocketGo which uses software rendering. 
+So I used the below instructions to find the bottlenecks. I decided to leave them here for the record.
 
 1. Add `defer profile.Start(profile.CPUProfile).Stop()` as the first line in main
 2. Add import for it: `import "github.com/pkg/profile"`

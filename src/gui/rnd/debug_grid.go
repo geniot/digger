@@ -9,12 +9,17 @@ import (
 )
 
 type DebugGrid struct {
-	texture *sdl.Texture
-	scene   *Scene
+	texture      *sdl.Texture
+	textureChase *sdl.Texture
+	scene        *Scene
 }
 
 func NewDebugGrid(scn *Scene) *DebugGrid {
-	return &DebugGrid{res.LoadTexture("dbg_field.png"), scn}
+	dg := &DebugGrid{}
+	dg.texture = res.LoadTexture("dbg_field.png")
+	dg.textureChase = res.LoadTexture("dbg_chase.png")
+	dg.scene = scn
+	return dg
 }
 
 func (debugGrid *DebugGrid) Render() {
@@ -52,4 +57,15 @@ func (debugGrid *DebugGrid) Render() {
 			}
 		}
 	}
+
+	for monster := range debugGrid.scene.monsters.Iter() {
+		for _, p := range monster.chasePath {
+			pT := p.(*ChaseTile)
+			ctx.RendererIns.Copy(debugGrid.textureChase, nil, &sdl.Rect{
+				X: int32(CELLS_OFFSET + CELL_WIDTH/2 + pT.X*CELL_WIDTH/2 - 3),
+				Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + pT.Y*CELL_HEIGHT/2 - 3),
+				W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
+		}
+	}
+
 }
