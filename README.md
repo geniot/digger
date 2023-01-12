@@ -37,11 +37,11 @@ I mostly play it on my handheld consoles, so mouse is not used in the desktop ve
 
 Only keys:
 
-| Desktop    | PocketGo2v2 | Function             |
-|------------|-------------|----------------------|
-| Left Ctrl  | A           | fire                 |
-| Arrow Keys | ←,↑,→,↓     | move selection frame |  
-| q          | L1+Start    | quit                 |  
+| Desktop    | PocketGo2v2 | Function            |
+|------------|-------------|---------------------|
+| Left Ctrl  | A           | fire                |
+| Arrow Keys | ←,↑,→,↓     | drive digger around |  
+| q          | L1+Start    | quit                |  
 
 # Motivation
 
