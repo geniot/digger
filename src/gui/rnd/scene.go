@@ -55,12 +55,8 @@ func NewScene() *Scene {
 	}
 
 	scn.field = NewField(scn)
-	scn.digger = NewDigger(scn)
 	scn.emeralds = mapset.NewSet[*Emerald]()
 	scn.bags = mapset.NewSet[*Bag]()
-	scn.monsters = mapset.NewSet[*Monster]()
-
-	scn.monsters.Add(NewMonster(scn))
 
 	rows := strings.Split(strings.TrimSpace(res.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {
@@ -89,6 +85,10 @@ func NewScene() *Scene {
 			}
 		}
 	}
+
+	scn.digger = NewDigger(scn)
+	scn.monsters = mapset.NewSet[*Monster]()
+	scn.monsters.Add(NewMonster(scn))
 
 	scn.eatEmeraldPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
