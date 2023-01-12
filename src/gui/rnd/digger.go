@@ -176,8 +176,6 @@ func (digger *Digger) Step(n uint64) {
 
 func (digger *Digger) fire() {
 	digger.scene.fire = NewFire(digger, digger.scene)
-	digger.scene.media.soundFire.Volume(100)
-	digger.scene.media.soundFire.Play(SOUND_FIRE, 1)
 }
 
 func (digger *Digger) move(dir Direction) {
@@ -200,6 +198,7 @@ func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 	if collision := digger.collisionObject.Check(float64(x), float64(y)); collision != nil {
 		for i := 0; i < len(collision.Objects); i++ {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
+				em.soundEat()
 				em.Destroy()
 			} else if bag, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
 				bag.push(dir)

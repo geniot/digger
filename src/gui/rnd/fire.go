@@ -26,6 +26,8 @@ type Fire struct {
 
 	collisionObject *resolv.Object
 
+	soundChannel int
+
 	scene *Scene
 }
 
@@ -67,6 +69,8 @@ func NewFire(digger *Digger, scn *Scene) *Fire {
 	fr.collisionObject = resolv.NewObject(float64(fr.offsetX+fr.innerOffsetX), float64(fr.offsetY+fr.innerOffsetY), float64(fr.width), float64(fr.height), FIRE_COLLISION_TAG)
 	fr.collisionObject.Data = fr
 	scn.collisionSpace.Add(fr.collisionObject)
+
+	fr.soundChannel, _ = scn.media.soundFire.Play(-1, 0)
 
 	return fr
 }
@@ -174,7 +178,7 @@ func (fire *Fire) canMove(dir Direction) bool {
 
 func (fire *Fire) Destroy() {
 	fire.scene.fire = nil
-	fire.scene.media.soundFire.Volume(0)
+	fire.scene.media.soundExplode.Play(fire.soundChannel, 0)
 	fire.scene.collisionSpace.Remove(fire.collisionObject)
 }
 

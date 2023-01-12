@@ -59,7 +59,7 @@ func DrawText(txt string, color sdl.Color) *SurfTexture {
 	textSurface, err := ctx.FontIns.RenderUTF8Blended(txt, color)
 	if err != nil || textSurface == nil || textSurface.W == 0 || textSurface.W > SCREEN_LOGICAL_WIDTH/4 {
 		if err != nil {
-			println(err.Error())
+			//println(err.Error())
 		}
 		return nil
 	} else {

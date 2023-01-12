@@ -5,6 +5,7 @@ import (
 	. "github.com/geniot/digger/src/glb"
 	"github.com/solarlune/resolv"
 	"github.com/veandco/go-sdl2/sdl"
+	"time"
 )
 
 type Emerald struct {
@@ -51,10 +52,23 @@ func (emerald *Emerald) getHitBox() *sdl.Rect {
 }
 
 func (emerald *Emerald) Destroy() {
-	emerald.scene.soundEat()
 	emerald.scene.field.eatEmerald(emerald)
 	emerald.scene.collisionSpace.Remove(emerald.collisionObject)
 	emerald.scene.emeralds.Remove(emerald)
+}
+
+func (emerald *Emerald) soundEat() {
+	delta := time.Now().UnixMilli() - emerald.scene.lastEat
+	if delta < EM_SOUND_DELTA_MS {
+		emerald.scene.eatEmeraldPointer += 1
+		if emerald.scene.eatEmeraldPointer >= len(emerald.scene.media.soundEatEmerald) {
+			emerald.scene.eatEmeraldPointer = 0
+		}
+	} else {
+		emerald.scene.eatEmeraldPointer = 0
+	}
+	emerald.scene.lastEat = time.Now().UnixMilli()
+	emerald.scene.emeraldSoundChannel, _ = emerald.scene.media.soundEatEmerald[emerald.scene.eatEmeraldPointer].Play(emerald.scene.emeraldSoundChannel, 0)
 }
 
 /**

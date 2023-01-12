@@ -41,6 +41,10 @@ type Media struct {
 	soundEatEmerald [8]*mix.Chunk
 	soundEatGold    *mix.Chunk
 	soundFire       *mix.Chunk
+	soundExplode    *mix.Chunk
+	soundWobble     *mix.Chunk
+	soundFall       *mix.Chunk
+	soundBagToGold  *mix.Chunk
 }
 
 func NewMedia() *Media {
@@ -96,6 +100,10 @@ func NewMedia() *Media {
 	md.soundDiggerTune, _ = mix.LoadWAVRW(res.GetAudio("digger.wav"), true)
 	md.soundEatGold, _ = mix.LoadWAVRW(res.GetAudio("gold.wav"), true)
 	md.soundFire, _ = mix.LoadWAVRW(res.GetAudio("fire.wav"), true)
+	md.soundExplode, _ = mix.LoadWAVRW(res.GetAudio("explode.wav"), true)
+	md.soundWobble, _ = mix.LoadWAVRW(res.GetAudio("wobble.wav"), true)
+	md.soundFall, _ = mix.LoadWAVRW(res.GetAudio("fall.wav"), true)
+	md.soundBagToGold, _ = mix.LoadWAVRW(res.GetAudio("bag2gold.wav"), true)
 
 	return md
 }

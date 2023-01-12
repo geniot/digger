@@ -19,8 +19,9 @@ type Scene struct {
 	bags     mapset.Set[*Bag]
 	monsters mapset.Set[*Monster]
 
-	eatEmeraldPointer int
-	lastEat           int64
+	eatEmeraldPointer   int
+	lastEat             int64
+	emeraldSoundChannel int
 
 	collisionSpace *resolv.Space
 	chaseWorld     *ChaseWorld
@@ -91,6 +92,7 @@ func NewScene() *Scene {
 
 	scn.eatEmeraldPointer = 0
 	scn.lastEat = time.Now().UnixMilli()
+	scn.emeraldSoundChannel = -1
 
 	//scn.soundDiggerTune.Play(-1, 10)
 
@@ -147,18 +149,4 @@ func (scene *Scene) Render() {
 	}
 
 	scene.fpsCounter.Render()
-}
-
-func (scene *Scene) soundEat() {
-	delta := time.Now().UnixMilli() - scene.lastEat
-	if delta < EM_SOUND_DELTA_MS {
-		scene.eatEmeraldPointer += 1
-		if scene.eatEmeraldPointer >= len(scene.media.soundEatEmerald) {
-			scene.eatEmeraldPointer = 0
-		}
-	} else {
-		scene.eatEmeraldPointer = 0
-	}
-	scene.lastEat = time.Now().UnixMilli()
-	scene.media.soundEatEmerald[scene.eatEmeraldPointer].Play(1, 0)
 }

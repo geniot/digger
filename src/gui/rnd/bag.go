@@ -4,6 +4,7 @@ import (
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
 	"github.com/solarlune/resolv"
+	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -22,6 +23,7 @@ type Bag struct {
 
 	startFallFromY int32
 	startHold      uint64
+	soundChannel   int
 
 	collisionObject *resolv.Object
 	pushDir         Direction
@@ -54,6 +56,8 @@ func NewBag(cX int, cY int, scn *Scene) *Bag {
 	bg.collisionObject = resolv.NewObject(float64(hitBox.X), float64(hitBox.Y), float64(hitBox.W), float64(hitBox.H), BAG_COLLISION_TAG)
 	bg.collisionObject.Data = bg
 	scn.collisionSpace.Add(bg.collisionObject)
+
+	bg.soundChannel = -1
 
 	return bg
 }
@@ -90,13 +94,13 @@ func (bag *Bag) Step(n uint64) {
 		}
 	case BAG_HOLD:
 		if n-bag.startHold > HOLD_WAIT_STEPS && !bag.isOnHold() {
-			bag.state = BAG_SHAKING
+			bag.state = BAG_WOBBLE
+			bag.soundChannel, _ = bag.scene.media.soundWobble.Play(bag.soundChannel, 0)
 		}
 	case BAG_PUSHED:
 		bag.state = BAG_MOVING
 		if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH == 0 && bag.hasHollowSpaceUnder() {
-			bag.state = BAG_FALLING
-			bag.startFallFromY = bag.offsetY
+			bag.startFall()
 		} else {
 			if bag.canMove(bag.pushDir) {
 				bag.move()
@@ -109,8 +113,7 @@ func (bag *Bag) Step(n uint64) {
 					bag.move()
 				} else {
 					if bag.hasHollowSpaceUnder() {
-						bag.state = BAG_FALLING
-						bag.startFallFromY = bag.offsetY
+						bag.startFall()
 					} else {
 						bag.state = BAG_SET
 					}
@@ -123,21 +126,19 @@ func (bag *Bag) Step(n uint64) {
 					}
 				} else {
 					if bag.hasHollowSpaceUnder() {
-						bag.state = BAG_FALLING
-						bag.startFallFromY = bag.offsetY
+						bag.startFall()
 					} else {
 						bag.state = BAG_SET
 					}
 				}
 			}
 		}
-	case BAG_SHAKING:
-		if n%(SPRITE_UPDATE_RATE*4) == 0 {
+	case BAG_WOBBLE:
+		if n%(SPRITE_UPDATE_RATE*3) == 0 {
 			bag.spriteShakePointer += 1
 			if bag.spriteShakePointer >= len(bag.scene.media.bagSpritesShakeFrameSequence) {
 				bag.spriteShakePointer = 0
-				bag.state = BAG_FALLING
-				bag.startFallFromY = bag.offsetY
+				bag.startFall()
 			}
 		}
 
@@ -146,6 +147,7 @@ func (bag *Bag) Step(n uint64) {
 			if bag.canFall() {
 				bag.fall()
 			} else {
+				mix.HaltChannel(bag.soundChannel)
 				if bag.state == BAG_FALLING {
 					if bag.offsetY-bag.startFallFromY > CELL_HEIGHT {
 						bag.turnToGold(BAG_GOLD)
@@ -175,6 +177,12 @@ func (bag *Bag) Step(n uint64) {
 
 }
 
+func (bag *Bag) startFall() {
+	bag.state = BAG_FALLING
+	bag.startFallFromY = bag.offsetY
+	bag.soundChannel, _ = bag.scene.media.soundFall.Play(bag.soundChannel, 0)
+}
+
 func (bag *Bag) fall() {
 	bag.offsetY += 1
 	bag.scene.field.drawEatUp(bag.offsetX, bag.offsetY+bag.height-4)
@@ -184,6 +192,9 @@ func (bag *Bag) fall() {
 func (bag *Bag) turnToGold(newState BagState) {
 	bag.state = newState
 	bag.updateCollisionObject()
+	if bag.state == BAG_GOLD {
+		bag.soundChannel, _ = bag.scene.media.soundBagToGold.Play(bag.soundChannel, 0)
+	}
 }
 
 func (bag *Bag) updateCollisionObject() {
@@ -263,7 +274,7 @@ func (bag *Bag) Render() {
 	switch bag.state {
 	case BAG_SET, BAG_PUSHED, BAG_HOLD, BAG_MOVING:
 		ctx.RendererIns.Copy(bag.scene.media.bagTexture, nil, &sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
-	case BAG_SHAKING:
+	case BAG_WOBBLE:
 		dstRect := sdl.Rect{X: bag.offsetX, Y: bag.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT}
 		ctx.RendererIns.CopyEx(bag.scene.media.bagSpritesShake[bag.scene.media.bagSpritesShakeFrameSequence[bag.spriteShakePointer]], nil, &dstRect, 0, &sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2}, sdl.FLIP_NONE)
 	case BAG_FALLING:
