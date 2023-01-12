@@ -32,6 +32,9 @@ type Digger struct {
 
 	processedTimeStamp int64
 
+	soundChannel     int
+	isDieSoundPlayed bool
+
 	killerBag *Bag
 	scene     *Scene
 }
@@ -68,6 +71,8 @@ func (digger *Digger) reborn() {
 	digger.diePauseCounter = CELL_HEIGHT
 	digger.spriteGravePointer = 0
 	digger.spritePointer = 0
+	digger.soundChannel = -1
+	digger.isDieSoundPlayed = false
 
 	digger.offsetX = int32(CELLS_OFFSET + cellX*CELL_WIDTH)
 	digger.offsetY = int32(FIELD_OFFSET_Y + CELLS_OFFSET + cellY*CELL_HEIGHT)
@@ -141,6 +146,10 @@ func (digger *Digger) Step(n uint64) {
 					digger.collisionObject.Update()
 				}
 			} else {
+				if !digger.isDieSoundPlayed {
+					digger.soundChannel, _ = digger.scene.media.soundDie.Play(digger.soundChannel, 0)
+					digger.isDieSoundPlayed = true
+				}
 				if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
 					if digger.dieCounter > 0 {
 						digger.offsetY += 1
@@ -153,6 +162,7 @@ func (digger *Digger) Step(n uint64) {
 						} else {
 							runtime.GC()
 							digger.state = DIGGER_GRAVE
+							digger.soundChannel, _ = digger.scene.media.soundGrave.Play(digger.soundChannel, 0)
 						}
 					}
 				}
@@ -163,7 +173,7 @@ func (digger *Digger) Step(n uint64) {
 			if digger.spriteGravePointer < len(digger.scene.media.diggerSpritesGraveFrameSequence)-1 {
 				digger.spriteGravePointer += 1
 			} else {
-				digger.reborn()
+				digger.scene.onDie()
 			}
 		}
 	}
@@ -286,6 +296,8 @@ func (digger *Digger) eatField() {
 }
 
 func (digger *Digger) kill(kB *Bag) {
-	digger.state = DIGGER_DIE
-	digger.killerBag = kB
+	if digger.state != DIGGER_DIE { //only die once
+		digger.state = DIGGER_DIE
+		digger.killerBag = kB
+	}
 }

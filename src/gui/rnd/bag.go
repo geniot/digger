@@ -192,7 +192,7 @@ func (bag *Bag) fall() {
 func (bag *Bag) turnToGold(newState BagState) {
 	bag.state = newState
 	bag.updateCollisionObject()
-	if bag.state == BAG_GOLD {
+	if bag.state == BAG_GOLD && bag.scene.digger.state == DIGGER_ALIVE {
 		bag.soundChannel, _ = bag.scene.media.soundBagToGold.Play(bag.soundChannel, 0)
 	}
 }

@@ -45,6 +45,8 @@ type Media struct {
 	soundWobble     *mix.Chunk
 	soundFall       *mix.Chunk
 	soundBagToGold  *mix.Chunk
+	soundDie        *mix.Chunk
+	soundGrave      *mix.Chunk
 }
 
 func NewMedia() *Media {
@@ -69,7 +71,8 @@ func NewMedia() *Media {
 		res.LoadTexture("cgrave4.png"),
 		res.LoadTexture("cgrave5.png"),
 	}
-	md.diggerSpritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4} //making a pause at the end
+	//making a pause at the end to let the tune end
+	md.diggerSpritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}
 
 	md.emeraldTexture = res.LoadTexture("emerald.png")
 	md.emeraldTextureMask, _ = img.LoadRW(res.GetImage("emerald_mask.png"), true)
@@ -104,6 +107,8 @@ func NewMedia() *Media {
 	md.soundWobble, _ = mix.LoadWAVRW(res.GetAudio("wobble.wav"), true)
 	md.soundFall, _ = mix.LoadWAVRW(res.GetAudio("fall.wav"), true)
 	md.soundBagToGold, _ = mix.LoadWAVRW(res.GetAudio("bag2gold.wav"), true)
+	md.soundDie, _ = mix.LoadWAVRW(res.GetAudio("die.wav"), true)
+	md.soundGrave, _ = mix.LoadWAVRW(res.GetAudio("dietune.wav"), true)
 
 	return md
 }
