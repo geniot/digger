@@ -31,6 +31,18 @@ There are also some minor functional differences:
 
 I thought it makes more sense, at least for me.
 
+# Controls
+
+I mostly play it on my handheld consoles, so mouse is not used in the desktop versions.
+
+Only keys:
+
+| Desktop    | PocketGo2v2 | Function             |
+|------------|-------------|----------------------|
+| Left Ctrl  | A           | fire                 |
+| Arrow Keys | ←,↑,→,↓     | move selection frame |  
+| q          | L1+Start    | quit                 |  
+
 # Motivation
 
 Apart from the nostalgia that I'm having from time to time I started this project to learn [Go](https://go.dev/), [SDL2](https://www.libsdl.org/), some nuances of embedded
