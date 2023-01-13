@@ -63,13 +63,12 @@ func DrawText(txt string, color sdl.Color) *SurfTexture {
 		}
 		return nil
 	} else {
-		defer textSurface.Free()
 		textTexture, err := ctx.RendererIns.CreateTextureFromSurface(textSurface)
 		if err != nil {
 			println(err.Error())
 			return nil
 		}
-		return &SurfTexture{T: textTexture, W: textSurface.W, H: textSurface.H}
+		return &SurfTexture{T: textTexture, S: textSurface, W: textSurface.W, H: textSurface.H}
 	}
 }
 

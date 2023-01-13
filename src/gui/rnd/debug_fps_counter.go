@@ -2,7 +2,7 @@ package rnd
 
 import (
 	"github.com/geniot/digger/src/ctx"
-	glb2 "github.com/geniot/digger/src/glb"
+	"github.com/geniot/digger/src/glb"
 	"github.com/veandco/go-sdl2/sdl"
 	"strconv"
 )
@@ -12,7 +12,7 @@ type DebugFpsCounter struct {
 	frameCount     uint32
 	currentSecond  uint32
 	currentFPS     uint32
-	cachedTextures map[string]*glb2.SurfTexture
+	cachedTextures map[string]*glb.SurfTexture
 }
 
 func NewFpsCounter() *DebugFpsCounter {
@@ -21,10 +21,10 @@ func NewFpsCounter() *DebugFpsCounter {
 	dbg.frameCount = 0
 	dbg.currentSecond = sdl.GetTicks() / 1000
 	dbg.currentFPS = 0
-	dbg.cachedTextures = make(map[string]*glb2.SurfTexture)
+	dbg.cachedTextures = make(map[string]*glb.SurfTexture)
 	for i := 0; i < 100; i++ {
 		txt := "FPS: " + strconv.FormatInt(int64(i), 10)
-		dbg.cachedTextures[txt] = glb2.DrawText(txt, glb2.COLOR_WHITE)
+		dbg.cachedTextures[txt] = glb.DrawText(txt, glb.COLOR_WHITE)
 	}
 	return dbg
 }
