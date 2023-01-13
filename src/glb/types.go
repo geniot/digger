@@ -11,6 +11,10 @@ type MonsterState int64
 type FireState int64
 type BagState int64
 
+type Point struct {
+	X, Y int32
+}
+
 const (
 	UP Direction = iota
 	DOWN
@@ -44,7 +48,6 @@ const (
 	BAG_FALLING
 	BAG_GOLD_FALLING
 	BAG_GOLD
-	BAG_DESTOYED
 )
 
 type SurfTexture struct {

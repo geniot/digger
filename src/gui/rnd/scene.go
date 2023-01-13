@@ -55,8 +55,8 @@ func NewScene() *Scene {
 	}
 
 	scn.field = NewField(scn)
-	scn.emeralds = mapset.NewSet[*Emerald]()
-	scn.bags = mapset.NewSet[*Bag]()
+	scn.emeralds = mapset.NewThreadUnsafeSet[*Emerald]()
+	scn.bags = mapset.NewThreadUnsafeSet[*Bag]()
 
 	rows := strings.Split(strings.TrimSpace(res.GetLevel(scn.level)), "\n")
 	for y := 0; y < len(rows); y++ {

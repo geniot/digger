@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	IS_DEBUG_ON = false
+	IS_DEBUG_ON = true
 
 	APP_NAME       = "Digger"
 	APP_VERSION    = "0.1"
@@ -16,7 +16,7 @@ const (
 
 	TICK                   float64 = 1.0 / 200.0
 	SPRITE_UPDATE_RATE             = 18
-	CHASE_PATH_UPDATE_RATE         = 200
+	CHASE_PATH_UPDATE_RATE         = 10
 	DIGGER_SPEED                   = 4 //less is faster
 	DIGGER_DIE_SPEED               = 8
 	DIGGER_GRAVE_SPEED             = SPRITE_UPDATE_RATE * 2
@@ -42,6 +42,7 @@ const (
 	WINDOW_STATE_KEY  = "WINDOW_STATE_KEY"
 
 	DIGGER_COLLISION_TAG  = "digger"
+	MONSTER_COLLISION_TAG = "monster"
 	EMERALD_COLLISION_TAG = "emerald"
 	BAG_COLLISION_TAG     = "bag"
 	FIRE_COLLISION_TAG    = "fire"

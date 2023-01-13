@@ -45,7 +45,8 @@ Only keys:
 
 # Motivation
 
-Apart from the nostalgia that I'm having from time to time I started this project to learn [Go](https://go.dev/), [SDL2](https://www.libsdl.org/), some nuances of embedded
+Apart from the nostalgia that I'm having from time to time I started this project to learn [Go](https://go.dev/)
+, [SDL2](https://www.libsdl.org/), some nuances of embedded
 programming and game development.
 
 # Building
@@ -93,7 +94,7 @@ I only tested the game manually in the following environments:
 
 # CPU Profiling
 
-At one point I saw a significant frame rate drop on my PocketGo which uses software rendering. 
+At one point I saw a significant frame rate drop on my PocketGo which uses software rendering.
 So I used the below instructions to find the bottlenecks. I decided to leave them here for the record.
 
 1. Add `defer profile.Start(profile.CPUProfile).Stop()` as the first line in main
@@ -102,3 +103,7 @@ So I used the below instructions to find the bottlenecks. I decided to leave the
 4. Install `go install github.com/google/pprof@latest` if it is not yet installed
 5. Run on the command line: `pprof -top bin/digger_debug.exe <absolute_path_to>/cpu.pprof`
 6. You will see a report with method calls that cause most CPU consumption
+
+# TODO
+
+1. Add bags to the chase world as the optimal path is not optimal when bags are not considered

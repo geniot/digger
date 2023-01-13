@@ -212,11 +212,7 @@ func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 				em.Destroy()
 			} else if bag, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
 				bag.push(dir)
-				if bag.state == BAG_DESTOYED {
-					return true, false
-				} else {
-					return false, !bag.canMove(dir)
-				}
+				return false, !bag.canMove(dir)
 			}
 		}
 	}

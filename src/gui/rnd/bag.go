@@ -80,7 +80,7 @@ func (bag *Bag) getFallBox() *sdl.Rect {
 
 func (bag *Bag) Destroy() {
 	bag.scene.collisionSpace.Remove(bag.collisionObject)
-	bag.state = BAG_DESTOYED
+	bag.scene.bags.Remove(bag)
 }
 
 func (bag *Bag) Step(n uint64) {
