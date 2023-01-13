@@ -27,9 +27,8 @@ func (app *ApplicationImpl) Start() {
 	ctx.PhysicsLoopIns = loop2.NewPhysicsLoop()
 	ctx.RenderLoopIns = loop2.NewRenderLoop()
 
-	ctx.FontIns, _ = ttf.OpenFontRW(res.GetImage(glb.FONT_FILE_NAME), 1, glb.FONT_SIZE)
-
 	ctx.SceneIns = rnd.NewScene()
+	ctx.FontIns, _ = ttf.OpenFontRW(res.GetImage(glb.FONT_FILE_NAME), 1, glb.FONT_SIZE)
 
 	ctx.LoopIns.Start()
 

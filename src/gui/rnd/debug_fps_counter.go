@@ -22,10 +22,6 @@ func NewFpsCounter() *DebugFpsCounter {
 	dbg.currentSecond = sdl.GetTicks() / 1000
 	dbg.currentFPS = 0
 	dbg.cachedTextures = make(map[string]*glb.SurfTexture)
-	for i := 0; i < 100; i++ {
-		txt := "FPS: " + strconv.FormatInt(int64(i), 10)
-		dbg.cachedTextures[txt] = glb.DrawText(txt, glb.COLOR_WHITE)
-	}
 	return dbg
 }
 
@@ -52,5 +48,7 @@ func (fpsCounter *DebugFpsCounter) Render() {
 	texture := fpsCounter.cachedTextures[txt]
 	if texture != nil {
 		ctx.RendererIns.Copy(texture.T, nil, &sdl.Rect{X: 5, Y: 5, W: texture.W, H: texture.H})
+	} else {
+		fpsCounter.cachedTextures[txt] = glb.DrawText(txt, glb.COLOR_WHITE)
 	}
 }
