@@ -65,7 +65,7 @@ func NewDigger(scn *Scene) *Digger {
 
 func (digger *Digger) reborn() {
 	//same for all levels
-	cellX := 7
+	cellX := 4
 	cellY := 9
 	digger.dieCounter = CELL_HEIGHT / 3
 	digger.diePauseCounter = CELL_HEIGHT
@@ -210,7 +210,7 @@ func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
 				em.soundEat()
 				em.Destroy()
 			} else if bag, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
-				bag.push(dir)
+				bag.push(dir, digger)
 				return false, !bag.canMove(dir)
 			}
 		}

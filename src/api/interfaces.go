@@ -36,7 +36,3 @@ type IStartable interface {
 	Start()
 	Stop()
 }
-
-type IRenderable interface {
-	Render()
-}

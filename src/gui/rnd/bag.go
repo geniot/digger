@@ -235,7 +235,7 @@ func (bag *Bag) canMove(dir Direction) bool {
 					bg.Destroy()
 					return true
 				} else {
-					bg.push(dir)
+					bg.push(dir, bg)
 					bag.moveAttempts += 1
 					return false
 				}
@@ -293,7 +293,7 @@ func (bag *Bag) Render() {
 	}
 }
 
-func (bag *Bag) push(dir Direction) {
+func (bag *Bag) push(dir Direction, pusher interface{}) {
 	switch bag.state {
 	case BAG_SET:
 		if dir == UP {
@@ -303,12 +303,21 @@ func (bag *Bag) push(dir Direction) {
 			bag.state = BAG_PUSHED
 		}
 	case BAG_FALLING:
-		if bag.scene.digger.offsetY > bag.offsetY { //if we just pushed the bag there is no kill
-			bag.scene.digger.killerBag = bag
-			bag.scene.digger.kill()
+		if digger, ok1 := pusher.(*Digger); ok1 {
+			if digger.offsetY > bag.offsetY { //if we just pushed the bag there is no kill
+				digger.killerBag = bag
+				digger.kill()
+			}
+		} else if monster, ok2 := pusher.(*Monster); ok2 {
+			if monster.offsetY > bag.offsetY { //same logic for monster
+				monster.killerBag = bag
+				monster.kill()
+			}
 		}
 	case BAG_GOLD:
-		bag.scene.media.soundEatGold.Play(-1, 0)
+		if _, ok1 := pusher.(*Digger); ok1 {
+			bag.scene.media.soundEatGold.Play(-1, 0)
+		}
 		bag.Destroy()
 	}
 }

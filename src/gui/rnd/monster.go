@@ -59,8 +59,8 @@ func NewMonster(scn *Scene) *Monster {
 	scn.collisionSpace.Add(mns.collisionObject)
 
 	//same for all levels
-	cellX := 14
-	cellY := 0
+	cellX := 10
+	cellY := 9
 	mns.spritePointer = 0
 	mns.spritePointerInc = 1
 
@@ -79,17 +79,15 @@ func (monster *Monster) setPoints(x1 int32, y1 int32, x2 int32, y2 int32) int32 
 	size := int32(If(x1 == x2, math.Abs(float64(y1-y2)), math.Abs(float64(x1-x2))) + 1)
 	size = If(size > int32(len(monster.points)), int32(len(monster.points)), size)
 	for i := int32(0); i < size; i++ {
-		point := Point{}
 		if x1 == x2 {
 			inc := If(y2 > y1, i, i*-1)
-			point.X = x1
-			point.Y = y1 + inc
+			monster.points[i].X = x1
+			monster.points[i].Y = y1 + inc
 		} else {
 			inc := If(x2 > x1, i, i*-1)
-			point.X = x1 + inc
-			point.Y = y1
+			monster.points[i].X = x1 + inc
+			monster.points[i].Y = y1
 		}
-		monster.points[i] = point
 	}
 	return size
 }
@@ -115,27 +113,28 @@ func (monster *Monster) Step(n uint64) {
 		if monster.scene.digger.state == DIGGER_ALIVE {
 			if n%DIGGER_SPEED == 0 {
 				if monster.chasePath != nil {
-					hasMoved := false
+					dir := NONE
 
 					for i := len(monster.chasePath) - 1; i > 0; i-- {
 						thisTile := monster.chasePath[i].(*chs.ChaseTile)
 						nextTile := monster.chasePath[i-1].(*chs.ChaseTile)
 						size := monster.setTilePoints(thisTile, nextTile)
-						dir := monster.getDir(size)
-						if dir != NONE && monster.canMove(dir) {
-							monster.move(dir)
-							hasMoved = true
+						dir = monster.getDir(size)
+						if dir != NONE {
+							if monster.canMove(dir) {
+								monster.move(dir)
+							}
 							break
 						}
 					}
-					if !hasMoved { //path exists, but we need to get to the first point first
+					if dir == NONE { //path exists, but we need to get to the first point first
 						thisTile := monster.chasePath[len(monster.chasePath)-1].(*chs.ChaseTile)
 						points := monster.setPoints(
 							monster.offsetX,
 							monster.offsetY,
 							int32(CELLS_OFFSET+thisTile.X*CELL_WIDTH/2),
 							int32(FIELD_OFFSET_Y+CELLS_OFFSET+thisTile.Y*CELL_HEIGHT/2))
-						dir := monster.getDir(points)
+						dir = monster.getDir(points)
 						if dir != NONE && monster.canMove(dir) {
 							monster.move(dir)
 						}
@@ -242,6 +241,9 @@ func (monster *Monster) canMove(dir Direction) bool {
 		for i := 0; i < len(collision.Objects); i++ {
 			if digger, ok1 := collision.Objects[i].Data.(*Digger); ok1 {
 				digger.kill()
+				return false
+			} else if bag, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
+				bag.push(dir, monster)
 				return false
 			}
 		}
