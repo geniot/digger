@@ -190,3 +190,8 @@ func (monster *Monster) Render() {
 	}
 
 }
+
+func (monster *Monster) Destroy() {
+	monster.scene.collisionSpace.Remove(monster.collisionObject)
+	monster.scene.monsters.Remove(monster)
+}

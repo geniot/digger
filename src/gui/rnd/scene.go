@@ -121,6 +121,9 @@ func (scene *Scene) Step(n uint64) {
 	for monster := range scene.monsters.Iter() {
 		monster.Step(n)
 	}
+	if scene.monsters.Cardinality() == 0 {
+		scene.monsters.Add(NewMonster(scene))
+	}
 }
 
 /**
@@ -149,13 +152,4 @@ func (scene *Scene) Render() {
 	}
 
 	scene.fpsCounter.Render()
-}
-
-func (scene *Scene) onDie() {
-	scene.digger.reborn()
-	for bag := range scene.bags.Iter() {
-		if bag.state == BAG_GOLD {
-			bag.Destroy()
-		}
-	}
 }

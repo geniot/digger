@@ -65,8 +65,8 @@ func NewDigger(scn *Scene) *Digger {
 
 func (digger *Digger) reborn() {
 	//same for all levels
-	cellX := 0
-	cellY := 5
+	cellX := 7
+	cellY := 9
 	digger.dieCounter = CELL_HEIGHT / 3
 	digger.diePauseCounter = CELL_HEIGHT
 	digger.spriteGravePointer = 0
@@ -173,7 +173,7 @@ func (digger *Digger) Step(n uint64) {
 			if digger.spriteGravePointer < len(digger.scene.media.diggerSpritesGraveFrameSequence)-1 {
 				digger.spriteGravePointer += 1
 			} else {
-				digger.scene.onDie()
+				digger.reborn()
 			}
 		}
 	}
