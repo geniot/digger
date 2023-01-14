@@ -121,7 +121,7 @@ func (scene *Scene) Step(n uint64) {
 	for monster := range scene.monsters.Iter() {
 		monster.Step(n)
 	}
-	if scene.monsters.Cardinality() == 0 {
+	if scene.monsters.Cardinality() == 0 && scene.digger.state == DIGGER_ALIVE {
 		scene.monsters.Add(NewMonster(scene))
 	}
 }

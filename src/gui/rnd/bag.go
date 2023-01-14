@@ -241,6 +241,8 @@ func (bag *Bag) canMove(dir Direction) bool {
 				}
 			} else if _, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
 				return false
+			} else if _, ok3 := collision.Objects[i].Data.(*Monster); ok3 {
+				return false
 			}
 		}
 	}
@@ -327,12 +329,16 @@ func (bag *Bag) canFall() bool {
 		for i := 0; i < len(collision.Objects); i++ {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
 				em.Destroy()
-			} else if dg, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
-				dg.killerBag = bag
-				dg.kill()
-			} else if mns, ok3 := collision.Objects[i].Data.(*Monster); ok3 {
-				mns.killerBag = bag
-				mns.kill()
+			} else if digger, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
+				if digger.state == DIGGER_ALIVE {
+					digger.killerBag = bag
+					digger.kill()
+				}
+			} else if monster, ok3 := collision.Objects[i].Data.(*Monster); ok3 {
+				if monster.state != MONSTER_DIE {
+					monster.killerBag = bag
+					monster.kill()
+				}
 			} else if bg, ok4 := collision.Objects[i].Data.(*Bag); ok4 {
 				bag.turnToGold(BAG_GOLD_FALLING)
 				bg.turnToGold(BAG_GOLD)
