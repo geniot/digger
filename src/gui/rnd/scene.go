@@ -153,3 +153,15 @@ func (scene *Scene) Render() {
 
 	scene.fpsCounter.Render()
 }
+
+func (scene *Scene) onDiggerDie() {
+	for bag := range scene.bags.Iter() {
+		if bag.state == BAG_GOLD {
+			bag.Destroy()
+		}
+	}
+	for monster := range scene.monsters.Iter() {
+		monster.Destroy()
+	}
+	scene.digger.reborn()
+}

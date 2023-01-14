@@ -20,6 +20,7 @@ const (
 	DOWN
 	LEFT
 	RIGHT
+	NONE
 )
 
 const (

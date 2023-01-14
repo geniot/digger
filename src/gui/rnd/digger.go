@@ -138,42 +138,41 @@ func (digger *Digger) Step(n uint64) {
 			}
 		}
 	case DIGGER_DIE:
-		if digger.killerBag != nil {
-			if digger.killerBag.state == BAG_FALLING { //fall with the bag
-				if digger.killerBag.offsetY > digger.offsetY {
-					digger.offsetY = digger.killerBag.offsetY
+		if digger.killerBag != nil && digger.killerBag.state == BAG_FALLING { //fall with the bag
+			if digger.killerBag.offsetY > digger.offsetY {
+				digger.offsetY = digger.killerBag.offsetY
+				digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
+				digger.collisionObject.Update()
+			}
+		} else {
+			if !digger.isDieSoundPlayed {
+				digger.soundChannel, _ = digger.scene.media.soundDie.Play(digger.soundChannel, 0)
+				digger.isDieSoundPlayed = true
+			}
+			if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
+				if digger.dieCounter > 0 {
+					digger.offsetY += 1
+					digger.dieCounter -= 1
 					digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 					digger.collisionObject.Update()
-				}
-			} else {
-				if !digger.isDieSoundPlayed {
-					digger.soundChannel, _ = digger.scene.media.soundDie.Play(digger.soundChannel, 0)
-					digger.isDieSoundPlayed = true
-				}
-				if n%DIGGER_DIE_SPEED == 0 { //sink at the end of the fall
-					if digger.dieCounter > 0 {
-						digger.offsetY += 1
-						digger.dieCounter -= 1
-						digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-						digger.collisionObject.Update()
+				} else {
+					if digger.diePauseCounter > 0 {
+						digger.diePauseCounter -= 1
 					} else {
-						if digger.diePauseCounter > 0 {
-							digger.diePauseCounter -= 1
-						} else {
-							runtime.GC()
-							digger.state = DIGGER_GRAVE
-							digger.soundChannel, _ = digger.scene.media.soundGrave.Play(digger.soundChannel, 0)
-						}
+						runtime.GC()
+						digger.state = DIGGER_GRAVE
+						digger.soundChannel, _ = digger.scene.media.soundGrave.Play(digger.soundChannel, 0)
 					}
 				}
 			}
 		}
+
 	case DIGGER_GRAVE:
 		if n%DIGGER_GRAVE_SPEED == 0 {
 			if digger.spriteGravePointer < len(digger.scene.media.diggerSpritesGraveFrameSequence)-1 {
 				digger.spriteGravePointer += 1
 			} else {
-				digger.reborn()
+				digger.scene.onDiggerDie()
 			}
 		}
 	}
@@ -190,10 +189,10 @@ func (digger *Digger) fire() {
 
 func (digger *Digger) move(dir Direction) {
 	digger.direction = dir
-	x := If(dir == RIGHT, int32(1), If(dir == LEFT, int32(-1), 0))
-	y := If(dir == DOWN, int32(1), If(dir == UP, int32(-1), 0))
-	digger.offsetX += x
-	digger.offsetY += y
+	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
+	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
+	digger.offsetX += int32(x)
+	digger.offsetY += int32(y)
 	digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
 	digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
 	digger.collisionObject.Update()
@@ -291,9 +290,8 @@ func (digger *Digger) eatField() {
 	}
 }
 
-func (digger *Digger) kill(kB *Bag) {
-	if digger.state != DIGGER_DIE { //only die once
+func (digger *Digger) kill() {
+	if digger.state == DIGGER_ALIVE {
 		digger.state = DIGGER_DIE
-		digger.killerBag = kB
 	}
 }

@@ -304,7 +304,8 @@ func (bag *Bag) push(dir Direction) {
 		}
 	case BAG_FALLING:
 		if bag.scene.digger.offsetY > bag.offsetY { //if we just pushed the bag there is no kill
-			bag.scene.digger.kill(bag)
+			bag.scene.digger.killerBag = bag
+			bag.scene.digger.kill()
 		}
 	case BAG_GOLD:
 		bag.scene.media.soundEatGold.Play(-1, 0)
@@ -318,7 +319,8 @@ func (bag *Bag) canFall() bool {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
 				em.Destroy()
 			} else if dg, ok3 := collision.Objects[i].Data.(*Digger); ok3 {
-				dg.kill(bag)
+				dg.killerBag = bag
+				dg.kill()
 			} else if bg, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
 				bag.turnToGold(BAG_GOLD_FALLING)
 				bg.turnToGold(BAG_GOLD)
