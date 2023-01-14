@@ -14,17 +14,18 @@ const (
 	ICON_FILE_NAME = "digger.png"
 	FONT_SIZE      = 12
 
-	TICK                   float64 = 1.0 / 200.0
-	SPRITE_UPDATE_RATE             = 18
-	CHASE_PATH_UPDATE_RATE         = 10
-	DIGGER_SPEED                   = 4 //less is faster
-	DIGGER_DIE_SPEED               = 8
-	DIGGER_GRAVE_SPEED             = SPRITE_UPDATE_RATE * 2
-	BAG_PUSH_SPEED                 = 8
-	FIRE_SPEED                     = 2
-	BAG_FALL_SPEED                 = 2
-	EM_SOUND_DELTA_MS              = 700
-	HOLD_WAIT_STEPS        uint64  = 80 //bound to DIGGER_SPEED
+	TICK                        float64 = 1.0 / 200.0
+	SPRITE_UPDATE_RATE                  = 18
+	CHASE_PATH_UPDATE_RATE              = 10
+	DIGGER_SPEED                        = 4 //less is faster
+	DIGGER_DIE_SPEED                    = 8
+	DIGGER_GRAVE_SPEED                  = SPRITE_UPDATE_RATE * 2
+	BAG_PUSH_SPEED                      = 8
+	FIRE_SPEED                          = 2
+	BAG_FALL_SPEED                      = 2
+	EM_SOUND_DELTA_MS                   = 700
+	HOLD_WAIT_STEPS             uint64  = 80 //bound to DIGGER_SPEED
+	CHASE_LINK_OPEN_COEFFICIENT         = 0.6
 
 	SCREEN_LOGICAL_WIDTH  = 320
 	SCREEN_LOGICAL_HEIGHT = 240

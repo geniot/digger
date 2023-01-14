@@ -59,8 +59,8 @@ func NewMonster(scn *Scene) *Monster {
 	scn.collisionSpace.Add(mns.collisionObject)
 
 	//same for all levels
-	cellX := 10
-	cellY := 9
+	cellX := 14
+	cellY := 0
 	mns.spritePointer = 0
 	mns.spritePointerInc = 1
 

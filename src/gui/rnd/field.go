@@ -194,7 +194,7 @@ func (field *Field) updateChaseTiles(x int32, y int32) {
 		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH-CELL_WIDTH,
 			CELLS_OFFSET+y*CELL_HEIGHT+CELL_HEIGHT/2,
-			CELL_WIDTH*0.8,
+			CELL_WIDTH*CHASE_LINK_OPEN_COEFFICIENT,
 			false) {
 			tile.Kind = chs.KindTunnel
 		}
@@ -207,7 +207,7 @@ func (field *Field) updateChaseTiles(x int32, y int32) {
 		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH,
 			CELLS_OFFSET+y*CELL_HEIGHT+CELL_HEIGHT/2,
-			CELL_WIDTH*0.8,
+			CELL_WIDTH*CHASE_LINK_OPEN_COEFFICIENT,
 			false) {
 			tile.Kind = chs.KindTunnel
 		}
@@ -220,7 +220,7 @@ func (field *Field) updateChaseTiles(x int32, y int32) {
 		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH+CELL_WIDTH/2,
 			CELLS_OFFSET+y*CELL_HEIGHT-CELL_HEIGHT,
-			CELL_HEIGHT*0.8,
+			CELL_HEIGHT*CHASE_LINK_OPEN_COEFFICIENT,
 			true) {
 			tile.Kind = chs.KindTunnel
 		}
@@ -233,7 +233,7 @@ func (field *Field) updateChaseTiles(x int32, y int32) {
 		if tile.Kind != chs.KindTunnel && field.isLinkOpen(
 			CELLS_OFFSET+x*CELL_WIDTH+CELL_WIDTH/2,
 			CELLS_OFFSET+y*CELL_HEIGHT,
-			CELL_HEIGHT*0.8,
+			CELL_HEIGHT*CHASE_LINK_OPEN_COEFFICIENT,
 			true) {
 			tile.Kind = chs.KindTunnel
 		}

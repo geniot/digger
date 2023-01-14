@@ -65,7 +65,7 @@ func NewDigger(scn *Scene) *Digger {
 
 func (digger *Digger) reborn() {
 	//same for all levels
-	cellX := 4
+	cellX := 7
 	cellY := 9
 	digger.dieCounter = CELL_HEIGHT / 3
 	digger.diePauseCounter = CELL_HEIGHT
