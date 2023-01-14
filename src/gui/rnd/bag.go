@@ -318,10 +318,13 @@ func (bag *Bag) canFall() bool {
 		for i := 0; i < len(collision.Objects); i++ {
 			if em, ok1 := collision.Objects[i].Data.(*Emerald); ok1 {
 				em.Destroy()
-			} else if dg, ok3 := collision.Objects[i].Data.(*Digger); ok3 {
+			} else if dg, ok2 := collision.Objects[i].Data.(*Digger); ok2 {
 				dg.killerBag = bag
 				dg.kill()
-			} else if bg, ok2 := collision.Objects[i].Data.(*Bag); ok2 {
+			} else if mns, ok3 := collision.Objects[i].Data.(*Monster); ok3 {
+				mns.killerBag = bag
+				mns.kill()
+			} else if bg, ok4 := collision.Objects[i].Data.(*Bag); ok4 {
 				bag.turnToGold(BAG_GOLD_FALLING)
 				bg.turnToGold(BAG_GOLD)
 				return false

@@ -37,6 +37,9 @@ type Media struct {
 	monsterSpritesNobbin []*sdl.Texture
 	monsterSpritesHobbin []*sdl.Texture
 
+	monsterSpriteNobbinDead *sdl.Texture
+	monsterSpriteHobbinDead *sdl.Texture
+
 	soundDiggerTune *mix.Chunk
 	soundEatEmerald [8]*mix.Chunk
 	soundEatGold    *mix.Chunk
@@ -96,6 +99,9 @@ func NewMedia() *Media {
 		res.LoadTexture("clhob1.png"),
 		res.LoadTexture("clhob2.png"),
 		res.LoadTexture("clhob3.png")}
+
+	md.monsterSpriteNobbinDead = res.LoadTexture("cnobd.png")
+	md.monsterSpriteHobbinDead = res.LoadTexture("clhobd.png")
 
 	for i := 0; i <= 7; i++ {
 		md.soundEatEmerald[i], _ = mix.LoadWAVRW(res.GetAudio("emerald"+strconv.FormatInt(int64(i), 10)+".wav"), true)

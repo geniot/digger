@@ -32,6 +32,7 @@ const (
 const (
 	MONSTER_NOBBIN MonsterState = iota
 	MONSTER_HOBBIN
+	MONSTER_DIE
 )
 
 const (

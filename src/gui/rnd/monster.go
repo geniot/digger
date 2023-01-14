@@ -32,7 +32,8 @@ type Monster struct {
 	chasePath []astar.Pather
 	points    []Point
 
-	scene *Scene
+	killerBag *Bag
+	scene     *Scene
 }
 
 /**
@@ -103,44 +104,57 @@ func (monster *Monster) setTilePoints(tile1 *chs.ChaseTile, tile2 *chs.ChaseTile
 }
 
 func (monster *Monster) Step(n uint64) {
-	if n%SPRITE_UPDATE_RATE == 0 {
-		monster.spritePointer, monster.spritePointerInc = GetNextSpritePointerAndInc(
-			monster.spritePointer,
-			monster.spritePointerInc,
-			If(monster.state == MONSTER_NOBBIN, len(monster.scene.media.monsterSpritesNobbin), len(monster.scene.media.monsterSpritesHobbin)))
-	}
-	if monster.scene.digger.state == DIGGER_ALIVE {
-		if n%DIGGER_SPEED == 0 {
-			if monster.chasePath != nil {
-				hasMoved := false
+	switch monster.state {
+	case MONSTER_NOBBIN, MONSTER_HOBBIN:
+		if n%SPRITE_UPDATE_RATE == 0 {
+			monster.spritePointer, monster.spritePointerInc = GetNextSpritePointerAndInc(
+				monster.spritePointer,
+				monster.spritePointerInc,
+				If(monster.state == MONSTER_NOBBIN, len(monster.scene.media.monsterSpritesNobbin), len(monster.scene.media.monsterSpritesHobbin)))
+		}
+		if monster.scene.digger.state == DIGGER_ALIVE {
+			if n%DIGGER_SPEED == 0 {
+				if monster.chasePath != nil {
+					hasMoved := false
 
-				for i := len(monster.chasePath) - 1; i > 0; i-- {
-					thisTile := monster.chasePath[i].(*chs.ChaseTile)
-					nextTile := monster.chasePath[i-1].(*chs.ChaseTile)
-					size := monster.setTilePoints(thisTile, nextTile)
-					dir := monster.getDir(size)
-					if dir != NONE && monster.canMove(dir) {
-						monster.move(dir)
-						hasMoved = true
-						break
+					for i := len(monster.chasePath) - 1; i > 0; i-- {
+						thisTile := monster.chasePath[i].(*chs.ChaseTile)
+						nextTile := monster.chasePath[i-1].(*chs.ChaseTile)
+						size := monster.setTilePoints(thisTile, nextTile)
+						dir := monster.getDir(size)
+						if dir != NONE && monster.canMove(dir) {
+							monster.move(dir)
+							hasMoved = true
+							break
+						}
 					}
-				}
-				if !hasMoved { //path exists, but we need to get to the first point first
-					thisTile := monster.chasePath[len(monster.chasePath)-1].(*chs.ChaseTile)
-					points := monster.setPoints(
-						monster.offsetX,
-						monster.offsetY,
-						int32(CELLS_OFFSET+thisTile.X*CELL_WIDTH/2),
-						int32(FIELD_OFFSET_Y+CELLS_OFFSET+thisTile.Y*CELL_HEIGHT/2))
-					dir := monster.getDir(points)
-					if dir != NONE && monster.canMove(dir) {
-						monster.move(dir)
+					if !hasMoved { //path exists, but we need to get to the first point first
+						thisTile := monster.chasePath[len(monster.chasePath)-1].(*chs.ChaseTile)
+						points := monster.setPoints(
+							monster.offsetX,
+							monster.offsetY,
+							int32(CELLS_OFFSET+thisTile.X*CELL_WIDTH/2),
+							int32(FIELD_OFFSET_Y+CELLS_OFFSET+thisTile.Y*CELL_HEIGHT/2))
+						dir := monster.getDir(points)
+						if dir != NONE && monster.canMove(dir) {
+							monster.move(dir)
+						}
 					}
 				}
 			}
+			if n%CHASE_PATH_UPDATE_RATE == 0 {
+				monster.updateChasePath()
+			}
 		}
-		if n%CHASE_PATH_UPDATE_RATE == 0 {
-			monster.updateChasePath()
+	case MONSTER_DIE:
+		if monster.killerBag != nil && monster.killerBag.state == BAG_FALLING { //fall with the bag
+			if monster.killerBag.offsetY > monster.offsetY {
+				monster.offsetY = monster.killerBag.offsetY
+				monster.collisionObject.Y = float64(monster.offsetY + monster.innerOffsetY)
+				monster.collisionObject.Update()
+			}
+		} else {
+			monster.Destroy()
 		}
 	}
 }
@@ -202,13 +216,11 @@ func (monster *Monster) getHitBox() *sdl.Rect {
 func (monster *Monster) Render() {
 	switch monster.state {
 	case MONSTER_NOBBIN:
-		ctx.RendererIns.CopyEx(
-			monster.scene.media.monsterSpritesNobbin[monster.spritePointer],
-			nil,
-			&sdl.Rect{X: monster.offsetX, Y: monster.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT},
-			0.0,
-			&sdl.Point{X: CELL_WIDTH / 2, Y: CELL_HEIGHT / 2},
-			sdl.FLIP_NONE)
+		ctx.RendererIns.Copy(monster.scene.media.monsterSpritesNobbin[monster.spritePointer],
+			nil, &sdl.Rect{X: monster.offsetX, Y: monster.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
+	case MONSTER_DIE:
+		ctx.RendererIns.Copy(monster.scene.media.monsterSpriteNobbinDead,
+			nil, &sdl.Rect{X: monster.offsetX, Y: monster.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
 	}
 
 	if IS_DEBUG_ON {
@@ -235,4 +247,8 @@ func (monster *Monster) canMove(dir Direction) bool {
 		}
 	}
 	return true
+}
+
+func (monster *Monster) kill() {
+	monster.state = MONSTER_DIE
 }
