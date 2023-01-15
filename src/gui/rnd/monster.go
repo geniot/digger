@@ -111,7 +111,7 @@ func (monster *Monster) Step(n uint64) {
 				If(monster.state == MONSTER_NOBBIN, len(monster.scene.media.monsterSpritesNobbin), len(monster.scene.media.monsterSpritesHobbin)))
 		}
 		if monster.scene.digger.state == DIGGER_ALIVE {
-			if n%DIGGER_SPEED == 0 {
+			if n%MONSTER_SPEED == 0 {
 				if monster.chasePath != nil {
 					dir := NONE
 

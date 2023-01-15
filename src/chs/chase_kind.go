@@ -4,6 +4,7 @@ package chs
 const (
 	KindTunnel = iota
 	KindField
+	KindBag
 	KindFrom
 	KindTo
 	KindPath
@@ -13,6 +14,7 @@ const (
 var KindRunes = map[int]rune{
 	KindTunnel: '.',
 	KindField:  'X',
+	KindBag:    'B',
 	KindFrom:   'F',
 	KindTo:     'T',
 	KindPath:   '●',
@@ -22,6 +24,7 @@ var KindRunes = map[int]rune{
 var RuneKinds = map[rune]int{
 	'.': KindTunnel,
 	'X': KindField,
+	'B': KindBag,
 	'F': KindFrom,
 	'T': KindTo,
 }
@@ -30,6 +33,7 @@ var RuneKinds = map[rune]int{
 var KindCosts = map[int]float64{
 	KindTunnel: 1.0,
 	KindFrom:   1.0,
+	KindBag:    10.0,
 	KindTo:     1.0,
 }
 

@@ -11,6 +11,7 @@ import (
 type DebugGrid struct {
 	texture      *sdl.Texture
 	textureChase *sdl.Texture
+	textureBag   *sdl.Texture
 	scene        *Scene
 }
 
@@ -18,6 +19,7 @@ func NewDebugGrid(scn *Scene) *DebugGrid {
 	dg := &DebugGrid{}
 	dg.texture = res.LoadTexture("dbg_field.png")
 	dg.textureChase = res.LoadTexture("dbg_chase.png")
+	dg.textureBag = res.LoadTexture("dbg_bag.png")
 	dg.scene = scn
 	return dg
 }
@@ -46,6 +48,16 @@ func (debugGrid *DebugGrid) Render() {
 			int32(CELLS_OFFSET+x*CELL_WIDTH), FIELD_OFFSET_Y+CELLS_OFFSET+CELL_HEIGHT*CELLS_VERTICAL)
 	}
 
+	for monster := range debugGrid.scene.monsters.Iter() {
+		for _, p := range monster.chasePath {
+			pT := p.(*ChaseTile)
+			ctx.RendererIns.Copy(debugGrid.textureChase, nil, &sdl.Rect{
+				X: int32(CELLS_OFFSET + CELL_WIDTH/2 + pT.X*CELL_WIDTH/2 - 3),
+				Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + pT.Y*CELL_HEIGHT/2 - 3),
+				W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
+		}
+	}
+
 	for y := 0; y < CELLS_VERTICAL*2-1; y++ {
 		for x := 0; x < CELLS_HORIZONTAL*2-1; x++ {
 			tile := debugGrid.scene.chaseWorld.Tile(x, y)
@@ -54,17 +66,12 @@ func (debugGrid *DebugGrid) Render() {
 					X: int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
 					Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
 					W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
+			} else if tile.Kind == KindBag {
+				ctx.RendererIns.Copy(debugGrid.textureBag, nil, &sdl.Rect{
+					X: int32(CELLS_OFFSET + CELL_WIDTH/2 + x*CELL_WIDTH/2 - 3),
+					Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + y*CELL_HEIGHT/2 - 3),
+					W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
 			}
-		}
-	}
-
-	for monster := range debugGrid.scene.monsters.Iter() {
-		for _, p := range monster.chasePath {
-			pT := p.(*ChaseTile)
-			ctx.RendererIns.Copy(debugGrid.textureChase, nil, &sdl.Rect{
-				X: int32(CELLS_OFFSET + CELL_WIDTH/2 + pT.X*CELL_WIDTH/2 - 3),
-				Y: int32(FIELD_OFFSET_Y + CELLS_OFFSET + CELL_HEIGHT/2 + pT.Y*CELL_HEIGHT/2 - 3),
-				W: CELL_WIDTH / 3, H: CELL_HEIGHT / 3})
 		}
 	}
 

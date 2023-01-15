@@ -1,6 +1,7 @@
 package rnd
 
 import (
+	"github.com/geniot/digger/src/chs"
 	"github.com/geniot/digger/src/ctx"
 	. "github.com/geniot/digger/src/glb"
 	"github.com/solarlune/resolv"
@@ -86,6 +87,7 @@ func (bag *Bag) Destroy() {
 func (bag *Bag) Step(n uint64) {
 	switch bag.state {
 	case BAG_SET:
+		bag.updateChaseWorld(chs.KindBag)
 		if n%SPRITE_UPDATE_RATE == 0 {
 			if bag.hasHollowSpaceUnder() {
 				bag.state = BAG_HOLD
@@ -99,6 +101,7 @@ func (bag *Bag) Step(n uint64) {
 		}
 	case BAG_PUSHED:
 		bag.state = BAG_MOVING
+		bag.updateChaseWorld(chs.KindTunnel)
 		if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH == 0 && bag.hasHollowSpaceUnder() {
 			bag.startFall()
 		} else {
@@ -107,6 +110,7 @@ func (bag *Bag) Step(n uint64) {
 			}
 		}
 	case BAG_MOVING:
+		bag.updateChaseWorld(chs.KindTunnel)
 		if n%BAG_PUSH_SPEED == 0 {
 			if bag.canMove(bag.pushDir) {
 				if (CELLS_OFFSET+bag.offsetX)%CELL_WIDTH != 0 {
@@ -143,6 +147,7 @@ func (bag *Bag) Step(n uint64) {
 		}
 
 	case BAG_FALLING:
+		bag.updateChaseWorld(chs.KindTunnel)
 		if n%BAG_FALL_SPEED == 0 {
 			if bag.canFall() {
 				bag.fall()
@@ -351,4 +356,8 @@ func (bag *Bag) canFall() bool {
 	} else {
 		return true
 	}
+}
+
+func (bag *Bag) updateChaseWorld(kind int) {
+	bag.scene.chaseWorld.Tile(int((bag.offsetX-CELLS_OFFSET)/CELL_WIDTH*2), int((bag.offsetY-CELLS_OFFSET-FIELD_OFFSET_Y)/CELL_HEIGHT*2)).Kind = kind
 }

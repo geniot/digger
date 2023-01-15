@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	IS_DEBUG_ON = false
+	IS_DEBUG_ON = true
 
 	APP_NAME       = "Digger"
 	APP_VERSION    = "0.1"
@@ -18,6 +18,7 @@ const (
 	SPRITE_UPDATE_RATE                  = 18
 	CHASE_PATH_UPDATE_RATE              = 10
 	DIGGER_SPEED                        = 4 //less is faster
+	MONSTER_SPEED                       = 4
 	DIGGER_DIE_SPEED                    = 8
 	DIGGER_GRAVE_SPEED                  = SPRITE_UPDATE_RATE * 2
 	BAG_PUSH_SPEED                      = 8

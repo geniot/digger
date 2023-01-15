@@ -107,3 +107,23 @@ So I used the below instructions to find the bottlenecks. I decided to leave the
 # TODO
 
 1. Add bags to the chase world as the optimal path is not optimal when bags are not considered
+
+# Game Tweaks
+
+- Speed: digger, monsters
+- Number of monsters: 
+   - on the field
+   - total on level
+   - to be killed before cherry
+   - after cherry
+   - chasers vs. patrollers (move algo)
+   - nobbins vs. hobbins
+- Time it takes to:
+   - nobbin becomes hobbin and back
+
+# Game State
+
+1. Lives
+2. Score
+3. Level
+4. 
