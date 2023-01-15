@@ -29,8 +29,9 @@ type Monster struct {
 
 	processedTimeStamp int64
 
-	chasePath []astar.Pather
-	points    []Point
+	chasePath  []astar.Pather
+	points     []Point
+	pointsSize int32
 
 	killerBag *Bag
 	scene     *Scene
@@ -75,10 +76,10 @@ func NewMonster(scn *Scene) *Monster {
 	return mns
 }
 
-func (monster *Monster) setPoints(x1 int32, y1 int32, x2 int32, y2 int32) int32 {
-	size := int32(If(x1 == x2, math.Abs(float64(y1-y2)), math.Abs(float64(x1-x2))) + 1)
-	size = If(size > int32(len(monster.points)), int32(len(monster.points)), size)
-	for i := int32(0); i < size; i++ {
+func (monster *Monster) setPoints(x1 int32, y1 int32, x2 int32, y2 int32) {
+	monster.pointsSize = int32(If(x1 == x2, math.Abs(float64(y1-y2)), math.Abs(float64(x1-x2))) + 1)
+	monster.pointsSize = If(monster.pointsSize > int32(len(monster.points)), int32(len(monster.points)), monster.pointsSize)
+	for i := int32(0); i < monster.pointsSize; i++ {
 		if x1 == x2 {
 			inc := If(y2 > y1, i, i*-1)
 			monster.points[i].X = x1
@@ -89,11 +90,10 @@ func (monster *Monster) setPoints(x1 int32, y1 int32, x2 int32, y2 int32) int32 
 			monster.points[i].Y = y1
 		}
 	}
-	return size
 }
 
-func (monster *Monster) setTilePoints(tile1 *chs.ChaseTile, tile2 *chs.ChaseTile) int32 {
-	return monster.setPoints(
+func (monster *Monster) setTilePoints(tile1 *chs.ChaseTile, tile2 *chs.ChaseTile) {
+	monster.setPoints(
 		int32(CELLS_OFFSET+tile1.X*CELL_WIDTH/2),
 		int32(FIELD_OFFSET_Y+CELLS_OFFSET+tile1.Y*CELL_HEIGHT/2),
 		int32(CELLS_OFFSET+tile2.X*CELL_WIDTH/2),
@@ -118,8 +118,8 @@ func (monster *Monster) Step(n uint64) {
 					for i := len(monster.chasePath) - 1; i > 0; i-- {
 						thisTile := monster.chasePath[i].(*chs.ChaseTile)
 						nextTile := monster.chasePath[i-1].(*chs.ChaseTile)
-						size := monster.setTilePoints(thisTile, nextTile)
-						dir = monster.getDir(size)
+						monster.setTilePoints(thisTile, nextTile)
+						dir = monster.getDir()
 						if dir != NONE {
 							if monster.canMove(dir) {
 								monster.move(dir)
@@ -129,12 +129,12 @@ func (monster *Monster) Step(n uint64) {
 					}
 					if dir == NONE { //path exists, but we need to get to the first point first
 						thisTile := monster.chasePath[len(monster.chasePath)-1].(*chs.ChaseTile)
-						points := monster.setPoints(
+						monster.setPoints(
 							monster.offsetX,
 							monster.offsetY,
 							int32(CELLS_OFFSET+thisTile.X*CELL_WIDTH/2),
 							int32(FIELD_OFFSET_Y+CELLS_OFFSET+thisTile.Y*CELL_HEIGHT/2))
-						dir = monster.getDir(points)
+						dir = monster.getDir()
 						if dir != NONE && monster.canMove(dir) {
 							monster.move(dir)
 						}
@@ -158,8 +158,8 @@ func (monster *Monster) Step(n uint64) {
 	}
 }
 
-func (monster *Monster) getDir(size int32) Direction {
-	for k := int32(0); k < size-1; k++ {
+func (monster *Monster) getDir() Direction {
+	for k := int32(0); k < monster.pointsSize-1; k++ {
 		point := monster.points[k]
 		nextPoint := monster.points[k+1]
 		if point.X == monster.offsetX && point.Y == monster.offsetY {
@@ -204,7 +204,37 @@ func (monster *Monster) updateChasePath() {
 
 	path, _, _ := astar.Path(from, to)
 	if path != nil {
-		monster.chasePath = path
+		if monster.chasePath == nil {
+			monster.chasePath = path
+		} else {
+			//we don't change monster direction, it looks too automatic
+			if monster.getPathDir(path) == monster.getDir() {
+				monster.chasePath = path
+			}
+		}
+
+	}
+}
+
+func (monster *Monster) getPathDir(path []astar.Pather) Direction {
+	if len(path) > 1 {
+		lastTile := path[len(path)-1].(*chs.ChaseTile)
+		nextTile := path[len(path)-2].(*chs.ChaseTile)
+		if lastTile.X == nextTile.X {
+			if nextTile.Y > lastTile.Y {
+				return DOWN
+			} else {
+				return UP
+			}
+		} else {
+			if nextTile.X > lastTile.X {
+				return RIGHT
+			} else {
+				return LEFT
+			}
+		}
+	} else {
+		return NONE
 	}
 }
 
