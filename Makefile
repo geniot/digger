@@ -28,7 +28,10 @@ mips:
 squash:
 	mksquashfs bin/${PROGRAM_NAME}.gcw src/res/media/${PROGRAM_NAME}.png src/res/default.gcw0.desktop bin/${PROGRAM_NAME}.opk -all-root -no-xattrs -noappend -no-exports
 
-opk: clean mips squash
+deploy:
+	scp bin/digger.opk root@10.1.1.2:/media/data/apps
+
+opk: clean mips squash deploy
 
 #on PG2 use opkrun
 
