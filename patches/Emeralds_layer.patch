@@ -1,0 +1,177 @@
+Subject: [PATCH] Emeralds layer
+---
+Index: src/gui/rnd/scene.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/gui/rnd/scene.go b/src/gui/rnd/scene.go
+--- a/src/gui/rnd/scene.go	(revision e1e111dccd88665050ebe52a48454f216ec581e2)
++++ b/src/gui/rnd/scene.go	(date 1700168681901)
+@@ -11,11 +11,12 @@
+ )
+ 
+ type Scene struct {
+-	level    int
+-	field    *Field
+-	digger   *Digger
+-	fire     *Fire
+-	emeralds mapset.Set[*Emerald]
++	level   int
++	field   *Field
++	emLayer *Layer
++	digger  *Digger
++	fire    *Fire
++
+ 	bags     mapset.Set[*Bag]
+ 	monsters mapset.Set[*Monster]
+ 
+@@ -55,7 +56,7 @@
+ 	}
+ 
+ 	scn.field = NewField(scn)
+-	scn.emeralds = mapset.NewThreadUnsafeSet[*Emerald]()
++	scn.emLayer = NewLayer(scn)
+ 	scn.bags = mapset.NewThreadUnsafeSet[*Bag]()
+ 
+ 	rows := strings.Split(strings.TrimSpace(res.GetLevel(scn.level)), "\n")
+@@ -64,7 +65,7 @@
+ 		row = strings.TrimSuffix(rows[y], "\r")
+ 		for x := 0; x < len(row); x++ {
+ 			if row[x] == 'C' {
+-				scn.emeralds.Add(NewEmerald(x, y, scn))
++				scn.emLayer.emeralds.Add(NewEmerald(x, y, scn))
+ 			} else if row[x] == 'B' {
+ 				scn.bags.Add(NewBag(x, y, scn))
+ 			} else if row[x] == 'S' {
+@@ -135,9 +136,7 @@
+ 	if scene.fire != nil {
+ 		scene.fire.Render()
+ 	}
+-	for emerald := range scene.emeralds.Iter() {
+-		emerald.Render()
+-	}
++	scene.emLayer.Render()
+ 	for bag := range scene.bags.Iter() {
+ 		bag.Render()
+ 	}
+Index: src/gui/rnd/layer.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/gui/rnd/layer.go b/src/gui/rnd/layer.go
+new file mode 100644
+--- /dev/null	(date 1700167878568)
++++ b/src/gui/rnd/layer.go	(date 1700167878568)
+@@ -0,0 +1,56 @@
++package rnd
++
++import (
++	mapset "github.com/deckarep/golang-set/v2"
++	"github.com/geniot/digger/src/ctx"
++	. "github.com/geniot/digger/src/glb"
++	"github.com/veandco/go-sdl2/sdl"
++)
++
++type Layer struct {
++	background        *sdl.Surface
++	backgroundTexture *sdl.Texture
++	isChanged         bool
++	scene             *Scene
++	emeralds          mapset.Set[*Emerald]
++}
++
++func NewLayer(scn *Scene) *Layer {
++	layer := &Layer{}
++	layer.scene = scn
++	layer.emeralds = mapset.NewThreadUnsafeSet[*Emerald]()
++
++	info, _ := ctx.RendererIns.GetInfo()
++	layer.background, _ = sdl.CreateRGBSurfaceWithFormat(0,
++		SCREEN_LOGICAL_WIDTH,
++		SCREEN_LOGICAL_HEIGHT,
++		32, uint32(info.TextureFormats[0]))
++
++	layer.isChanged = true
++	return layer
++}
++
++func (layer *Layer) Render() {
++	if layer.isChanged {
++		if layer.backgroundTexture != nil {
++			layer.backgroundTexture.Destroy()
++		}
++		info, _ := ctx.RendererIns.GetInfo()
++		layer.background, _ = sdl.CreateRGBSurfaceWithFormat(0,
++			SCREEN_LOGICAL_WIDTH,
++			SCREEN_LOGICAL_HEIGHT,
++			32, uint32(info.TextureFormats[0]))
++		
++		for emerald := range layer.emeralds.Iter() {
++			emerald.Render(layer.background)
++		}
++		layer.backgroundTexture, _ = ctx.RendererIns.CreateTextureFromSurface(layer.background)
++		layer.isChanged = false
++	}
++	ctx.RendererIns.Copy(layer.backgroundTexture, nil, &sdl.Rect{Y: FIELD_OFFSET_Y, W: SCREEN_LOGICAL_WIDTH, H: SCREEN_LOGICAL_HEIGHT})
++}
++
++func (layer *Layer) Remove(emerald *Emerald) {
++	layer.emeralds.Remove(emerald)
++	layer.isChanged = true
++}
+Index: src/gui/rnd/media.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/gui/rnd/media.go b/src/gui/rnd/media.go
+--- a/src/gui/rnd/media.go	(revision e1e111dccd88665050ebe52a48454f216ec581e2)
++++ b/src/gui/rnd/media.go	(date 1700167031115)
+@@ -21,7 +21,7 @@
+ 	diggerSpritesGraveFrameSequence []int
+ 	diggerSpritesGrave              []*sdl.Texture
+ 
+-	emeraldTexture     *sdl.Texture
++	emeraldSurface     *sdl.Surface
+ 	emeraldTextureMask *sdl.Surface
+ 
+ 	fireSprites          []*sdl.Texture
+@@ -77,7 +77,7 @@
+ 	//making a pause at the end to let the tune end
+ 	md.diggerSpritesGraveFrameSequence = []int{0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}
+ 
+-	md.emeraldTexture = res.LoadTexture("emerald.png")
++	md.emeraldSurface, _ = img.LoadRW(res.GetImage("emerald.png"), true)
+ 	md.emeraldTextureMask, _ = img.LoadRW(res.GetImage("emerald_mask.png"), true)
+ 
+ 	md.fieldHorizontalBlob, _ = img.LoadRW(res.GetImage("blob1.png"), true)
+Index: src/gui/rnd/emerald.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/gui/rnd/emerald.go b/src/gui/rnd/emerald.go
+--- a/src/gui/rnd/emerald.go	(revision e1e111dccd88665050ebe52a48454f216ec581e2)
++++ b/src/gui/rnd/emerald.go	(date 1700167950018)
+@@ -54,7 +54,7 @@
+ func (emerald *Emerald) Destroy() {
+ 	emerald.scene.field.eatEmerald(emerald)
+ 	emerald.scene.collisionSpace.Remove(emerald.collisionObject)
+-	emerald.scene.emeralds.Remove(emerald)
++	emerald.scene.emLayer.Remove(emerald)
+ }
+ 
+ func (emerald *Emerald) soundEat() {
+@@ -75,8 +75,8 @@
+  * VIEW
+  */
+ 
+-func (emerald *Emerald) Render() {
+-	ctx.RendererIns.Copy(emerald.scene.media.emeraldTexture, nil, &sdl.Rect{X: emerald.offsetX, Y: emerald.offsetY, W: CELL_WIDTH, H: CELL_HEIGHT})
++func (emerald *Emerald) Render(background *sdl.Surface) {
++	emerald.scene.media.emeraldSurface.Blit(nil, background, &sdl.Rect{X: emerald.offsetX, Y: emerald.offsetY - CELL_HEIGHT, W: CELL_WIDTH, H: CELL_HEIGHT})
+ 
+ 	if IS_DEBUG_ON {
+ 		ctx.RendererIns.SetDrawColor(255, 255, 255, 255)
