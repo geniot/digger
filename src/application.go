@@ -29,7 +29,7 @@ func NewApplication() *Application {
 	app := Application{}
 
 	// the order of these calls matters
-	rl.SetTraceLogLevel(rl.LogWarning)
+	rl.SetTraceLogLevel(rl.LogTrace)
 	rl.SetConfigFlags(rl.FlagVsyncHint) //should be set before window initialization!
 	rl.InitWindow(winWidth, winHeight, "TrimUI Digger")
 	rl.SetWindowMonitor(0) //used for testing on multiple monitors
