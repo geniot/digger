@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"math/rand"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -13,10 +14,21 @@ var (
 	}
 )
 
+const (
+	SCREEN_LOGICAL_WIDTH  = 320
+	SCREEN_LOGICAL_HEIGHT = 240
+	CELLS_HORIZONTAL      = 15
+	CELLS_VERTICAL        = 10
+	CELL_WIDTH            = 20
+	CELL_HEIGHT           = 20
+	CELLS_OFFSET          = 10
+	FIELD_OFFSET_Y        = 20
+)
+
 type GameScene struct {
-	a      *Application
-	target rl.RenderTexture2D
-	//cube      *Cube
+	a         *Application
+	rgba      *image.RGBA
+	target    rl.RenderTexture2D
 	isStarted bool
 }
 
@@ -26,7 +38,8 @@ func NewGameScene(a *Application) *GameScene {
 	//gameScene.cube = NewCube(3, split(CubeCorrect), a)
 	gameScene.isStarted = false
 	//gameScene.Reset()
-	gameScene.target = rl.LoadRenderTexture(100, 100)
+	gameScene.target = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+
 	rl.BeginTextureMode(gameScene.target)
 	rl.ClearBackground(rl.Yellow)
 	rl.EndTextureMode()
@@ -39,22 +52,15 @@ func (gs *GameScene) ShouldExit() bool {
 }
 
 func (gs *GameScene) Update(camera *rl.Camera) {
+	randomColor := COLORS[rand.Intn(len(COLORS))]
 
 	rl.BeginTextureMode(gs.target)
-	rl.DrawPixel(int32(rand.Intn(100)), int32(rand.Intn(100)), COLORS[rand.Intn(len(COLORS))])
-	//rl.DrawPixel(0, 0, rl.Black)
+	rl.DrawPixel(int32(rand.Intn(100)), int32(rand.Intn(100)), randomColor)
+	rl.DrawRectangle(int32(rand.Intn(100)), int32(rand.Intn(100)), int32(rand.Intn(100)), int32(rand.Intn(100)), randomColor)
 	rl.EndTextureMode()
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	rl.DrawTexture(gs.target.Texture, 0, 0, rl.White)
 	rl.EndDrawing()
-
-	//image := rl.LoadImageFromTexture(gs.target.Texture)
-	////colors := rl.LoadImageColors(image)
-	//color1 := rl.GetImageColor(*image, 0, 0)
-	//color2 := rl.GetImageColor(*image, 0, 1)
-	////color2 := colors[1]
-	//println(color1.RGBA())
-	//println(color2.RGBA())
 }
