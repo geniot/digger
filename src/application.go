@@ -5,7 +5,6 @@ import (
 )
 
 type Application struct {
-	camera                *rl.Camera
 	scenes                map[int]Scene
 	currentSceneIndex     int
 	colorTextures         map[int]rl.Texture2D
@@ -17,7 +16,7 @@ func (a *Application) ShouldExit() bool {
 }
 
 func (a *Application) Update() {
-	a.scenes[a.currentSceneIndex].Update(a.camera)
+	a.scenes[a.currentSceneIndex].Update()
 }
 
 func (a *Application) Exit() {
@@ -30,7 +29,7 @@ func NewApplication() *Application {
 
 	// the order of these calls matters
 	rl.SetTraceLogLevel(rl.LogTrace)
-	rl.SetConfigFlags(rl.FlagVsyncHint) //should be set before window initialization!
+	rl.SetConfigFlags(rl.FlagVsyncHint | rl.FlagWindowResizable) //should be set before window initialization!
 	rl.InitWindow(winWidth, winHeight, "TrimUI Digger")
 	rl.SetWindowMonitor(0) //used for testing on multiple monitors
 	rl.InitAudioDevice()
@@ -40,12 +39,12 @@ func NewApplication() *Application {
 	setDefaultTextStyle()
 
 	//camera
-	app.camera = &rl.Camera3D{}
-	app.camera.Position = rl.NewVector3(10, 10, 10)
-	app.camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	app.camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
-	app.camera.Fovy = 40.0
-	app.camera.Projection = rl.CameraPerspective
+	//app.camera = &rl.Camera3D{}
+	//app.camera.Position = rl.NewVector3(10, 10, 10)
+	//app.camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
+	//app.camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	//app.camera.Fovy = 40.0
+	//app.camera.Projection = rl.CameraPerspective
 
 	// textures
 	app.colorTextures = make(map[int]rl.Texture2D)
