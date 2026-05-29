@@ -5,10 +5,11 @@ import (
 )
 
 type Application struct {
-	scenes                map[int]Scene
-	currentSceneIndex     int
-	colorTextures         map[int]rl.Texture2D
-	selectedColorTextures map[int]rl.Texture2D
+	scenes            map[int]Scene
+	drawTarget        rl.RenderTexture2D
+	currentSceneIndex int
+	sourceRect        rl.Rectangle
+	destRect          rl.Rectangle
 }
 
 func (a *Application) ShouldExit() bool {
@@ -16,11 +17,38 @@ func (a *Application) ShouldExit() bool {
 }
 
 func (a *Application) Update() {
-	a.scenes[a.currentSceneIndex].Update()
+	if rl.IsWindowResized() {
+		a.updateRects()
+	}
+	rl.BeginDrawing()
+	rl.ClearBackground(rl.Black)
+
+	a.scenes[a.currentSceneIndex].Update(a.drawTarget)
+
+	rl.DrawTexturePro(a.drawTarget.Texture,
+		a.sourceRect,
+		a.destRect,
+		rl.Vector2{}, 0, rl.White)
+	rl.EndDrawing()
 }
 
 func (a *Application) Exit() {
 	rl.CloseWindow()
+}
+
+func (a *Application) updateRects() {
+	screenWidth := float32(rl.GetScreenWidth())
+	screenHeight := float32(rl.GetScreenHeight())
+	a.sourceRect = rl.NewRectangle(0, float32(-SCREEN_LOGICAL_HEIGHT), float32(SCREEN_LOGICAL_WIDTH), float32(-SCREEN_LOGICAL_HEIGHT))
+	ratioX := screenWidth / float32(SCREEN_LOGICAL_WIDTH)
+	ratioY := screenHeight / float32(SCREEN_LOGICAL_HEIGHT)
+	resizeRatio := If(ratioX < ratioY, ratioX, ratioY)
+	a.destRect = rl.NewRectangle(
+		(screenWidth-(SCREEN_LOGICAL_WIDTH*resizeRatio))*0.5,
+		(screenHeight-(SCREEN_LOGICAL_HEIGHT*resizeRatio))*0.5,
+		SCREEN_LOGICAL_WIDTH*resizeRatio,
+		SCREEN_LOGICAL_HEIGHT*resizeRatio,
+	)
 }
 
 func NewApplication() *Application {
@@ -38,20 +66,6 @@ func NewApplication() *Application {
 
 	setDefaultTextStyle()
 
-	//camera
-	//app.camera = &rl.Camera3D{}
-	//app.camera.Position = rl.NewVector3(10, 10, 10)
-	//app.camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	//app.camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
-	//app.camera.Fovy = 40.0
-	//app.camera.Projection = rl.CameraPerspective
-
-	// textures
-	app.colorTextures = make(map[int]rl.Texture2D)
-	app.selectedColorTextures = make(map[int]rl.Texture2D)
-	//prepareTextures(app.colorTextures, false)
-	//prepareTextures(app.selectedColorTextures, true)
-
 	// scenes
 	app.scenes = make(map[int]Scene)
 	//app.scenes[menuSceneKey] = NewMenuScene(&app)
@@ -62,6 +76,13 @@ func NewApplication() *Application {
 
 	//debug
 	//app.currentSceneIndex = controlsSceneKey
+
+	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	rl.BeginTextureMode(app.drawTarget)
+	rl.ClearBackground(rl.Black)
+	rl.EndTextureMode()
+
+	app.updateRects()
 
 	return &app
 }

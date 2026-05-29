@@ -1,5 +1,7 @@
 package main
 
+import rl "github.com/gen2brain/raylib-go/raylib"
+
 const (
 	menuSceneKey = iota
 	gameSceneKey
@@ -8,6 +10,6 @@ const (
 )
 
 type Scene interface {
-	Update()
+	Update(drawTarget rl.RenderTexture2D)
 	ShouldExit() bool
 }

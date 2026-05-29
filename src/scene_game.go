@@ -33,9 +33,6 @@ func (gs *GameScene) ShouldExit() bool {
 	return rl.IsKeyPressed(rl.KeyEscape) || (rl.IsGamepadButtonDown(gamePadId, menuCode) && rl.IsGamepadButtonDown(gamePadId, startCode))
 }
 
-func (gs *GameScene) Update() {
-	rl.BeginDrawing()
-	rl.ClearBackground(rl.Black)
-	gs.field.Update()
-	rl.EndDrawing()
+func (gs *GameScene) Update(drawTarget rl.RenderTexture2D) {
+	gs.field.Update(drawTarget)
 }
