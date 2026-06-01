@@ -61,8 +61,6 @@ func NewApplication() *Application {
 	rl.InitWindow(winWidth, winHeight, "TrimUI Digger")
 	rl.SetWindowMonitor(0) //used for testing on multiple monitors
 	rl.InitAudioDevice()
-	rl.SetClipPlanes(0.5, 100) //these values are found by trial and error for TrimUI, see https://github.com/raysan5/raylib/issues/4917
-	rl.DisableBackfaceCulling()
 
 	setDefaultTextStyle()
 
@@ -79,7 +77,7 @@ func NewApplication() *Application {
 
 	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 	rl.BeginTextureMode(app.drawTarget)
-	rl.ClearBackground(rl.Black)
+	rl.ClearBackground(rl.RayWhite)
 	rl.EndTextureMode()
 
 	app.updateRects()

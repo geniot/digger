@@ -1,44 +1,49 @@
 package main
 
 import (
-	"math/rand"
+	"embed"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var (
-	COLORS = []rl.Color{
-		rl.Red, rl.Green, rl.Blue, rl.Yellow, rl.Purple, rl.Orange, rl.Pink, rl.Brown, rl.Gray,
-		rl.LightGray, rl.DarkGray, rl.DarkGreen, rl.DarkBlue, rl.DarkPurple, rl.DarkBrown,
-	}
+	//go:embed res/*
+	resList embed.FS
 )
 
 type Field struct {
-	app    *Application
-	target rl.RenderTexture2D
+	app        *Application
+	target     rl.RenderTexture2D
+	sourceRect rl.Rectangle
+	zeroVector rl.Vector2
 }
 
 func NewField(app *Application) *Field {
 	fld := &Field{}
 	fld.app = app
-	fld.target = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT-20)
+
+	fld.sourceRect = rl.NewRectangle(0, 0, SCREEN_LOGICAL_WIDTH, -SCREEN_LOGICAL_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	fld.zeroVector = rl.Vector2{X: 0, Y: 0}
+
+	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
+	bgTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes))))
+	fld.target = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+
 	rl.BeginTextureMode(fld.target)
-	rl.ClearBackground(rl.Yellow)
+	rl.ClearBackground(rl.Black)
+	for y := 14; y < 200; y += 4 {
+		for x := 0; x < 320; x += 20 {
+			sourceRect := rl.NewRectangle(0, 0, 20, float32(If(y+4 > 200, 2, 4)))
+			rl.DrawTextureRec(bgTexture, sourceRect, rl.Vector2{X: float32(x), Y: float32(y)}, rl.White)
+		}
+	}
 	rl.EndTextureMode()
 	return fld
 }
 
 func (c *Field) Update(drawTarget rl.RenderTexture2D) {
-	randomColor := COLORS[rand.Intn(len(COLORS))]
-
-	rl.BeginTextureMode(c.target)
-	rl.DrawPixel(int32(rand.Intn(SCREEN_LOGICAL_WIDTH)), int32(rand.Intn(SCREEN_LOGICAL_HEIGHT)), randomColor)
-	rl.DrawRectangleLines(1, 0, SCREEN_LOGICAL_WIDTH-1, SCREEN_LOGICAL_HEIGHT-21, rl.Red)
-	//rl.DrawRectangle(int32(rand.Intn(SCREEN_LOGICAL_WIDTH)), int32(rand.Intn(SCREEN_LOGICAL_HEIGHT)), int32(rand.Intn(SCREEN_LOGICAL_WIDTH)), int32(rand.Intn(SCREEN_LOGICAL_HEIGHT)), randomColor)
-	rl.EndTextureMode()
-
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTexture(c.target.Texture, 0, 20, rl.White)
+	rl.DrawTextureRec(c.target.Texture, c.sourceRect, c.zeroVector, rl.White)
 	rl.EndTextureMode()
 
 }
