@@ -2,7 +2,8 @@ package main
 
 var (
 	leveldat = [][]string{
-		{"S   B     HHHHS",
+		{
+			"S   B     HHHHS",
 			"V  CC  C  V B  ",
 			"VB CC  C  V    ",
 			"V  CCB CB V CCC",
@@ -11,8 +12,10 @@ var (
 			" V    B B V    ",
 			" HHHH     V    ",
 			"C   V     V   C",
-			"CC  HHHHHHH  CC"},
-		{"SHHHHH  B B  HS",
+			"CC  HHHHHHH  CC",
+		},
+		{
+			"SHHHHH  B B  HS",
 			" CC  V       V ",
 			" CC  V CCCCC V ",
 			"BCCB V CCCCC V ",
@@ -21,8 +24,10 @@ var (
 			" CC  V CC V    ",
 			" BB  VCCCCV CC ",
 			"C    V CC V CC ",
-			"CC   HHHHHH    "},
-		{"SHHHHB B BHHHHS",
+			"CC   HHHHHH    ",
+		},
+		{
+			"SHHHHB B BHHHHS",
 			"CC  V C C V BB ",
 			"C   V C C V CC ",
 			" BB V C C VCCCC",
@@ -31,8 +36,10 @@ var (
 			" CC  C V C  CC ",
 			" CC  C V C     ",
 			"C    C V C    C",
-			"CC   C H C   CC"},
-		{"SHBCCCCBCCCCBHS",
+			"CC   C H C   CC",
+		},
+		{
+			"SHBCCCCBCCCCBHS",
 			"CV  CCCCCCC  VC",
 			"CHHH CCCCC HHHC",
 			"C  V  CCC  V  C",
@@ -41,8 +48,10 @@ var (
 			"  C  VCCCV  C  ",
 			" CCC HHHHH CCC ",
 			"CCCCC CVC CCCCC",
-			"CCCCC CHC CCCCC"},
-		{"SHHHHHHHHHHHHHS",
+			"CCCCC CHC CCCCC",
+		},
+		{
+			"SHHHHHHHHHHHHHS",
 			"VBCCCCBVCCCCCCV",
 			"VCCCCCCV CCBC V",
 			"V CCCC VCCBCCCV",
@@ -51,8 +60,10 @@ var (
 			"VCCBCCCV CCCC V",
 			"V CCBC VCCCCCCV",
 			"VCCCCCCVCCCCCCV",
-			"HHHHHHHHHHHHHHH"},
-		{"SHHHHHHHHHHHHHS",
+			"HHHHHHHHHHHHHHH",
+		},
+		{
+			"SHHHHHHHHHHHHHS",
 			"VCBCCV V VCCBCV",
 			"VCCC VBVBV CCCV",
 			"VCCCHH V HHCCCV",
@@ -61,8 +72,10 @@ var (
 			"VC V CCVCC V CV",
 			"VCHHBCCVCCBHHCV",
 			"VCVCCCCVCCCCVCV",
-			"HHHHHHHHHHHHHHH"},
-		{"SHCCCCCVCCCCCHS",
+			"HHHHHHHHHHHHHHH",
+		},
+		{
+			"SHCCCCCVCCCCCHS",
 			" VCBCBCVCBCBCV ",
 			"BVCCCCCVCCCCCVB",
 			"CHHCCCCVCCCCHHC",
@@ -71,8 +84,10 @@ var (
 			"CCCCV CVC VCCCC",
 			"CCCCHH V HHCCCC",
 			"CCCCCV V VCCCCC",
-			"CCCCCHHHHHCCCCC"},
-		{"HHHHHHHHHHHHHHS",
+			"CCCCCHHHHHCCCCC",
+		},
+		{
+			"HHHHHHHHHHHHHHS",
 			"V CCBCCCCCBCC V",
 			"HHHCCCCBCCCCHHH",
 			"VBV CCCCCCC VBV",
@@ -81,7 +96,8 @@ var (
 			"VCCCHHHCHHHCCCV",
 			"VCCCC V V CCCCV",
 			"VCCCCCV VCCCCCV",
-			"HHHHHHHHHHHHHHH"},
+			"HHHHHHHHHHHHHHH",
+		},
 	}
 )
 
