@@ -13,7 +13,8 @@ var (
 
 type Field struct {
 	app        *Application
-	target     rl.RenderTexture2D
+	texture    rl.RenderTexture2D
+	image      *rl.Image
 	sourceRect rl.Rectangle
 	zeroVector rl.Vector2
 }
@@ -26,26 +27,36 @@ func NewField(app *Application) *Field {
 	fld.zeroVector = rl.Vector2{X: 0, Y: 0}
 
 	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
-	bgTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes))))
+	bgImage := rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes)))
+	bgTexture := rl.LoadTextureFromImage(bgImage)
+
 	upBlobBytes := orPanicRes(resList.ReadFile("res/cublob.png"))
-	upBlobTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", upBlobBytes, int32(len(upBlobBytes))))
+	upBlobImage := rl.LoadImageFromMemory(".png", upBlobBytes, int32(len(upBlobBytes)))
+	upBlobTexture := rl.LoadTextureFromImage(upBlobImage)
+
 	downBlobBytes := orPanicRes(resList.ReadFile("res/cdblob.png"))
-	downBlobTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", downBlobBytes, int32(len(downBlobBytes))))
+	downBlobImage := rl.LoadImageFromMemory(".png", downBlobBytes, int32(len(downBlobBytes)))
+	downBlobTexture := rl.LoadTextureFromImage(downBlobImage)
+
 	leftBlobBytes := orPanicRes(resList.ReadFile("res/clblob.png"))
-	leftBlobTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", leftBlobBytes, int32(len(leftBlobBytes))))
+	leftBlobImage := rl.LoadImageFromMemory(".png", leftBlobBytes, int32(len(leftBlobBytes)))
+	leftBlobTexture := rl.LoadTextureFromImage(leftBlobImage)
+
 	rightBlobBytes := orPanicRes(resList.ReadFile("res/crblob.png"))
-	rightBlobTexture := rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", rightBlobBytes, int32(len(rightBlobBytes))))
+	rightBlobImage := rl.LoadImageFromMemory(".png", rightBlobBytes, int32(len(rightBlobBytes)))
+	rightBlobTexture := rl.LoadTextureFromImage(rightBlobImage)
 
-	fld.target = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	fld.texture = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	fld.image = rl.GenImageColor(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, rl.Black)
 
-	rl.BeginTextureMode(fld.target)
+	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
 	for y := 14; y < 200; y += 4 {
 		for x := 0; x < 320; x += 20 {
-			sourceRect := rl.NewRectangle(0, 0, 20, float32(If(y+4 > 200, 2, 4)))
-			rl.DrawTextureRec(bgTexture, sourceRect, rl.Vector2{X: float32(x), Y: float32(y)}, rl.White)
+			fld.draw(float32(x), float32(y), 20, float32(If(y+4 > 200, 2, 4)), &bgTexture, bgImage)
 		}
 	}
+	//little offsets as copied from the original code
 	dX := int32(-2)
 	dY := int32(15)
 	uX := int32(-2)
@@ -62,25 +73,22 @@ func NewField(app *Application) *Field {
 				xp := x*20 + 12
 				yp := y*18 + 18
 				if c == 'V' || c == 'S' {
-					rl.DrawTexture(downBlobTexture, xp+dX, yp-15+dY, rl.White)
-					rl.DrawTexture(downBlobTexture, xp+dX, yp-12+dY, rl.White)
-					rl.DrawTexture(downBlobTexture, xp+dX, yp-9+dY, rl.White)
-					rl.DrawTexture(downBlobTexture, xp+dX, yp-6+dY, rl.White)
-					rl.DrawTexture(downBlobTexture, xp+dX, yp-3+dY, rl.White)
-					rl.DrawTexture(upBlobTexture, xp+uX, yp+3+uY, rl.White)
+					for decr := int32(-15); decr <= -3; decr += 3 {
+						fld.draw(float32(xp+dX), float32(yp+decr+dY), float32(downBlobImage.Width), float32(downBlobImage.Height), &downBlobTexture, downBlobImage)
+					}
+					fld.draw(float32(xp+uX), float32(yp+3+uY), float32(upBlobImage.Width), float32(upBlobImage.Height), &upBlobTexture, upBlobImage)
 				}
 				if c == 'H' || c == 'S' {
-					rl.DrawTexture(rightBlobTexture, xp-16+rX, yp+rY, rl.White)
-					rl.DrawTexture(rightBlobTexture, xp-12+rX, yp+rY, rl.White)
-					rl.DrawTexture(rightBlobTexture, xp-8+rX, yp+rY, rl.White)
-					rl.DrawTexture(rightBlobTexture, xp-4+rX, yp+rY, rl.White)
-					rl.DrawTexture(leftBlobTexture, xp+4+lX, yp+lY, rl.White)
+					for decr := int32(-16); decr <= -4; decr += 4 {
+						fld.draw(float32(xp+decr+rX), float32(yp+rY), float32(rightBlobImage.Width), float32(rightBlobImage.Height), &rightBlobTexture, rightBlobImage)
+					}
+					fld.draw(float32(xp+4+lX), float32(yp+lY), float32(leftBlobImage.Width), float32(leftBlobImage.Height), &leftBlobTexture, leftBlobImage)
 				}
 				if x < 14 && (getLevelChar(x+1, y, levplan()) == 'H' || getLevelChar(x+1, y, levplan()) == 'S') {
-					rl.DrawTexture(rightBlobTexture, xp+rX, yp+rY, rl.White)
+					fld.draw(float32(xp+rX), float32(yp+rY), float32(rightBlobImage.Width), float32(rightBlobImage.Height), &rightBlobTexture, rightBlobImage)
 				}
 				if y < 9 && (getLevelChar(x, y+1, levplan()) == 'V' || getLevelChar(x, y+1, levplan()) == 'H') {
-					rl.DrawTexture(downBlobTexture, xp+dX, yp+dY, rl.White)
+					fld.draw(float32(xp+dX), float32(yp+dY), float32(downBlobImage.Width), float32(downBlobImage.Height), &downBlobTexture, downBlobImage)
 				}
 			}
 		}
@@ -89,8 +97,35 @@ func NewField(app *Application) *Field {
 	return fld
 }
 
+func (c *Field) draw(x, y, width, height float32, texture *rl.Texture2D, image *rl.Image) {
+	sourceRect := rl.NewRectangle(0, 0, width, height)
+	destRect := rl.NewRectangle(x, y, width, height)
+	rl.DrawTexturePro(*texture, sourceRect, destRect, rl.Vector2{}, 0, rl.White)
+	rl.ImageDraw(c.image, image, sourceRect, destRect, rl.White)
+}
+
 func (c *Field) Update(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTextureRec(c.target.Texture, c.sourceRect, c.zeroVector, rl.White)
+	//c.Debug()
+	//rl.DrawTextureRec(rl.LoadTextureFromImage(clone), c.sourceRect, c.zeroVector, rl.White)
+	rl.DrawTextureRec(c.texture.Texture, c.sourceRect, c.zeroVector, rl.White)
 	rl.EndTextureMode()
+}
+
+func (c *Field) Debug() {
+	clone1 := rl.ImageCopy(c.image)
+	rl.ImageFlipVertical(clone1)
+	colors1 := rl.LoadImageColors(clone1)
+
+	clone2 := rl.LoadImageFromTexture(c.texture.Texture)
+	colors2 := rl.LoadImageColors(clone2)
+
+	if len(colors1) != len(colors2) {
+		panic("colors are different")
+	}
+	for i := 0; i < len(colors1); i++ {
+		if colors1[i].R != colors2[i].R || colors1[i].G != colors2[i].G || colors1[i].B != colors2[i].B || colors1[i].A != colors2[i].A {
+			panic("colors are different")
+		}
+	}
 }
