@@ -13,7 +13,7 @@ var (
 
 const (
 	FIELD_WIDTH  = 320
-	FIELD_HEIGHT = 200 - 14
+	FIELD_HEIGHT = 186
 )
 
 type Field struct {
@@ -29,6 +29,7 @@ func NewField(app *Application) *Field {
 	fld.app = app
 
 	fld.sourceRec = rl.NewRectangle(0, 0, SCREEN_LOGICAL_WIDTH, -SCREEN_LOGICAL_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	fld.destRec = rl.NewRectangle(0, SCREEN_LOGICAL_HEIGHT-FIELD_HEIGHT, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 
 	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
 	bgImage := rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes)))
@@ -55,20 +56,20 @@ func NewField(app *Application) *Field {
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
-	for y := 14; y < 200; y += 4 {
-		for x := 0; x < 320; x += 20 {
-			fld.draw(float32(x), float32(y), 20, float32(If(y+4 > 200, 2, 4)), &bgTexture, bgImage)
+	for y := 0; y < FIELD_HEIGHT; y += 4 {
+		for x := 0; x < FIELD_WIDTH; x += 20 {
+			fld.draw(float32(x), float32(y), 20, float32(If(y+4 > FIELD_HEIGHT, 2, 4)), &bgTexture, bgImage)
 		}
 	}
 	//little offsets as copied from the original code
 	dX := int32(-2)
-	dY := int32(15)
+	dY := int32(1)
 	uX := int32(-2)
-	uY := int32(-6)
+	uY := int32(-20)
 	rX := int32(16)
-	rY := int32(-1)
+	rY := int32(-15)
 	lX := int32(-8)
-	lY := int32(-1)
+	lY := int32(-15)
 
 	for x := int32(0); x < 15; x++ {
 		for y := int32(0); y < 10; y++ {
@@ -104,7 +105,7 @@ func NewField(app *Application) *Field {
 func (c *Field) draw(x, y, width, height float32, texture *rl.Texture2D, image *rl.Image) {
 	sourceRect := rl.NewRectangle(0, 0, width, height)
 	destRect := rl.NewRectangle(x, y, width, height)
-	rl.DrawTexturePro(*texture, sourceRect, destRect, rl.Vector2{}, 0, rl.White)
+	rl.DrawTexturePro(*texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
 	rl.ImageDraw(c.image, image, sourceRect, destRect, rl.White)
 }
 
@@ -112,7 +113,7 @@ func (c *Field) Update(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	//c.Debug()
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(clone), c.sourceRect, c.zeroVector, rl.White)
-	rl.DrawTextureRec(c.texture.Texture, c.sourceRec, ZERO_VECTOR2, rl.White)
+	rl.DrawTexturePro(c.texture.Texture, c.sourceRec, c.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 }
 
