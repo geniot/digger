@@ -28,8 +28,8 @@ func NewField(app *Application) *Field {
 	fld := &Field{}
 	fld.app = app
 
-	fld.sourceRec = rl.NewRectangle(0, 0, SCREEN_LOGICAL_WIDTH, -SCREEN_LOGICAL_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
-	fld.destRec = rl.NewRectangle(0, SCREEN_LOGICAL_HEIGHT-FIELD_HEIGHT, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	fld.sourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
 	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
 	bgImage := rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes)))
@@ -51,14 +51,16 @@ func NewField(app *Application) *Field {
 	rightBlobImage := rl.LoadImageFromMemory(".png", rightBlobBytes, int32(len(rightBlobBytes)))
 	rightBlobTexture := rl.LoadTextureFromImage(rightBlobImage)
 
-	fld.texture = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
-	fld.image = rl.GenImageColor(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, rl.Black)
+	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
+	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
-	for y := 0; y < FIELD_HEIGHT; y += 4 {
-		for x := 0; x < FIELD_WIDTH; x += 20 {
-			fld.draw(float32(x), float32(y), 20, float32(If(y+4 > FIELD_HEIGHT, 2, 4)), &bgTexture, bgImage)
+	for y := int32(0); y < FIELD_HEIGHT; y += bgTexture.Height {
+		for x := int32(0); x < FIELD_WIDTH; x += bgTexture.Width {
+			fld.draw(float32(x), float32(y), float32(bgTexture.Width),
+				float32(If(y+bgTexture.Height > FIELD_HEIGHT, bgTexture.Height/2, bgTexture.Height)),
+				&bgTexture, bgImage)
 		}
 	}
 	//little offsets as copied from the original code
