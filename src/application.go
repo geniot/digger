@@ -18,17 +18,15 @@ func (a *Application) ShouldExit() bool {
 
 func (a *Application) Update() {
 	if rl.IsWindowResized() {
-		a.updateRects()
+		a.onResize()
 	}
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
-
 	a.scenes[a.currentSceneIndex].Update(a.drawTarget)
-
 	rl.DrawTexturePro(a.drawTarget.Texture,
 		a.sourceRect,
 		a.destRect,
-		rl.Vector2{}, 0, rl.White)
+		ZERO_VECTOR2, 0, rl.White)
 	rl.EndDrawing()
 }
 
@@ -36,7 +34,7 @@ func (a *Application) Exit() {
 	rl.CloseWindow()
 }
 
-func (a *Application) updateRects() {
+func (a *Application) onResize() {
 	screenWidth := float32(rl.GetScreenWidth())
 	screenHeight := float32(rl.GetScreenHeight())
 	a.sourceRect = rl.NewRectangle(0, float32(-SCREEN_LOGICAL_HEIGHT), float32(SCREEN_LOGICAL_WIDTH), float32(-SCREEN_LOGICAL_HEIGHT))
@@ -76,11 +74,11 @@ func NewApplication() *Application {
 	//app.currentSceneIndex = controlsSceneKey
 
 	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
-	rl.BeginTextureMode(app.drawTarget)
-	rl.ClearBackground(rl.RayWhite)
-	rl.EndTextureMode()
+	//rl.BeginTextureMode(app.drawTarget)
+	//rl.ClearBackground(rl.RayWhite)
+	//rl.EndTextureMode()
 
-	app.updateRects()
+	app.onResize()
 
 	return &app
 }

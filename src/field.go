@@ -11,20 +11,24 @@ var (
 	resList embed.FS
 )
 
+const (
+	FIELD_WIDTH  = 320
+	FIELD_HEIGHT = 200 - 14
+)
+
 type Field struct {
-	app        *Application
-	texture    rl.RenderTexture2D
-	image      *rl.Image
-	sourceRect rl.Rectangle
-	zeroVector rl.Vector2
+	app       *Application
+	texture   rl.RenderTexture2D
+	image     *rl.Image
+	sourceRec rl.Rectangle
+	destRec   rl.Rectangle
 }
 
 func NewField(app *Application) *Field {
 	fld := &Field{}
 	fld.app = app
 
-	fld.sourceRect = rl.NewRectangle(0, 0, SCREEN_LOGICAL_WIDTH, -SCREEN_LOGICAL_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
-	fld.zeroVector = rl.Vector2{X: 0, Y: 0}
+	fld.sourceRec = rl.NewRectangle(0, 0, SCREEN_LOGICAL_WIDTH, -SCREEN_LOGICAL_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
 
 	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
 	bgImage := rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes)))
@@ -108,7 +112,7 @@ func (c *Field) Update(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	//c.Debug()
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(clone), c.sourceRect, c.zeroVector, rl.White)
-	rl.DrawTextureRec(c.texture.Texture, c.sourceRect, c.zeroVector, rl.White)
+	rl.DrawTextureRec(c.texture.Texture, c.sourceRec, ZERO_VECTOR2, rl.White)
 	rl.EndTextureMode()
 }
 

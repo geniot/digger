@@ -2,6 +2,11 @@ package main
 
 import (
 	gui "github.com/gen2brain/raylib-go/raygui"
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+var (
+	ZERO_VECTOR2 = rl.Vector2{}
 )
 
 func orPanic(err interface{}) {
