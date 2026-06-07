@@ -29,7 +29,7 @@ func If[T any](cond bool, vTrue, vFalse T) T {
 	return vFalse
 }
 
-func IfInt(cond bool, vTrue int, vFalse int) int {
+func IfInt(cond bool, vTrue int32, vFalse int32) int32 {
 	if cond {
 		return vTrue
 	}
@@ -52,4 +52,19 @@ func setTextStyle(ts int64, sp int64, ta int64, pp int64) {
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_PADDING, pp)
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_ALIGNMENT_VERTICAL, int64(gui.TEXT_ALIGN_CENTER))
 	gui.SetStyle(gui.TEXTBOX, gui.TEXT_ALIGNMENT, int64(gui.TEXT_ALIGN_LEFT))
+}
+
+func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
+	nextSpritePointerInc := spritePointerInc
+	nextSpritePointer := currentPointer + spritePointerInc
+	if nextSpritePointer >= spritesLen {
+		nextSpritePointer = spritesLen - 1
+	}
+	if nextSpritePointer < 0 {
+		nextSpritePointer = 0
+	}
+	if nextSpritePointer == spritesLen-1 || nextSpritePointer == 0 {
+		nextSpritePointerInc = -spritePointerInc
+	}
+	return nextSpritePointer, nextSpritePointerInc
 }

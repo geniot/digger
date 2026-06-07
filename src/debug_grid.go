@@ -1,0 +1,36 @@
+package main
+
+import rl "github.com/gen2brain/raylib-go/raylib"
+
+type DebugGrid struct {
+	app       *Application
+	texture   rl.RenderTexture2D
+	sourceRec rl.Rectangle
+	destRec   rl.Rectangle
+}
+
+func NewDebugGrid(app *Application) *DebugGrid {
+	debugGrid := &DebugGrid{}
+	debugGrid.app = app
+	debugGrid.sourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	debugGrid.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
+
+	debugGrid.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
+	rl.BeginTextureMode(debugGrid.texture)
+	for y := int32(0); y < CELLS_VERTICAL+1; y += 1 {
+		rl.DrawLine(0, y*CELL_HEIGHT+FIELD_OFFSET_Y, FIELD_WIDTH, y*CELL_HEIGHT+FIELD_OFFSET_Y, rl.White)
+
+	}
+	for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
+		rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
+	}
+	rl.EndTextureMode()
+
+	return debugGrid
+}
+
+func (dg *DebugGrid) Update(drawTarget rl.RenderTexture2D, _ int64) {
+	rl.BeginTextureMode(drawTarget)
+	rl.DrawTexturePro(dg.texture.Texture, dg.sourceRec, dg.destRec, ZERO_VECTOR2, 0, rl.White)
+	rl.EndTextureMode()
+}

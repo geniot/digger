@@ -1,14 +1,7 @@
 package main
 
 import (
-	"embed"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
-)
-
-var (
-	//go:embed res/*
-	resList embed.FS
 )
 
 const (
@@ -111,7 +104,7 @@ func (c *Field) draw(x, y, width, height float32, texture *rl.Texture2D, image *
 	rl.ImageDraw(c.image, image, sourceRect, destRect, rl.White)
 }
 
-func (c *Field) Update(drawTarget rl.RenderTexture2D) {
+func (c *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
 	rl.BeginTextureMode(drawTarget)
 	//c.Debug()
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(clone), c.sourceRect, c.zeroVector, rl.White)

@@ -1,11 +1,19 @@
 package main
 
 import (
+	"embed"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+var (
+	//go:embed res/*
+	resList embed.FS
 )
 
 type Application struct {
 	scenes            map[int]Scene
+	frame             int64
 	drawTarget        rl.RenderTexture2D
 	currentSceneIndex int
 	sourceRect        rl.Rectangle
@@ -17,12 +25,13 @@ func (a *Application) ShouldExit() bool {
 }
 
 func (a *Application) Update() {
+	a.frame++
 	if rl.IsWindowResized() {
 		a.onResize()
 	}
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
-	a.scenes[a.currentSceneIndex].Update(a.drawTarget)
+	a.scenes[a.currentSceneIndex].Update(a.drawTarget, a.frame)
 	rl.DrawTexturePro(a.drawTarget.Texture,
 		a.sourceRect,
 		a.destRect,
@@ -42,10 +51,10 @@ func (a *Application) onResize() {
 	ratioY := screenHeight / float32(SCREEN_LOGICAL_HEIGHT)
 	resizeRatio := If(ratioX < ratioY, ratioX, ratioY)
 	a.destRect = rl.NewRectangle(
-		(screenWidth-(SCREEN_LOGICAL_WIDTH*resizeRatio))*0.5,
-		(screenHeight-(SCREEN_LOGICAL_HEIGHT*resizeRatio))*0.5,
-		SCREEN_LOGICAL_WIDTH*resizeRatio,
-		SCREEN_LOGICAL_HEIGHT*resizeRatio,
+		(screenWidth-(float32(SCREEN_LOGICAL_WIDTH)*resizeRatio))*0.5,
+		(screenHeight-(float32(SCREEN_LOGICAL_HEIGHT)*resizeRatio))*0.5,
+		float32(SCREEN_LOGICAL_WIDTH)*resizeRatio,
+		float32(SCREEN_LOGICAL_HEIGHT)*resizeRatio,
 	)
 }
 
@@ -73,6 +82,7 @@ func NewApplication() *Application {
 	//debug
 	//app.currentSceneIndex = controlsSceneKey
 
+	app.frame = 0
 	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 	//rl.BeginTextureMode(app.drawTarget)
 	//rl.ClearBackground(rl.RayWhite)
