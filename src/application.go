@@ -22,9 +22,11 @@ func (a *Application) Update() {
 	if rl.IsWindowResized() {
 		a.onResize()
 	}
+
+	a.scenes[a.currentSceneIndex].Update(a.drawTarget, a.frame)
+
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
-	a.scenes[a.currentSceneIndex].Update(a.drawTarget, a.frame)
 	rl.DrawTexturePro(a.drawTarget.Texture,
 		a.sourceRect,
 		a.destRect,
@@ -39,7 +41,7 @@ func (a *Application) Exit() {
 func (a *Application) onResize() {
 	screenWidth := float32(rl.GetScreenWidth())
 	screenHeight := float32(rl.GetScreenHeight())
-	a.sourceRect = rl.NewRectangle(0, float32(-SCREEN_LOGICAL_HEIGHT), float32(SCREEN_LOGICAL_WIDTH), float32(-SCREEN_LOGICAL_HEIGHT))
+	a.sourceRect = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(-SCREEN_LOGICAL_HEIGHT))
 	ratioX := screenWidth / float32(SCREEN_LOGICAL_WIDTH)
 	ratioY := screenHeight / float32(SCREEN_LOGICAL_HEIGHT)
 	resizeRatio := If(ratioX < ratioY, ratioX, ratioY)

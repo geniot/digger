@@ -48,7 +48,7 @@ func (gs *GameScene) ShouldExit() bool {
 }
 
 func (gs *GameScene) Update(drawTarget rl.RenderTexture2D, frame int64) {
-	//gs.field.Update(drawTarget, frame)
-	//gs.digger.Update(drawTarget, frame)
+	gs.field.Update(drawTarget, frame)
+	gs.digger.Update(drawTarget, frame)
 	gs.debugGrid.Update(drawTarget, frame)
 }

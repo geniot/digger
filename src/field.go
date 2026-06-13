@@ -81,34 +81,36 @@ func NewField(app *Application) *Field {
 	return fld
 }
 
-func (c *Field) draw(x float32, y float32, textureImage *TextureImage) {
+func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
 	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)
 	destRect := rl.NewRectangle(x, y, textureImage.width, textureImage.height)
 	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
-	rl.ImageDraw(c.image, textureImage.image, sourceRect, destRect, rl.White)
+	rl.ImageDraw(field.image, textureImage.image, sourceRect, destRect, rl.White)
 }
 
-func (c *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
+func (field *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
 	rl.BeginTextureMode(drawTarget)
-	//c.Debug()
-	//rl.DrawTextureRec(rl.LoadTextureFromImage(clone), c.sourceRect, c.zeroVector, rl.White)
-	rl.DrawTexturePro(c.texture.Texture, c.sourceRec, c.destRec, ZERO_VECTOR2, 0, rl.White)
+	//field.Debug()
+	rl.DrawTexturePro(field.texture.Texture, field.sourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 }
 
-func (c *Field) Debug() {
-	clone1 := rl.ImageCopy(c.image)
+func (field *Field) Debug() {
+	clone1 := rl.ImageCopy(field.image)
 	rl.ImageFlipVertical(clone1)
 	colors1 := rl.LoadImageColors(clone1)
 
-	clone2 := rl.LoadImageFromTexture(c.texture.Texture)
+	clone2 := rl.LoadImageFromTexture(field.texture.Texture)
 	colors2 := rl.LoadImageColors(clone2)
 
+	println(len(colors1))
 	if len(colors1) != len(colors2) {
 		panic("colors are different")
 	}
 	for i := 0; i < len(colors1); i++ {
+		println("ok")
 		if colors1[i].R != colors2[i].R || colors1[i].G != colors2[i].G || colors1[i].B != colors2[i].B || colors1[i].A != colors2[i].A {
+			println("colors are different")
 			panic("colors are different")
 		}
 	}

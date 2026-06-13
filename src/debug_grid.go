@@ -29,8 +29,8 @@ func NewDebugGrid(app *Application) *DebugGrid {
 	return debugGrid
 }
 
-func (dg *DebugGrid) Update(drawTarget rl.RenderTexture2D, _ int64) {
+func (debugGrid *DebugGrid) Update(drawTarget rl.RenderTexture2D, _ int64) {
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTexturePro(dg.texture.Texture, dg.sourceRec, dg.destRec, ZERO_VECTOR2, 0, rl.White)
+	rl.DrawTexturePro(debugGrid.texture.Texture, debugGrid.sourceRec, debugGrid.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 }

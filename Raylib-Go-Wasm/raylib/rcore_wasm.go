@@ -2242,8 +2242,10 @@ func GenImageText(width int, height int, text string) Image {
 
 // ImageCopy - Create an image duplicate (useful for transformations)
 func ImageCopy(image *Image) *Image {
-	var zero *Image
-	return zero
+	ret, fl := imageCopy.Call(wasm.Struct(image))
+	v := wasm.ReadStruct[Image](ret)
+	wasm.Free(fl...)
+	return &v
 }
 
 // ImageFromImage - Create an image from another image piece
@@ -2364,7 +2366,7 @@ func ImageDither(image *Image, rBpp int32, gBpp int32, bBpp int32, aBpp int32) {
 
 // ImageFlipVertical - Flip image vertically
 func ImageFlipVertical(image *Image) {
-	_, fl := imageFlipVertical.Call(image)
+	_, fl := imageFlipVertical.Call(wasm.Struct(*image))
 	wasm.Free(fl...)
 }
 
@@ -2432,8 +2434,10 @@ func ImageColorReplace(image *Image, col color.RGBA, replace color.RGBA) {
 //
 // NOTE: Memory allocated should be freed using UnloadImageColors()
 func LoadImageColors(image *Image) []color.RGBA {
-	var zero []color.RGBA
-	return zero
+	ret, fl := loadImageColors.Call(wasm.Struct(*image))
+	v := wasm.ReadStruct[[]color.RGBA](ret)
+	wasm.Free(fl...)
+	return v
 }
 
 // LoadImagePalette - Load colors palette from image as a Color array (RGBA - 32bit)
@@ -2582,7 +2586,7 @@ func ImageDrawTriangleStrip(dst *Image, points []Vector2, col color.RGBA) {
 
 // ImageDraw - Draw a source image within a destination image (tint applied to source)
 func ImageDraw(dst *Image, src *Image, srcRec Rectangle, dstRec Rectangle, tint color.RGBA) {
-	_, fl := imageDraw.Call(dst, src, wasm.Struct(srcRec), wasm.Struct(dstRec), wasm.Struct(tint))
+	_, fl := imageDraw.Call(wasm.Struct(*dst), wasm.Struct(*src), wasm.Struct(srcRec), wasm.Struct(dstRec), wasm.Struct(tint))
 	wasm.Free(fl...)
 }
 
