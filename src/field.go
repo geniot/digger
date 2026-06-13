@@ -24,36 +24,20 @@ func NewField(app *Application) *Field {
 	fld.sourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
 	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
-	bgBytes := orPanicRes(resList.ReadFile("res/cback1.png"))
-	bgImage := rl.LoadImageFromMemory(".png", bgBytes, int32(len(bgBytes)))
-	bgTexture := rl.LoadTextureFromImage(bgImage)
-
-	upBlobBytes := orPanicRes(resList.ReadFile("res/cublob.png"))
-	upBlobImage := rl.LoadImageFromMemory(".png", upBlobBytes, int32(len(upBlobBytes)))
-	upBlobTexture := rl.LoadTextureFromImage(upBlobImage)
-
-	downBlobBytes := orPanicRes(resList.ReadFile("res/cdblob.png"))
-	downBlobImage := rl.LoadImageFromMemory(".png", downBlobBytes, int32(len(downBlobBytes)))
-	downBlobTexture := rl.LoadTextureFromImage(downBlobImage)
-
-	leftBlobBytes := orPanicRes(resList.ReadFile("res/clblob.png"))
-	leftBlobImage := rl.LoadImageFromMemory(".png", leftBlobBytes, int32(len(leftBlobBytes)))
-	leftBlobTexture := rl.LoadTextureFromImage(leftBlobImage)
-
-	rightBlobBytes := orPanicRes(resList.ReadFile("res/crblob.png"))
-	rightBlobImage := rl.LoadImageFromMemory(".png", rightBlobBytes, int32(len(rightBlobBytes)))
-	rightBlobTexture := rl.LoadTextureFromImage(rightBlobImage)
+	bg := NewTextureImage("cback1.png")
+	upBlob := NewTextureImage("cublob.png")
+	downBlob := NewTextureImage("cdblob.png")
+	leftBlob := NewTextureImage("clblob.png")
+	rightBlob := NewTextureImage("crblob.png")
 
 	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
 	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
-	for y := int32(0); y < FIELD_HEIGHT; y += bgTexture.Height {
-		for x := int32(0); x < FIELD_WIDTH; x += bgTexture.Width {
-			fld.draw(float32(x), float32(y), float32(bgTexture.Width),
-				float32(If(y+bgTexture.Height > FIELD_HEIGHT, bgTexture.Height/2, bgTexture.Height)),
-				&bgTexture, bgImage)
+	for y := int32(0); y < FIELD_HEIGHT; y += int32(bg.height) {
+		for x := int32(0); x < FIELD_WIDTH; x += int32(bg.width) {
+			fld.draw(float32(x), float32(y), bg)
 		}
 	}
 	//little offsets as copied from the original code
@@ -74,21 +58,21 @@ func NewField(app *Application) *Field {
 				yp := y*18 + 18
 				if c == 'V' || c == 'S' {
 					for decr := int32(-15); decr <= -3; decr += 3 {
-						fld.draw(float32(xp+dX), float32(yp+decr+dY), float32(downBlobImage.Width), float32(downBlobImage.Height), &downBlobTexture, downBlobImage)
+						fld.draw(float32(xp+dX), float32(yp+decr+dY), downBlob)
 					}
-					fld.draw(float32(xp+uX), float32(yp+3+uY), float32(upBlobImage.Width), float32(upBlobImage.Height), &upBlobTexture, upBlobImage)
+					fld.draw(float32(xp+uX), float32(yp+3+uY), upBlob)
 				}
 				if c == 'H' || c == 'S' {
 					for decr := int32(-16); decr <= -4; decr += 4 {
-						fld.draw(float32(xp+decr+rX), float32(yp+rY), float32(rightBlobImage.Width), float32(rightBlobImage.Height), &rightBlobTexture, rightBlobImage)
+						fld.draw(float32(xp+decr+rX), float32(yp+rY), rightBlob)
 					}
-					fld.draw(float32(xp+4+lX), float32(yp+lY), float32(leftBlobImage.Width), float32(leftBlobImage.Height), &leftBlobTexture, leftBlobImage)
+					fld.draw(float32(xp+4+lX), float32(yp+lY), leftBlob)
 				}
 				if x < 14 && (getLevelChar(x+1, y, levplan()) == 'H' || getLevelChar(x+1, y, levplan()) == 'S') {
-					fld.draw(float32(xp+rX), float32(yp+rY), float32(rightBlobImage.Width), float32(rightBlobImage.Height), &rightBlobTexture, rightBlobImage)
+					fld.draw(float32(xp+rX), float32(yp+rY), rightBlob)
 				}
 				if y < 9 && (getLevelChar(x, y+1, levplan()) == 'V' || getLevelChar(x, y+1, levplan()) == 'H') {
-					fld.draw(float32(xp+dX), float32(yp+dY), float32(downBlobImage.Width), float32(downBlobImage.Height), &downBlobTexture, downBlobImage)
+					fld.draw(float32(xp+dX), float32(yp+dY), downBlob)
 				}
 			}
 		}
@@ -97,11 +81,11 @@ func NewField(app *Application) *Field {
 	return fld
 }
 
-func (c *Field) draw(x, y, width, height float32, texture *rl.Texture2D, image *rl.Image) {
-	sourceRect := rl.NewRectangle(0, 0, width, height)
-	destRect := rl.NewRectangle(x, y, width, height)
-	rl.DrawTexturePro(*texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
-	rl.ImageDraw(c.image, image, sourceRect, destRect, rl.White)
+func (c *Field) draw(x float32, y float32, textureImage *TextureImage) {
+	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)
+	destRect := rl.NewRectangle(x, y, textureImage.width, textureImage.height)
+	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
+	rl.ImageDraw(c.image, textureImage.image, sourceRect, destRect, rl.White)
 }
 
 func (c *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {

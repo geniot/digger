@@ -15,26 +15,17 @@ type Digger struct {
 	direction        Direction
 	spritePointer    int
 	spritePointerInc int
-	sprites          []rl.Texture2D
+	sprites          []*TextureImage
 }
 
 func NewDigger(app *Application) *Digger {
 	digger := &Digger{}
 	digger.app = app
 
-	digger.sprites = make([]rl.Texture2D, 3)
-
-	dg1Bytes := orPanicRes(resList.ReadFile("res/cldig1.png"))
-	dg1Image := rl.LoadImageFromMemory(".png", dg1Bytes, int32(len(dg1Bytes)))
-	digger.sprites[0] = rl.LoadTextureFromImage(dg1Image)
-
-	dg2Bytes := orPanicRes(resList.ReadFile("res/cldig2.png"))
-	dg2Image := rl.LoadImageFromMemory(".png", dg2Bytes, int32(len(dg2Bytes)))
-	digger.sprites[1] = rl.LoadTextureFromImage(dg2Image)
-
-	dg3Bytes := orPanicRes(resList.ReadFile("res/cldig3.png"))
-	dg3Image := rl.LoadImageFromMemory(".png", dg3Bytes, int32(len(dg3Bytes)))
-	digger.sprites[2] = rl.LoadTextureFromImage(dg3Image)
+	digger.sprites = make([]*TextureImage, 3)
+	digger.sprites[0] = NewTextureImage("cldig1.png")
+	digger.sprites[1] = NewTextureImage("cldig2.png")
+	digger.sprites[2] = NewTextureImage("cldig3.png")
 
 	//same for all levels
 	cellX := int32(7)
@@ -57,7 +48,7 @@ func (digger *Digger) Update(drawTarget rl.RenderTexture2D, frame int64) {
 	destRec := rl.NewRectangle(float32(digger.posX), float32(digger.posY), float32(CELL_WIDTH), float32(CELL_HEIGHT))
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexturePro(
-		digger.sprites[digger.spritePointer],
+		digger.sprites[digger.spritePointer].texture,
 		sourceRec,
 		destRec,
 		rl.Vector2{},
