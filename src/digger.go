@@ -51,7 +51,7 @@ func (digger *Digger) Update(drawTarget rl.RenderTexture2D, frame int64) {
 		digger.sprites[digger.spritePointer].texture,
 		sourceRec,
 		destRec,
-		rl.Vector2{},
+		ZERO_VECTOR2,
 		0,
 		rl.White)
 	rl.EndTextureMode()

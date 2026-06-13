@@ -91,6 +91,7 @@ func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
 func (field *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
 	rl.BeginTextureMode(drawTarget)
 	//field.Debug()
+	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.sourceRec, ZERO_VECTOR2, rl.White)
 	rl.DrawTexturePro(field.texture.Texture, field.sourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 }
@@ -99,9 +100,10 @@ func (field *Field) Debug() {
 	clone1 := rl.ImageCopy(field.image)
 	rl.ImageFlipVertical(clone1)
 	colors1 := rl.LoadImageColors(clone1)
-
+	defer rl.UnloadImageColors(colors1)
 	clone2 := rl.LoadImageFromTexture(field.texture.Texture)
 	colors2 := rl.LoadImageColors(clone2)
+	defer rl.UnloadImageColors(colors2)
 
 	println(len(colors1))
 	if len(colors1) != len(colors2) {

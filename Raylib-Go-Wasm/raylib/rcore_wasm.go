@@ -2434,10 +2434,13 @@ func ImageColorReplace(image *Image, col color.RGBA, replace color.RGBA) {
 //
 // NOTE: Memory allocated should be freed using UnloadImageColors()
 func LoadImageColors(image *Image) []color.RGBA {
-	ret, fl := loadImageColors.Call(wasm.Struct(*image))
-	v := wasm.ReadStruct[[]color.RGBA](ret)
-	wasm.Free(fl...)
-	return v
+	var colorData = make([]color.RGBA, image.Width*image.Height)
+	ret, _ := loadImageColors.Call(wasm.Struct(*image))
+	ptr := ret.(wasmrt.Ptr)
+	wasmrt.CopySliceToGo(ptr, colorData)
+	/// it is wrong to call wasm.Free(fl...)
+	// instead do unloadImageColors.Call(ret)
+	return colorData
 }
 
 // LoadImagePalette - Load colors palette from image as a Color array (RGBA - 32bit)
