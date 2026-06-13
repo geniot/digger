@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Digger
-Comment=Run and collect
-Exec=digger.gcw
-Terminal=false
-Type=Application
-StartupNotify=true
-Icon=digger
-Categories=games;

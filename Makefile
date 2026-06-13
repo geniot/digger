@@ -33,6 +33,8 @@ deploy:
 
 opk: clean mips squash deploy
 
-#on PG2 use opkrun
+wasm:
+	go mod tidy -modfile go.wasm.mod
+	GOOS=js GOARCH=wasm go build -modfile go.wasm.mod -tags="wasm" -o ./docs/main.wasm digger/src digger/src
 
 
