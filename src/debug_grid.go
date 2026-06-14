@@ -12,10 +12,10 @@ type DebugGrid struct {
 func NewDebugGrid(app *Application) *DebugGrid {
 	debugGrid := &DebugGrid{}
 	debugGrid.app = app
-	debugGrid.sourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
-	debugGrid.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
+	debugGrid.sourceRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), -float32(SCREEN_LOGICAL_HEIGHT)) //see https://github.com/raysan5/raylib/issues/3803
+	debugGrid.destRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(SCREEN_LOGICAL_HEIGHT))
 
-	debugGrid.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
+	debugGrid.texture = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 	rl.BeginTextureMode(debugGrid.texture)
 	for y := int32(0); y < CELLS_VERTICAL+1; y += 1 {
 		rl.DrawLine(0, y*CELL_HEIGHT+FIELD_OFFSET_Y, FIELD_WIDTH, y*CELL_HEIGHT+FIELD_OFFSET_Y, rl.White)
@@ -24,6 +24,7 @@ func NewDebugGrid(app *Application) *DebugGrid {
 	for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
 		rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
 	}
+	rl.DrawRectangleLines(1, 0, SCREEN_LOGICAL_WIDTH-1, SCREEN_LOGICAL_HEIGHT-1, rl.Yellow)
 	rl.EndTextureMode()
 
 	return debugGrid
