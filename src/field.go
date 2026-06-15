@@ -101,6 +101,7 @@ func (field *Field) Debug() {
 	rl.ImageFlipVertical(clone1)
 	colors1 := rl.LoadImageColors(clone1)
 	defer rl.UnloadImageColors(colors1)
+
 	clone2 := rl.LoadImageFromTexture(field.texture.Texture)
 	colors2 := rl.LoadImageColors(clone2)
 	defer rl.UnloadImageColors(colors2)

@@ -14,6 +14,15 @@ const (
 	NONE
 )
 
+var (
+	keysToDirectionsMap = map[int32]Direction{
+		rl.KeyLeft:  LEFT,
+		rl.KeyRight: RIGHT,
+		rl.KeyUp:    UP,
+		rl.KeyDown:  DOWN,
+	}
+)
+
 const (
 	SCREEN_LOGICAL_WIDTH  = int32(320)
 	SCREEN_LOGICAL_HEIGHT = int32(240)
@@ -48,7 +57,17 @@ func (gs *GameScene) ShouldExit() bool {
 }
 
 func (gs *GameScene) Update(drawTarget rl.RenderTexture2D, frame int64) {
+	gs.handleUserInput()
 	gs.field.Update(drawTarget, frame)
 	gs.digger.Update(drawTarget, frame)
 	gs.debugGrid.Update(drawTarget, frame)
+}
+
+func (gs *GameScene) handleUserInput() {
+	gs.digger.shouldMove = false
+	gs.digger.direction = NONE
+	if direction, ok := keysToDirectionsMap[rl.GetKeyPressed()]; ok {
+		gs.digger.direction = direction
+		gs.digger.shouldMove = true
+	}
 }

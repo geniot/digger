@@ -13,6 +13,7 @@ type Digger struct {
 	innerOffsetX     int32
 	innerOffsetY     int32
 	direction        Direction
+	shouldMove       bool
 	spritePointer    int
 	spritePointerInc int
 	sprites          []*TextureImage
@@ -37,6 +38,7 @@ func NewDigger(app *Application) *Digger {
 	digger.posX = FIELD_OFFSET_X + cellX*CELL_WIDTH - digger.innerOffsetX
 	digger.posY = FIELD_OFFSET_Y + cellY*CELL_HEIGHT - digger.innerOffsetY
 	digger.direction = RIGHT
+	digger.shouldMove = false
 	return digger
 }
 
