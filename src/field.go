@@ -10,18 +10,20 @@ const (
 )
 
 type Field struct {
-	app       *Application
-	texture   rl.RenderTexture2D
-	image     *rl.Image
-	sourceRec rl.Rectangle
-	destRec   rl.Rectangle
+	app              *Application
+	texture          rl.RenderTexture2D
+	image            *rl.Image
+	textureSourceRec rl.Rectangle
+	imageSourceRec   rl.Rectangle
+	destRec          rl.Rectangle
 }
 
 func NewField(app *Application) *Field {
 	fld := &Field{}
 	fld.app = app
 
-	fld.sourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	fld.textureSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
+	fld.imageSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
 	bg := NewTextureImage("cback1.png")
@@ -89,10 +91,10 @@ func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
 }
 
 func (field *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
-	rl.BeginTextureMode(drawTarget)
 	//field.Debug()
-	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.sourceRec, ZERO_VECTOR2, rl.White)
-	rl.DrawTexturePro(field.texture.Texture, field.sourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
+	rl.BeginTextureMode(drawTarget)
+	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)
+	rl.DrawTexturePro(field.texture.Texture, field.textureSourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 }
 
@@ -106,14 +108,14 @@ func (field *Field) Debug() {
 	colors2 := rl.LoadImageColors(clone2)
 	defer rl.UnloadImageColors(colors2)
 
-	println(len(colors1))
+	//println(len(colors1))
 	if len(colors1) != len(colors2) {
 		panic("colors are different")
 	}
 	for i := 0; i < len(colors1); i++ {
-		println("ok")
 		if colors1[i].R != colors2[i].R || colors1[i].G != colors2[i].G || colors1[i].B != colors2[i].B || colors1[i].A != colors2[i].A {
-			println("colors are different")
+			println(colors1[i].R, " ", colors1[i].G, " ", colors1[i].B, " ", colors1[i].A, " ")
+			println(colors2[i].R, " ", colors2[i].G, " ", colors2[i].B, " ", colors2[i].A, " ")
 			panic("colors are different")
 		}
 	}
