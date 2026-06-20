@@ -42,16 +42,16 @@ func orPanicRes[T any](res T, err interface{}) T {
 }
 
 func setDefaultTextStyle() {
-	setTextStyle(40, 10, int64(gui.TEXT_ALIGN_LEFT), 20)
+	setTextStyle(40, 10, gui.TEXT_ALIGN_LEFT, 20)
 }
 
-func setTextStyle(ts int64, sp int64, ta int64, pp int64) {
+func setTextStyle(ts gui.PropertyValue, sp gui.PropertyValue, ta gui.PropertyValue, pp gui.PropertyValue) {
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_SIZE, ts)
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_SPACING, sp)
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_ALIGNMENT, ta)
 	gui.SetStyle(gui.DEFAULT, gui.TEXT_PADDING, pp)
-	gui.SetStyle(gui.DEFAULT, gui.TEXT_ALIGNMENT_VERTICAL, int64(gui.TEXT_ALIGN_CENTER))
-	gui.SetStyle(gui.TEXTBOX, gui.TEXT_ALIGNMENT, int64(gui.TEXT_ALIGN_LEFT))
+	gui.SetStyle(gui.DEFAULT, gui.TEXT_ALIGNMENT_VERTICAL, gui.TEXT_ALIGN_CENTER)
+	gui.SetStyle(gui.TEXTBOX, gui.TEXT_ALIGNMENT, gui.TEXT_ALIGN_LEFT)
 }
 
 func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
