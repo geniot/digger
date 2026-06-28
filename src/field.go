@@ -10,7 +10,7 @@ const (
 )
 
 type Field struct {
-	app              *Application
+	scene            *GameScene
 	texture          rl.RenderTexture2D
 	image            *rl.Image
 	textureSourceRec rl.Rectangle
@@ -18,9 +18,9 @@ type Field struct {
 	destRec          rl.Rectangle
 }
 
-func NewField(app *Application) *Field {
+func NewField(scene *GameScene) *Field {
 	fld := &Field{}
-	fld.app = app
+	fld.scene = scene
 
 	fld.textureSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
 	fld.imageSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
@@ -118,5 +118,21 @@ func (field *Field) Debug() {
 			println(colors2[i].R, " ", colors2[i].G, " ", colors2[i].B, " ", colors2[i].A, " ")
 			panic("colors are different")
 		}
+	}
+}
+
+func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) bool {
+	//screen bounds
+	switch dir {
+	case RIGHT:
+		return offsetX < CELL_WIDTH*(CELLS_HORIZONTAL-1)
+	case LEFT:
+		return offsetX > 0
+	case UP:
+		return offsetY > FIELD_OFFSET_Y
+	case DOWN:
+		return offsetY < FIELD_OFFSET_Y+CELL_HEIGHT*(CELLS_VERTICAL-1)
+	default:
+		return true
 	}
 }

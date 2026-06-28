@@ -1,12 +1,15 @@
 package main
 
 import (
+	"strconv"
+
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var (
-	ZERO_VECTOR2 = rl.Vector2{}
+	ZERO_VECTOR2        = rl.Vector2{}
+	CELL_CENTER_VECTOR2 = rl.Vector2{X: float32(CELL_WIDTH / 2), Y: float32(CELL_HEIGHT / 2)}
 )
 
 func orPanic(err interface{}) {
@@ -67,4 +70,19 @@ func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, sprite
 		nextSpritePointerInc = -spritePointerInc
 	}
 	return nextSpritePointer, nextSpritePointerInc
+}
+
+func Opposite(dir Direction) Direction {
+	if dir == UP {
+		return DOWN
+	} else if dir == DOWN {
+		return UP
+	} else if dir == LEFT {
+		return RIGHT
+	} else if dir == RIGHT {
+		return LEFT
+	} else {
+		println("Unidentified direction: " + strconv.FormatInt(int64(dir), 10))
+		return dir
+	}
 }

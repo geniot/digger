@@ -45,9 +45,9 @@ type GameScene struct {
 func NewGameScene(a *Application) *GameScene {
 	gameScene := GameScene{}
 	gameScene.a = a
-	gameScene.field = NewField(a)
-	gameScene.digger = NewDigger(a)
-	gameScene.debugGrid = NewDebugGrid(a)
+	gameScene.field = NewField(&gameScene)
+	gameScene.digger = NewDigger(&gameScene)
+	gameScene.debugGrid = NewDebugGrid(&gameScene)
 	gameScene.isStarted = false
 	return &gameScene
 }
@@ -65,9 +65,10 @@ func (gs *GameScene) Update(drawTarget rl.RenderTexture2D, frame int64) {
 
 func (gs *GameScene) handleUserInput() {
 	gs.digger.shouldMove = false
-	gs.digger.direction = NONE
-	if direction, ok := keysToDirectionsMap[rl.GetKeyPressed()]; ok {
-		gs.digger.direction = direction
-		gs.digger.shouldMove = true
+	for k, v := range keysToDirectionsMap {
+		if rl.IsKeyDown(k) {
+			gs.digger.direction = v
+			gs.digger.shouldMove = true
+		}
 	}
 }

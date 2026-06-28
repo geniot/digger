@@ -3,15 +3,15 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type DebugGrid struct {
-	app       *Application
+	scene     *GameScene
 	texture   rl.RenderTexture2D
 	sourceRec rl.Rectangle
 	destRec   rl.Rectangle
 }
 
-func NewDebugGrid(app *Application) *DebugGrid {
+func NewDebugGrid(scene *GameScene) *DebugGrid {
 	debugGrid := &DebugGrid{}
-	debugGrid.app = app
+	debugGrid.scene = scene
 	debugGrid.sourceRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), -float32(SCREEN_LOGICAL_HEIGHT)) //see https://github.com/raysan5/raylib/issues/3803
 	debugGrid.destRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(SCREEN_LOGICAL_HEIGHT))
 
@@ -24,7 +24,7 @@ func NewDebugGrid(app *Application) *DebugGrid {
 	for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
 		rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
 	}
-	rl.DrawRectangleLines(1, 0, SCREEN_LOGICAL_WIDTH-1, SCREEN_LOGICAL_HEIGHT-1, rl.Yellow)
+	rl.DrawRectangleLines(0, 0, SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT, rl.Yellow)
 	rl.EndTextureMode()
 
 	return debugGrid
@@ -33,5 +33,6 @@ func NewDebugGrid(app *Application) *DebugGrid {
 func (debugGrid *DebugGrid) Update(drawTarget rl.RenderTexture2D, _ int64) {
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexturePro(debugGrid.texture.Texture, debugGrid.sourceRec, debugGrid.destRec, ZERO_VECTOR2, 0, rl.White)
+	//rl.DrawFPS(5, 5)
 	rl.EndTextureMode()
 }
