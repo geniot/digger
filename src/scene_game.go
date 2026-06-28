@@ -52,18 +52,7 @@ func NewGameScene(a *Application) *GameScene {
 	return &gameScene
 }
 
-func (gs *GameScene) ShouldExit() bool {
-	return rl.IsKeyPressed(rl.KeyEscape) || (rl.IsGamepadButtonDown(gamePadId, menuCode) && rl.IsGamepadButtonDown(gamePadId, startCode))
-}
-
-func (gs *GameScene) Update(drawTarget rl.RenderTexture2D, frame int64) {
-	gs.handleUserInput()
-	gs.field.Update(drawTarget, frame)
-	gs.digger.Update(drawTarget, frame)
-	gs.debugGrid.Update(drawTarget, frame)
-}
-
-func (gs *GameScene) handleUserInput() {
+func (gs *GameScene) ProcessInput() {
 	gs.digger.shouldMove = false
 	for k, v := range keysToDirectionsMap {
 		if rl.IsKeyDown(k) {
@@ -71,4 +60,20 @@ func (gs *GameScene) handleUserInput() {
 			gs.digger.shouldMove = true
 		}
 	}
+}
+
+func (gs *GameScene) Update(tick int64) {
+	gs.field.Update(tick)
+	gs.digger.Update(tick)
+	gs.debugGrid.Update(tick)
+}
+
+func (gs *GameScene) Render(drawTarget rl.RenderTexture2D) {
+	gs.field.Render(drawTarget)
+	gs.digger.Render(drawTarget)
+	gs.debugGrid.Render(drawTarget)
+}
+
+func (gs *GameScene) ShouldExit() bool {
+	return rl.IsKeyPressed(rl.KeyEscape) || (rl.IsGamepadButtonDown(gamePadId, menuCode) && rl.IsGamepadButtonDown(gamePadId, startCode))
 }

@@ -9,6 +9,8 @@ const (
 )
 
 type Scene interface {
-	Update(drawTarget rl.RenderTexture2D, frame int64)
+	ProcessInput()
+	Update(tick int64)
+	Render(drawTarget rl.RenderTexture2D)
 	ShouldExit() bool
 }

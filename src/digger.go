@@ -3,8 +3,8 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 const (
-	SPRITE_UPDATE_RATE = 5
-	DIGGER_SPEED       = 1 //less is faster
+	SPRITE_UPDATE_RATE = 18
+	DIGGER_SPEED       = 4 //less is faster
 )
 
 type Digger struct {
@@ -43,11 +43,11 @@ func NewDigger(scene *GameScene) *Digger {
 	return digger
 }
 
-func (digger *Digger) Update(drawTarget rl.RenderTexture2D, frame int64) {
-	if frame%SPRITE_UPDATE_RATE == 0 {
+func (digger *Digger) Update(tick int64) {
+	if tick%SPRITE_UPDATE_RATE == 0 {
 		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.sprites))
 	}
-	if frame%DIGGER_SPEED == 0 && digger.shouldMove {
+	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
 		if digger.direction == RIGHT {
 			digger.handleMove(RIGHT, UP, DOWN, (FIELD_OFFSET_Y+digger.posY)%CELL_HEIGHT)
 		} else if digger.direction == LEFT {
@@ -58,6 +58,9 @@ func (digger *Digger) Update(drawTarget rl.RenderTexture2D, frame int64) {
 			digger.handleMove(DOWN, LEFT, RIGHT, (digger.posX)%CELL_WIDTH)
 		}
 	}
+}
+
+func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 	sourceRec := rl.NewRectangle(0, 0, float32(IfInt(digger.direction == LEFT, CELL_WIDTH, -CELL_WIDTH)), float32(CELL_HEIGHT))
 	destRec := rl.NewRectangle(float32(digger.posX), float32(digger.posY), float32(CELL_WIDTH), float32(CELL_HEIGHT))
 	rl.BeginTextureMode(drawTarget)

@@ -4,38 +4,14 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+const TICK float64 = 1.0 / 200.0
+
 type Application struct {
 	scenes            map[int]Scene
-	frame             int64
 	drawTarget        rl.RenderTexture2D
 	currentSceneIndex int
 	sourceRect        rl.Rectangle
 	destRect          rl.Rectangle
-}
-
-func (a *Application) ShouldExit() bool {
-	return rl.WindowShouldClose() || a.scenes[a.currentSceneIndex].ShouldExit()
-}
-
-func (a *Application) Update() {
-	a.frame++
-	if rl.IsWindowResized() {
-		a.onResize()
-	}
-
-	a.scenes[a.currentSceneIndex].Update(a.drawTarget, a.frame)
-
-	rl.BeginDrawing()
-	rl.ClearBackground(rl.Black)
-	rl.DrawTexturePro(a.drawTarget.Texture,
-		a.sourceRect,
-		a.destRect,
-		ZERO_VECTOR2, 0, rl.White)
-	rl.EndDrawing()
-}
-
-func (a *Application) Exit() {
-	rl.CloseWindow()
 }
 
 func (a *Application) onResize() {
@@ -53,6 +29,28 @@ func (a *Application) onResize() {
 	)
 }
 
+func (a *Application) ProcessInput() {
+	if rl.IsWindowResized() {
+		a.onResize()
+	}
+	a.scenes[a.currentSceneIndex].ProcessInput()
+}
+
+func (a *Application) Update(tick int64) {
+	a.scenes[a.currentSceneIndex].Update(tick)
+}
+
+func (a *Application) Render() {
+	a.scenes[a.currentSceneIndex].Render(a.drawTarget)
+	rl.BeginDrawing()
+	rl.ClearBackground(rl.Black)
+	rl.DrawTexturePro(a.drawTarget.Texture,
+		a.sourceRect,
+		a.destRect,
+		ZERO_VECTOR2, 0, rl.White)
+	rl.EndDrawing()
+}
+
 func NewApplication() *Application {
 
 	app := Application{}
@@ -68,22 +66,22 @@ func NewApplication() *Application {
 
 	// scenes
 	app.scenes = make(map[int]Scene)
-	//app.scenes[menuSceneKey] = NewMenuScene(&app)
 	app.scenes[gameSceneKey] = NewGameScene(&app)
-	//app.scenes[tutorialSceneKey] = NewTutorialScene(&app)
-	//app.scenes[controlsSceneKey] = NewControlsScene(&app)
 	app.currentSceneIndex = gameSceneKey
 
 	//debug
 	//app.currentSceneIndex = controlsSceneKey
 
-	app.frame = 0
 	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
-	//rl.BeginTextureMode(app.drawTarget)
-	//rl.ClearBackground(rl.RayWhite)
-	//rl.EndTextureMode()
-
 	app.onResize()
 
 	return &app
+}
+
+func (a *Application) ShouldExit() bool {
+	return rl.WindowShouldClose() || a.scenes[a.currentSceneIndex].ShouldExit()
+}
+
+func (a *Application) Exit() {
+	rl.CloseWindow()
 }

@@ -90,7 +90,10 @@ func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
 	rl.ImageDraw(field.image, textureImage.image, sourceRect, destRect, rl.White)
 }
 
-func (field *Field) Update(drawTarget rl.RenderTexture2D, _ int64) {
+func (field *Field) Update(_ int64) {
+}
+
+func (field *Field) Render(drawTarget rl.RenderTexture2D) {
 	//field.Debug()
 	rl.BeginTextureMode(drawTarget)
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)

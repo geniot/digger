@@ -30,7 +30,10 @@ func NewDebugGrid(scene *GameScene) *DebugGrid {
 	return debugGrid
 }
 
-func (debugGrid *DebugGrid) Update(drawTarget rl.RenderTexture2D, _ int64) {
+func (debugGrid *DebugGrid) Update(_ int64) {
+}
+
+func (debugGrid *DebugGrid) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexturePro(debugGrid.texture.Texture, debugGrid.sourceRec, debugGrid.destRec, ZERO_VECTOR2, 0, rl.White)
 	//rl.DrawFPS(5, 5)
