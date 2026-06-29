@@ -24,7 +24,12 @@ func NewDebugGrid(scene *GameScene) *DebugGrid {
 	for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
 		rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
 	}
-	rl.DrawRectangleLines(1, 0, SCREEN_LOGICAL_WIDTH-1, SCREEN_LOGICAL_HEIGHT-1, rl.Yellow)
+	rl.DrawRectangleLinesEx(rl.Rectangle{
+		X:      0,
+		Y:      0,
+		Width:  float32(SCREEN_LOGICAL_WIDTH),
+		Height: float32(SCREEN_LOGICAL_HEIGHT),
+	}, 1, rl.Yellow)
 	rl.EndTextureMode()
 
 	return debugGrid
