@@ -2,11 +2,6 @@ package main
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-const (
-	SPRITE_UPDATE_RATE = 18
-	DIGGER_SPEED       = 4 //less is faster
-)
-
 type Digger struct {
 	scene            *GameScene
 	posX             int32

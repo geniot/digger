@@ -4,8 +4,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-const TICK float64 = 1.0 / 200.0
-
 type Application struct {
 	scenes            map[int]Scene
 	drawTarget        rl.RenderTexture2D

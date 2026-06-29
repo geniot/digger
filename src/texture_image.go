@@ -1,14 +1,7 @@
 package main
 
 import (
-	"embed"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
-)
-
-var (
-	//go:embed res/*
-	resList embed.FS
 )
 
 type TextureImage struct {

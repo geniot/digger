@@ -4,12 +4,6 @@ import (
 	"strconv"
 
 	gui "github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
-)
-
-var (
-	ZERO_VECTOR2        = rl.Vector2{}
-	CELL_CENTER_VECTOR2 = rl.Vector2{X: float32(CELL_WIDTH / 2), Y: float32(CELL_HEIGHT / 2)}
 )
 
 func orPanic(err interface{}) {

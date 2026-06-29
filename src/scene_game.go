@@ -6,34 +6,6 @@ import (
 
 type Direction int32
 
-const (
-	UP Direction = iota
-	DOWN
-	LEFT
-	RIGHT
-	NONE
-)
-
-var (
-	keysToDirectionsMap = map[int32]Direction{
-		rl.KeyLeft:  LEFT,
-		rl.KeyRight: RIGHT,
-		rl.KeyUp:    UP,
-		rl.KeyDown:  DOWN,
-	}
-)
-
-const (
-	SCREEN_LOGICAL_WIDTH  = int32(320)
-	SCREEN_LOGICAL_HEIGHT = int32(240)
-	CELLS_HORIZONTAL      = int32(15)
-	CELLS_VERTICAL        = int32(10)
-	CELL_WIDTH            = int32(20)
-	CELL_HEIGHT           = int32(18)
-	FIELD_OFFSET_X        = int32(10)
-	FIELD_OFFSET_Y        = int32(2)
-)
-
 type GameScene struct {
 	a         *Application
 	field     *Field

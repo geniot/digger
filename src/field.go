@@ -4,11 +4,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-const (
-	FIELD_WIDTH  = 320
-	FIELD_HEIGHT = 186
-)
-
 type Field struct {
 	scene            *GameScene
 	texture          rl.RenderTexture2D
