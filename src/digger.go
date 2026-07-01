@@ -1,28 +1,50 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type Digger struct {
 	scene            *GameScene
 	posX             int32
 	posY             int32
+	width            int32
+	height           int32
 	innerOffsetX     int32
 	innerOffsetY     int32
 	direction        Direction
 	shouldMove       bool
 	spritePointer    int
 	spritePointerInc int
-	sprites          []*TextureImage
+	leftSprites      []*TextureImage
+	rightSprites     []*TextureImage
+	upSprites        []*TextureImage
+	downSprites      []*TextureImage
 }
 
 func NewDigger(scene *GameScene) *Digger {
 	digger := &Digger{}
 	digger.scene = scene
 
-	digger.sprites = make([]*TextureImage, 3)
-	digger.sprites[0] = NewTextureImage("cldig1.png")
-	digger.sprites[1] = NewTextureImage("cldig2.png")
-	digger.sprites[2] = NewTextureImage("cldig3.png")
+	digger.leftSprites = make([]*TextureImage, 3)
+	digger.leftSprites[0] = NewTextureImage("cldig1.png", 0, false, false)
+	digger.leftSprites[1] = NewTextureImage("cldig2.png", 0, false, false)
+	digger.leftSprites[2] = NewTextureImage("cldig3.png", 0, false, false)
+
+	digger.rightSprites = make([]*TextureImage, 3)
+	digger.rightSprites[0] = NewTextureImage("cldig1.png", 0, true, false)
+	digger.rightSprites[1] = NewTextureImage("cldig2.png", 0, true, false)
+	digger.rightSprites[2] = NewTextureImage("cldig3.png", 0, true, false)
+
+	digger.upSprites = make([]*TextureImage, 3)
+	digger.upSprites[0] = NewTextureImage("cldig1.png", 90, false, false)
+	digger.upSprites[1] = NewTextureImage("cldig2.png", 90, false, false)
+	digger.upSprites[2] = NewTextureImage("cldig3.png", 90, false, false)
+
+	digger.downSprites = make([]*TextureImage, 3)
+	digger.downSprites[0] = NewTextureImage("cldig1.png", 90, false, true)
+	digger.downSprites[1] = NewTextureImage("cldig2.png", 90, false, true)
+	digger.downSprites[2] = NewTextureImage("cldig3.png", 90, false, true)
 
 	//same for all levels
 	cellX := int32(7)
@@ -31,8 +53,10 @@ func NewDigger(scene *GameScene) *Digger {
 	digger.innerOffsetY = int32(1)
 	digger.spritePointer = 0
 	digger.spritePointerInc = 1
-	digger.posX = FIELD_OFFSET_X + cellX*CELL_WIDTH - digger.innerOffsetX + CELL_WIDTH/2
-	digger.posY = FIELD_OFFSET_Y + cellY*CELL_HEIGHT - digger.innerOffsetY + CELL_HEIGHT/2
+	digger.width = 16
+	digger.height = 16
+	digger.posX = FIELD_OFFSET_X + cellX*CELL_WIDTH - digger.innerOffsetX
+	digger.posY = FIELD_OFFSET_Y + cellY*CELL_HEIGHT - digger.innerOffsetY
 	digger.direction = RIGHT
 	digger.shouldMove = false
 	return digger
@@ -40,81 +64,51 @@ func NewDigger(scene *GameScene) *Digger {
 
 func (digger *Digger) Update(tick int64) {
 	if tick%SPRITE_UPDATE_RATE == 0 {
-		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.sprites))
+		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.leftSprites))
 	}
-	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
-		if digger.direction == RIGHT {
-			digger.handleMove(RIGHT, UP, DOWN, (FIELD_OFFSET_Y+digger.posY)%CELL_HEIGHT)
-		} else if digger.direction == LEFT {
-			digger.handleMove(LEFT, UP, DOWN, (FIELD_OFFSET_Y+digger.posY)%CELL_HEIGHT)
-		} else if digger.direction == UP {
-			digger.handleMove(UP, LEFT, RIGHT, (digger.posX)%CELL_WIDTH)
-		} else if digger.direction == DOWN {
-			digger.handleMove(DOWN, LEFT, RIGHT, (digger.posX)%CELL_WIDTH)
-		}
+	if tick%DIGGER_SPEED == 0 && digger.shouldMove && digger.canMove() {
+		x := If(digger.direction == RIGHT, 1, If(digger.direction == LEFT, -1, 0))
+		y := If(digger.direction == DOWN, 1, If(digger.direction == UP, -1, 0))
+		digger.posX += int32(x)
+		digger.posY += int32(y)
+	}
+}
+
+func (digger *Digger) canMove() bool {
+	return digger.scene.field.isWithinBounds(digger.direction, digger.getCollisionRec())
+}
+
+func (digger *Digger) getSprites() []*TextureImage {
+	switch digger.direction {
+	case RIGHT:
+		return digger.rightSprites
+	case LEFT:
+		return digger.leftSprites
+	case UP:
+		return digger.upSprites
+	case DOWN:
+		return digger.downSprites
+	default:
+		return digger.rightSprites
+	}
+}
+
+func (digger *Digger) getCollisionRec() rl.Rectangle {
+	return rl.Rectangle{
+		X:      float32(digger.posX + (CELL_WIDTH-digger.width)/2),
+		Y:      float32(digger.posY + (CELL_WIDTH-digger.height)/2),
+		Width:  float32(digger.width),
+		Height: float32(digger.height),
 	}
 }
 
 func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
-	sourceRec := rl.NewRectangle(0, 0, float32(IfInt(digger.direction == LEFT, CELL_WIDTH, -CELL_WIDTH)), float32(CELL_HEIGHT))
-	destRec := rl.NewRectangle(float32(digger.posX), float32(digger.posY), float32(CELL_WIDTH), float32(CELL_HEIGHT))
+	sprites := digger.getSprites()
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTexturePro(
-		digger.sprites[digger.spritePointer].texture,
-		sourceRec,
-		destRec,
-		CELL_CENTER_VECTOR2,
-		float32(IfInt(digger.direction == LEFT || digger.direction == RIGHT, 0, IfInt(digger.direction == UP, 270, 90))),
+	rl.DrawTexture(
+		sprites[digger.spritePointer].texture,
+		digger.posX, digger.posY,
 		rl.White)
+	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()
-}
-
-func (digger *Digger) handleMove(dir1 Direction, dir2 Direction, dir3 Direction, mod int32) {
-	if digger.direction == dir1 {
-		if cM, _ := digger.canMoveShouldTurn(dir1); cM {
-			digger.move(dir1)
-		}
-	} else if digger.direction == Opposite(dir1) {
-		digger.direction = dir1
-	} else {
-		if mod != 0 {
-			if digger.direction == dir2 {
-				cM, sT := digger.canMoveShouldTurn(dir2)
-				if cM {
-					digger.move(dir2)
-				}
-				if sT {
-					digger.direction = Opposite(dir2)
-				}
-			} else if digger.direction == dir3 {
-				cM, sT := digger.canMoveShouldTurn(dir3)
-				if cM {
-					digger.move(dir3)
-				}
-				if sT {
-					digger.direction = Opposite(dir3)
-				}
-			}
-		} else {
-			digger.direction = dir1
-		}
-	}
-}
-
-func (digger *Digger) canMoveShouldTurn(dir Direction) (bool, bool) {
-	if !digger.scene.field.isWithinBounds(dir, digger.posX, digger.posY) {
-		return false, false
-	}
-	return true, false
-}
-
-func (digger *Digger) move(dir Direction) {
-	digger.direction = dir
-	x := If(dir == RIGHT, 1, If(dir == LEFT, -1, 0))
-	y := If(dir == DOWN, 1, If(dir == UP, -1, 0))
-	digger.posX += int32(x)
-	digger.posY += int32(y)
-	//digger.collisionObject.X = float64(digger.offsetX + digger.innerOffsetX)
-	//digger.collisionObject.Y = float64(digger.offsetY + digger.innerOffsetY)
-	//digger.collisionObject.Update()
 }

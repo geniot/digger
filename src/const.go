@@ -27,6 +27,10 @@ const (
 	controlsSceneKey
 )
 
+var (
+	TransparentYellow = rl.NewColor(253, 249, 0, 100)
+)
+
 const (
 	UP Direction = iota
 	DOWN

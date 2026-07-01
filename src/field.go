@@ -11,6 +11,11 @@ type Field struct {
 	textureSourceRec rl.Rectangle
 	imageSourceRec   rl.Rectangle
 	destRec          rl.Rectangle
+
+	rightBoundingRec rl.Rectangle
+	leftBoundingRec  rl.Rectangle
+	upBoundingRec    rl.Rectangle
+	downBoundingRec  rl.Rectangle
 }
 
 func NewField(scene *GameScene) *Field {
@@ -21,14 +26,19 @@ func NewField(scene *GameScene) *Field {
 	fld.imageSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
-	bg := NewTextureImage("cback1.png")
-	upBlob := NewTextureImage("cublob.png")
-	downBlob := NewTextureImage("cdblob.png")
-	leftBlob := NewTextureImage("clblob.png")
-	rightBlob := NewTextureImage("crblob.png")
+	bg := NewTextureImage("cback1.png", 0, false, false)
+	upBlob := NewTextureImage("cublob.png", 0, false, false)
+	downBlob := NewTextureImage("cdblob.png", 0, false, false)
+	leftBlob := NewTextureImage("clblob.png", 0, false, false)
+	rightBlob := NewTextureImage("crblob.png", 0, false, false)
 
 	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
 	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
+
+	fld.rightBoundingRec = rl.NewRectangle(float32(FIELD_WIDTH-FIELD_OFFSET_X), 0, 5, FIELD_HEIGHT)
+	fld.leftBoundingRec = rl.NewRectangle(float32(FIELD_OFFSET_X), 0, 5, FIELD_HEIGHT)
+	fld.upBoundingRec = rl.NewRectangle(0, float32(FIELD_OFFSET_Y), FIELD_WIDTH, 5)
+	fld.downBoundingRec = rl.NewRectangle(0, FIELD_HEIGHT, FIELD_WIDTH, 5)
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
@@ -49,7 +59,7 @@ func NewField(scene *GameScene) *Field {
 
 	for x := int32(0); x < 15; x++ {
 		for y := int32(0); y < 10; y++ {
-			c := getLevelChar(x, y, levplan())
+			c := getLevelChar(x, y, LevelPlan())
 			if c == 'S' || c == 'V' || c == 'H' {
 				xp := x*20 + 12
 				yp := y*18 + 18
@@ -65,10 +75,10 @@ func NewField(scene *GameScene) *Field {
 					}
 					fld.draw(float32(xp+4+lX), float32(yp+lY), leftBlob)
 				}
-				if x < 14 && (getLevelChar(x+1, y, levplan()) == 'H' || getLevelChar(x+1, y, levplan()) == 'S') {
+				if x < 14 && (getLevelChar(x+1, y, LevelPlan()) == 'H' || getLevelChar(x+1, y, LevelPlan()) == 'S') {
 					fld.draw(float32(xp+rX), float32(yp+rY), rightBlob)
 				}
-				if y < 9 && (getLevelChar(x, y+1, levplan()) == 'V' || getLevelChar(x, y+1, levplan()) == 'H') {
+				if y < 9 && (getLevelChar(x, y+1, LevelPlan()) == 'V' || getLevelChar(x, y+1, LevelPlan()) == 'H') {
 					fld.draw(float32(xp+dX), float32(yp+dY), downBlob)
 				}
 			}
@@ -93,6 +103,12 @@ func (field *Field) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)
 	rl.DrawTexturePro(field.texture.Texture, field.textureSourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
+
+	rl.DrawRectangleRec(field.rightBoundingRec, rl.Red)
+	//rl.DrawRectangleRec(field.leftBoundingRec, rl.Red)
+	//rl.DrawRectangleRec(field.upBoundingRec, rl.Red)
+	//rl.DrawRectangleRec(field.downBoundingRec, rl.Red)
+
 	rl.EndTextureMode()
 }
 
@@ -119,17 +135,17 @@ func (field *Field) Debug() {
 	}
 }
 
-func (field *Field) isWithinBounds(dir Direction, offsetX int32, offsetY int32) bool {
+func (field *Field) isWithinBounds(dir Direction, rec rl.Rectangle) bool {
 	//screen bounds
 	switch dir {
 	case RIGHT:
-		return offsetX < CELL_WIDTH*(CELLS_HORIZONTAL-1)
+		return rl.CheckCollisionRecs(rec, field.rightBoundingRec)
 	case LEFT:
-		return offsetX > 0
+		return rl.CheckCollisionRecs(rec, field.leftBoundingRec)
 	case UP:
-		return offsetY > FIELD_OFFSET_Y
+		return rl.CheckCollisionRecs(rec, field.upBoundingRec)
 	case DOWN:
-		return offsetY < FIELD_OFFSET_Y+CELL_HEIGHT*(CELLS_VERTICAL-1)
+		return rl.CheckCollisionRecs(rec, field.downBoundingRec)
 	default:
 		return true
 	}
