@@ -11,11 +11,6 @@ type Field struct {
 	textureSourceRec rl.Rectangle
 	imageSourceRec   rl.Rectangle
 	destRec          rl.Rectangle
-
-	rightBoundingRec rl.Rectangle
-	leftBoundingRec  rl.Rectangle
-	upBoundingRec    rl.Rectangle
-	downBoundingRec  rl.Rectangle
 }
 
 func NewField(scene *GameScene) *Field {
@@ -34,11 +29,6 @@ func NewField(scene *GameScene) *Field {
 
 	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
 	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
-
-	fld.rightBoundingRec = rl.NewRectangle(float32(FIELD_WIDTH-FIELD_OFFSET_X), 0, 5, FIELD_HEIGHT)
-	fld.leftBoundingRec = rl.NewRectangle(float32(FIELD_OFFSET_X), 0, 5, FIELD_HEIGHT)
-	fld.upBoundingRec = rl.NewRectangle(0, float32(FIELD_OFFSET_Y), FIELD_WIDTH, 5)
-	fld.downBoundingRec = rl.NewRectangle(0, FIELD_HEIGHT, FIELD_WIDTH, 5)
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
@@ -103,12 +93,6 @@ func (field *Field) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)
 	rl.DrawTexturePro(field.texture.Texture, field.textureSourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
-
-	rl.DrawRectangleRec(field.rightBoundingRec, rl.Red)
-	//rl.DrawRectangleRec(field.leftBoundingRec, rl.Red)
-	//rl.DrawRectangleRec(field.upBoundingRec, rl.Red)
-	//rl.DrawRectangleRec(field.downBoundingRec, rl.Red)
-
 	rl.EndTextureMode()
 }
 
@@ -136,17 +120,5 @@ func (field *Field) Debug() {
 }
 
 func (field *Field) isWithinBounds(dir Direction, rec rl.Rectangle) bool {
-	//screen bounds
-	switch dir {
-	case RIGHT:
-		return rl.CheckCollisionRecs(rec, field.rightBoundingRec)
-	case LEFT:
-		return rl.CheckCollisionRecs(rec, field.leftBoundingRec)
-	case UP:
-		return rl.CheckCollisionRecs(rec, field.upBoundingRec)
-	case DOWN:
-		return rl.CheckCollisionRecs(rec, field.downBoundingRec)
-	default:
-		return true
-	}
+	return true
 }

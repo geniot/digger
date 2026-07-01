@@ -29,6 +29,7 @@ const (
 
 var (
 	TransparentYellow = rl.NewColor(253, 249, 0, 100)
+	TransparentRed    = rl.NewColor(230, 41, 55, 100)
 )
 
 const (
