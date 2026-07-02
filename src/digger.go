@@ -26,25 +26,10 @@ func NewDigger(scene *GameScene) *Digger {
 	digger := &Digger{}
 	digger.scene = scene
 
-	digger.leftSprites = make([]*TextureImage, 3)
-	digger.leftSprites[0] = NewTextureImage("cldig1.png", 0, false, false)
-	digger.leftSprites[1] = NewTextureImage("cldig2.png", 0, false, false)
-	digger.leftSprites[2] = NewTextureImage("cldig3.png", 0, false, false)
-
-	digger.rightSprites = make([]*TextureImage, 3)
-	digger.rightSprites[0] = NewTextureImage("cldig1.png", 0, true, false)
-	digger.rightSprites[1] = NewTextureImage("cldig2.png", 0, true, false)
-	digger.rightSprites[2] = NewTextureImage("cldig3.png", 0, true, false)
-
-	digger.upSprites = make([]*TextureImage, 3)
-	digger.upSprites[0] = NewTextureImage("cldig1.png", 90, false, false)
-	digger.upSprites[1] = NewTextureImage("cldig2.png", 90, false, false)
-	digger.upSprites[2] = NewTextureImage("cldig3.png", 90, false, false)
-
-	digger.downSprites = make([]*TextureImage, 3)
-	digger.downSprites[0] = NewTextureImage("cldig1.png", 90, false, true)
-	digger.downSprites[1] = NewTextureImage("cldig2.png", 90, false, true)
-	digger.downSprites[2] = NewTextureImage("cldig3.png", 90, false, true)
+	digger.leftSprites = digger.initSprites(0, false, false)
+	digger.rightSprites = digger.initSprites(0, true, false)
+	digger.upSprites = digger.initSprites(90, false, false)
+	digger.downSprites = digger.initSprites(90, false, true)
 
 	//same for all levels
 	cellX := int32(7)
@@ -60,6 +45,14 @@ func NewDigger(scene *GameScene) *Digger {
 	digger.direction = RIGHT
 	digger.shouldMove = false
 	return digger
+}
+
+func (digger *Digger) initSprites(degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
+	sprites := make([]*TextureImage, 3)
+	sprites[0] = NewTextureImage("cldig1.png", degrees, flipHorizontal, flipVertical)
+	sprites[1] = NewTextureImage("cldig2.png", degrees, flipHorizontal, flipVertical)
+	sprites[2] = NewTextureImage("cldig3.png", degrees, flipHorizontal, flipVertical)
+	return sprites
 }
 
 func (digger *Digger) Update(tick int64) {
