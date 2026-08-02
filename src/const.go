@@ -21,6 +21,8 @@ const (
 	CELL_HEIGHT           = int32(18)
 	FIELD_OFFSET_X        = int32(10)
 	FIELD_OFFSET_Y        = int32(2)
+	DIGGER_INNER_OFFSET_X = int32(0)
+	DIGGER_INNER_OFFSET_Y = int32(1)
 
 	menuSceneKey = iota
 	gameSceneKey

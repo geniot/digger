@@ -19,9 +19,9 @@ func NewGameScene(a *Application) *GameScene {
 	gameScene := GameScene{}
 	gameScene.a = a
 	gameScene.field = NewField(&gameScene)
+	gameScene.moveGrid = NewMoveGrid(&gameScene)
 	gameScene.digger = NewDigger(&gameScene)
 	gameScene.debugGrid = NewDebugGrid(&gameScene)
-	gameScene.moveGrid = NewMoveGrid(&gameScene)
 	gameScene.isStarted = false
 	return &gameScene
 }
@@ -30,7 +30,7 @@ func (gs *GameScene) ProcessInput() {
 	gs.digger.shouldMove = false
 	for k, v := range keysToDirectionsMap {
 		if rl.IsKeyDown(k) {
-			gs.digger.direction = v
+			gs.digger.requestedDirection = v
 			gs.digger.shouldMove = true
 		}
 	}

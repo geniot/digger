@@ -5,21 +5,20 @@ import (
 )
 
 type Digger struct {
-	scene            *GameScene
-	posX             int32
-	posY             int32
-	width            int32
-	height           int32
-	innerOffsetX     int32
-	innerOffsetY     int32
-	direction        Direction
-	shouldMove       bool
-	spritePointer    int
-	spritePointerInc int
-	leftSprites      []*TextureImage
-	rightSprites     []*TextureImage
-	upSprites        []*TextureImage
-	downSprites      []*TextureImage
+	scene              *GameScene
+	posX               int32
+	posY               int32
+	width              int32
+	height             int32
+	direction          Direction
+	requestedDirection Direction
+	shouldMove         bool
+	spritePointer      int
+	spritePointerInc   int
+	leftSprites        []*TextureImage
+	rightSprites       []*TextureImage
+	upSprites          []*TextureImage
+	downSprites        []*TextureImage
 }
 
 func NewDigger(scene *GameScene) *Digger {
@@ -29,19 +28,13 @@ func NewDigger(scene *GameScene) *Digger {
 	digger.leftSprites = digger.initSprites(0, false, false)
 	digger.rightSprites = digger.initSprites(0, true, false)
 	digger.upSprites = digger.initSprites(90, false, false)
-	digger.downSprites = digger.initSprites(90, false, true)
+	digger.downSprites = digger.initSprites(90, true, true)
 
-	//same for all levels
-	cellX := int32(7)
-	cellY := int32(9)
-	digger.innerOffsetX = int32(0)
-	digger.innerOffsetY = int32(1)
 	digger.spritePointer = 0
 	digger.spritePointerInc = 1
 	digger.width = 16
 	digger.height = 16
-	digger.posX = FIELD_OFFSET_X + cellX*CELL_WIDTH - digger.innerOffsetX
-	digger.posY = FIELD_OFFSET_Y + cellY*CELL_HEIGHT - digger.innerOffsetY
+	digger.posX, digger.posY = scene.moveGrid.getDiggerStartPos()
 	digger.direction = RIGHT
 	digger.shouldMove = false
 	return digger
@@ -59,16 +52,9 @@ func (digger *Digger) Update(tick int64) {
 	if tick%SPRITE_UPDATE_RATE == 0 {
 		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.leftSprites))
 	}
-	if tick%DIGGER_SPEED == 0 && digger.shouldMove && digger.canMove() {
-		x := If(digger.direction == RIGHT, 1, If(digger.direction == LEFT, -1, 0))
-		y := If(digger.direction == DOWN, 1, If(digger.direction == UP, -1, 0))
-		digger.posX += int32(x)
-		digger.posY += int32(y)
+	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
+		digger.posX, digger.posY, digger.direction = digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
 	}
-}
-
-func (digger *Digger) canMove() bool {
-	return digger.scene.field.isWithinBounds(digger.direction, digger.getCollisionRec())
 }
 
 func (digger *Digger) getSprites() []*TextureImage {
@@ -88,8 +74,8 @@ func (digger *Digger) getSprites() []*TextureImage {
 
 func (digger *Digger) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
-		X:      float32(digger.posX + (CELL_WIDTH-digger.width)/2),
-		Y:      float32(digger.posY + (CELL_WIDTH-digger.height)/2),
+		X:      float32(digger.posX + (CELL_WIDTH-digger.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, -1, 0))),
+		Y:      float32(digger.posY + (CELL_WIDTH-digger.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, 0, 0))),
 		Width:  float32(digger.width),
 		Height: float32(digger.height),
 	}
@@ -100,7 +86,8 @@ func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
 		sprites[digger.spritePointer].texture,
-		digger.posX, digger.posY,
+		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, -1, 0)),
+		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, 0, 0)),
 		rl.White)
 	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()

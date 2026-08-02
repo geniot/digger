@@ -17,13 +17,13 @@ func NewDebugGrid(scene *GameScene) *DebugGrid {
 
 	debugGrid.texture = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
 	rl.BeginTextureMode(debugGrid.texture)
-	for y := int32(0); y < CELLS_VERTICAL+1; y += 1 {
-		rl.DrawLine(0, y*CELL_HEIGHT+FIELD_OFFSET_Y, FIELD_WIDTH, y*CELL_HEIGHT+FIELD_OFFSET_Y, rl.White)
-
-	}
-	for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
-		rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
-	}
+	//for y := int32(0); y < CELLS_VERTICAL+1; y += 1 {
+	//	rl.DrawLine(0, y*CELL_HEIGHT+FIELD_OFFSET_Y, FIELD_WIDTH, y*CELL_HEIGHT+FIELD_OFFSET_Y, rl.White)
+	//
+	//}
+	//for x := int32(0); x < CELLS_HORIZONTAL+1; x += 1 {
+	//	rl.DrawLine(x*CELL_WIDTH+FIELD_OFFSET_X, 0, x*CELL_WIDTH+FIELD_OFFSET_X, FIELD_HEIGHT, rl.White)
+	//}
 	rl.DrawRectangleLinesEx(rl.Rectangle{
 		X:      0,
 		Y:      0,
