@@ -118,7 +118,3 @@ func (field *Field) Debug() {
 		}
 	}
 }
-
-func (field *Field) isWithinBounds(dir Direction, rec rl.Rectangle) bool {
-	return true
-}
