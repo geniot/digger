@@ -38,16 +38,16 @@ func (gs *GameScene) ProcessInput() {
 
 func (gs *GameScene) Update(tick int64) {
 	gs.field.Update(tick)
-	gs.digger.Update(tick)
-	gs.debugGrid.Update(tick)
-	gs.moveGrid.Update(tick)
+	//gs.digger.Update(tick)
+	//gs.debugGrid.Update(tick)
+	//gs.moveGrid.Update(tick)
 }
 
 func (gs *GameScene) Render(drawTarget rl.RenderTexture2D) {
 	gs.field.Render(drawTarget)
-	gs.digger.Render(drawTarget)
-	gs.debugGrid.Render(drawTarget)
-	gs.moveGrid.Render(drawTarget)
+	//gs.digger.Render(drawTarget)
+	//gs.debugGrid.Render(drawTarget)
+	//gs.moveGrid.Render(drawTarget)
 }
 
 func (gs *GameScene) ShouldExit() bool {
