@@ -81,7 +81,7 @@ func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 }
 
 func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
-	limit := CELL_WIDTH / 2
+	limit := CELL_WIDTH / 3
 	for i := int32(0); i < limit; i++ {
 		if mg.dots[x1-x2*i+x3][y1-y2*i+y3] {
 			return true
