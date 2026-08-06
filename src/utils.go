@@ -1,10 +1,13 @@
 package main
 
 import (
-	"strconv"
-
 	gui "github.com/gen2brain/raylib-go/raygui"
 )
+
+type Pos struct {
+	X int32
+	Y int32
+}
 
 func orPanic(err interface{}) {
 	switch v := err.(type) {
@@ -64,19 +67,4 @@ func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, sprite
 		nextSpritePointerInc = -spritePointerInc
 	}
 	return nextSpritePointer, nextSpritePointerInc
-}
-
-func Opposite(dir Direction) Direction {
-	if dir == UP {
-		return DOWN
-	} else if dir == DOWN {
-		return UP
-	} else if dir == LEFT {
-		return RIGHT
-	} else if dir == RIGHT {
-		return LEFT
-	} else {
-		println("Unidentified direction: " + strconv.FormatInt(int64(dir), 10))
-		return dir
-	}
 }

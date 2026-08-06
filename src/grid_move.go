@@ -8,11 +8,27 @@ type MoveGrid struct {
 	sourceRec rl.Rectangle
 	destRec   rl.Rectangle
 	dots      [FIELD_WIDTH][FIELD_HEIGHT]bool
+	moveMap   map[Direction]Pos
+	dirMap    map[Direction][3]int32
 }
 
 func NewMoveGrid(scene *GameScene) *MoveGrid {
 	moveGrid := &MoveGrid{}
 	moveGrid.scene = scene
+
+	moveGrid.moveMap = map[Direction]Pos{
+		LEFT:  {-1, 0},
+		RIGHT: {1, 0},
+		UP:    {0, -1},
+		DOWN:  {0, 1},
+	}
+	moveGrid.dirMap = map[Direction][3]int32{
+		LEFT:  {int32(LEFT), int32(UP), int32(DOWN)},
+		RIGHT: {int32(RIGHT), int32(UP), int32(DOWN)},
+		UP:    {int32(UP), int32(LEFT), int32(RIGHT)},
+		DOWN:  {int32(DOWN), int32(LEFT), int32(RIGHT)},
+	}
+
 	moveGrid.sourceRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), -float32(SCREEN_LOGICAL_HEIGHT)) //see https://github.com/raysan5/raylib/issues/3803
 	moveGrid.destRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(SCREEN_LOGICAL_HEIGHT))
 
@@ -43,53 +59,75 @@ func NewMoveGrid(scene *GameScene) *MoveGrid {
 	return moveGrid
 }
 
-func (moveGrid *MoveGrid) Update(_ int64) {
+func (mg *MoveGrid) Update(_ int64) {
 }
 
-func (moveGrid *MoveGrid) Render(drawTarget rl.RenderTexture2D) {
+func (mg *MoveGrid) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTexturePro(moveGrid.texture.Texture, moveGrid.sourceRec, moveGrid.destRec, ZERO_VECTOR2, 0, rl.White)
+	rl.DrawTexturePro(mg.texture.Texture, mg.sourceRec, mg.destRec, ZERO_VECTOR2, 0, rl.White)
 	//rl.DrawFPS(5, 5)
 	rl.EndTextureMode()
 }
 
-func (moveGrid *MoveGrid) getDiggerStartPos() (int32, int32) {
+func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 	cellX := int32(7)
 	cellY := int32(9)
 	posX := FIELD_OFFSET_X + CELL_WIDTH/2 + cellX*CELL_WIDTH
 	posY := FIELD_OFFSET_Y + CELL_HEIGHT/2 + cellY*CELL_HEIGHT
-	if !moveGrid.dots[posX][posY] {
+	if !mg.dots[posX][posY] {
 		panic("digger start pos should be valid")
 	}
 	return posX, posY
 }
 
-func (moveGrid *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
-	direction := requestedDirection
-	m := map[Direction][9]int32{
-		LEFT:  {int32(LEFT), -1, 0, int32(UP), 0, -1, int32(DOWN), 0, 1},
-		RIGHT: {int32(RIGHT), 1, 0, int32(UP), 0, -1, int32(DOWN), 0, 1},
-		UP:    {int32(UP), 0, -1, int32(LEFT), -1, 0, int32(RIGHT), 1, 0},
-		DOWN:  {int32(DOWN), 0, 1, int32(LEFT), -1, 0, int32(RIGHT), 1, 0},
+func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
+	limit := CELL_WIDTH / 2
+	for i := int32(0); i < limit; i++ {
+		if mg.dots[x1-x2*i+x3][y1-y2*i+y3] {
+			return true
+		}
 	}
-	values := m[requestedDirection]
-	if requestedDirection == Direction(values[0]) {
-		if moveGrid.dots[x+values[1]][y+values[2]] {
-			x += values[1]
-			y += values[2]
+	return false
+}
+
+func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
+	direction := requestedDirection
+	d0 := Direction(mg.dirMap[requestedDirection][0])
+	d1 := Direction(mg.dirMap[requestedDirection][1])
+	d2 := Direction(mg.dirMap[requestedDirection][2])
+	m0 := mg.moveMap[d0]
+	m1 := mg.moveMap[d1]
+	m2 := mg.moveMap[d2]
+
+	if requestedDirection == d0 {
+		if mg.dots[x+m0.X][y+m0.Y] { //most expected situation
+			x += m0.X
+			y += m0.Y
 		} else {
-			if moveGrid.dots[x-values[1]][y-values[2]] {
-				direction = Direction(values[0])
+			if mg.dots[x-m0.X][y-m0.Y] { //border cases
+				direction = d0
 			} else {
-				if actualDirection == Direction(values[3]) && moveGrid.dots[x+values[4]][y+values[5]] {
-					x += values[4]
-					y += values[5]
-					direction = actualDirection
+				if actualDirection == d1 {
+					if mg.canMove(x, m1.X, m0.X, y, m1.Y, m0.Y) {
+						x -= m1.X
+						y -= m1.Y
+						direction = d2
+					} else if mg.dots[x+m1.X][y+m1.Y] {
+						x += m1.X
+						y += m1.Y
+						direction = d1
+					}
 				}
-				if actualDirection == Direction(values[6]) && moveGrid.dots[x+values[7]][y+values[8]] {
-					x += values[7]
-					y += values[8]
-					direction = actualDirection
+				if actualDirection == d2 {
+					if mg.canMove(x, m2.X, m0.X, y, m2.Y, m0.Y) {
+						x -= m2.X
+						y -= m2.Y
+						direction = d1
+					} else if mg.dots[x+m2.X][y+m2.Y] {
+						x += m2.X
+						y += m2.Y
+						direction = d2
+					}
 				}
 			}
 		}
