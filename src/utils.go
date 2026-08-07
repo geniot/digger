@@ -9,6 +9,11 @@ type Pos struct {
 	Y int32
 }
 
+type WidthHeight struct {
+	W int32
+	H int32
+}
+
 func orPanic(err interface{}) {
 	switch v := err.(type) {
 	case error:

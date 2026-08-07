@@ -74,20 +74,41 @@ func (digger *Digger) getSprites() []*TextureImage {
 
 func (digger *Digger) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
-		X:      float32(digger.posX + (CELL_WIDTH-digger.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, -1, 0))),
-		Y:      float32(digger.posY + (CELL_WIDTH-digger.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, 0, 0))),
-		Width:  float32(digger.width),
-		Height: float32(digger.height),
+		X:      float32(digger.posX + (CELL_WIDTH-digger.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + collisionOffsetsMap[digger.direction].X),
+		Y:      float32(digger.posY + (CELL_WIDTH-digger.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + collisionOffsetsMap[digger.direction].Y),
+		Width:  float32(digger.width + collisionSizeMap[digger.direction].W),
+		Height: float32(digger.height + collisionSizeMap[digger.direction].H),
 	}
 }
+
+var (
+	renderOffsetsMap = map[Direction]Pos{
+		LEFT:  {0, 0},
+		RIGHT: {0, 0},
+		UP:    {-1, 0},
+		DOWN:  {1, 1},
+	}
+	collisionOffsetsMap = map[Direction]Pos{
+		LEFT:  {0, 2},
+		RIGHT: {0, 2},
+		UP:    {0, 0},
+		DOWN:  {2, 1},
+	}
+	collisionSizeMap = map[Direction]WidthHeight{
+		LEFT:  {0, -2},
+		RIGHT: {0, -2},
+		UP:    {-2, 0},
+		DOWN:  {-2, 0},
+	}
+)
 
 func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 	sprites := digger.getSprites()
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
 		sprites[digger.spritePointer].texture,
-		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, -1, 0)),
-		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+IfInt(digger.direction == DOWN, 1, IfInt(digger.direction == UP, 0, 0)),
+		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+renderOffsetsMap[digger.direction].X,
+		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+renderOffsetsMap[digger.direction].Y,
 		rl.White)
 	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()

@@ -2,32 +2,32 @@ package main
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
+var (
+	moveMap = map[Direction]Pos{
+		LEFT:  {-1, 0},
+		RIGHT: {1, 0},
+		UP:    {0, -1},
+		DOWN:  {0, 1},
+	}
+	dirMap = map[Direction][3]int32{
+		LEFT:  {int32(LEFT), int32(UP), int32(DOWN)},
+		RIGHT: {int32(RIGHT), int32(UP), int32(DOWN)},
+		UP:    {int32(UP), int32(LEFT), int32(RIGHT)},
+		DOWN:  {int32(DOWN), int32(LEFT), int32(RIGHT)},
+	}
+)
+
 type MoveGrid struct {
 	scene     *GameScene
 	texture   rl.RenderTexture2D
 	sourceRec rl.Rectangle
 	destRec   rl.Rectangle
 	dots      [FIELD_WIDTH][FIELD_HEIGHT]bool
-	moveMap   map[Direction]Pos
-	dirMap    map[Direction][3]int32
 }
 
 func NewMoveGrid(scene *GameScene) *MoveGrid {
 	moveGrid := &MoveGrid{}
 	moveGrid.scene = scene
-
-	moveGrid.moveMap = map[Direction]Pos{
-		LEFT:  {-1, 0},
-		RIGHT: {1, 0},
-		UP:    {0, -1},
-		DOWN:  {0, 1},
-	}
-	moveGrid.dirMap = map[Direction][3]int32{
-		LEFT:  {int32(LEFT), int32(UP), int32(DOWN)},
-		RIGHT: {int32(RIGHT), int32(UP), int32(DOWN)},
-		UP:    {int32(UP), int32(LEFT), int32(RIGHT)},
-		DOWN:  {int32(DOWN), int32(LEFT), int32(RIGHT)},
-	}
 
 	moveGrid.sourceRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), -float32(SCREEN_LOGICAL_HEIGHT)) //see https://github.com/raysan5/raylib/issues/3803
 	moveGrid.destRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(SCREEN_LOGICAL_HEIGHT))
@@ -92,12 +92,12 @@ func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
 
 func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
 	direction := requestedDirection
-	d0 := Direction(mg.dirMap[requestedDirection][0])
-	d1 := Direction(mg.dirMap[requestedDirection][1])
-	d2 := Direction(mg.dirMap[requestedDirection][2])
-	m0 := mg.moveMap[d0]
-	m1 := mg.moveMap[d1]
-	m2 := mg.moveMap[d2]
+	d0 := Direction(dirMap[requestedDirection][0])
+	d1 := Direction(dirMap[requestedDirection][1])
+	d2 := Direction(dirMap[requestedDirection][2])
+	m0 := moveMap[d0]
+	m1 := moveMap[d1]
+	m2 := moveMap[d2]
 
 	if requestedDirection == d0 {
 		if mg.dots[x+m0.X][y+m0.Y] { //most expected situation
