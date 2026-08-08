@@ -57,7 +57,7 @@ func NewApplication() *Application {
 	rl.SetTraceLogLevel(rl.LogTrace)
 	rl.SetConfigFlags(rl.FlagVsyncHint | rl.FlagWindowResizable) //should be set before window initialization!
 	rl.InitWindow(winWidth, winHeight, "Digger")
-	rl.SetWindowMonitor(0) //used for testing on multiple monitors
+	rl.SetWindowMonitor(1) //used for testing on multiple monitors
 	rl.InitAudioDevice()
 
 	setDefaultTextStyle()

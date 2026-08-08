@@ -11,6 +11,10 @@ type Field struct {
 	textureSourceRec rl.Rectangle
 	imageSourceRec   rl.Rectangle
 	destRec          rl.Rectangle
+	upBlob           *TextureImage
+	downBlob         *TextureImage
+	leftBlob         *TextureImage
+	rightBlob        *TextureImage
 }
 
 func NewField(scene *GameScene) *Field {
@@ -22,10 +26,11 @@ func NewField(scene *GameScene) *Field {
 	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
 	bg := NewTextureImage("cback1.png", 0, false, false)
-	upBlob := NewTextureImage("cublob.png", 0, false, false)
-	downBlob := NewTextureImage("cdblob.png", 0, false, false)
-	leftBlob := NewTextureImage("clblob.png", 0, false, false)
-	rightBlob := NewTextureImage("crblob.png", 0, false, false)
+
+	fld.upBlob = NewTextureImage("cublob.png", 0, false, false)
+	fld.downBlob = NewTextureImage("cdblob.png", 0, false, false)
+	fld.leftBlob = NewTextureImage("clblob.png", 0, false, false)
+	fld.rightBlob = NewTextureImage("crblob.png", 0, false, false)
 
 	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
 	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
@@ -37,6 +42,7 @@ func NewField(scene *GameScene) *Field {
 			fld.draw(float32(x), float32(y), bg)
 		}
 	}
+	rl.EndTextureMode()
 	//little offsets as copied from the original code
 	dX := int32(-2)
 	dY := int32(1)
@@ -55,34 +61,35 @@ func NewField(scene *GameScene) *Field {
 				yp := y*18 + 18
 				if c == 'V' || c == 'S' {
 					for decr := int32(-15); decr <= -3; decr += 3 {
-						fld.draw(float32(xp+dX), float32(yp+decr+dY), downBlob)
+						fld.draw(float32(xp+dX), float32(yp+decr+dY), fld.downBlob)
 					}
-					fld.draw(float32(xp+uX), float32(yp+3+uY), upBlob)
+					fld.draw(float32(xp+uX), float32(yp+3+uY), fld.upBlob)
 				}
 				if c == 'H' || c == 'S' {
 					for decr := int32(-16); decr <= -4; decr += 4 {
-						fld.draw(float32(xp+decr+rX), float32(yp+rY), rightBlob)
+						fld.draw(float32(xp+decr+rX), float32(yp+rY), fld.rightBlob)
 					}
-					fld.draw(float32(xp+4+lX), float32(yp+lY), leftBlob)
+					fld.draw(float32(xp+4+lX), float32(yp+lY), fld.leftBlob)
 				}
 				if x < 14 && (getLevelChar(x+1, y, LevelPlan()) == 'H' || getLevelChar(x+1, y, LevelPlan()) == 'S') {
-					fld.draw(float32(xp+rX), float32(yp+rY), rightBlob)
+					fld.draw(float32(xp+rX), float32(yp+rY), fld.rightBlob)
 				}
 				if y < 9 && (getLevelChar(x, y+1, LevelPlan()) == 'V' || getLevelChar(x, y+1, LevelPlan()) == 'H') {
-					fld.draw(float32(xp+dX), float32(yp+dY), downBlob)
+					fld.draw(float32(xp+dX), float32(yp+dY), fld.downBlob)
 				}
 			}
 		}
 	}
-	rl.EndTextureMode()
 	return fld
 }
 
 func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
+	rl.BeginTextureMode(field.texture)
 	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)
 	destRect := rl.NewRectangle(x, y, textureImage.width, textureImage.height)
 	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
 	rl.ImageDraw(field.image, textureImage.image, sourceRect, destRect, rl.White)
+	rl.EndTextureMode()
 }
 
 func (field *Field) Update(_ int64) {

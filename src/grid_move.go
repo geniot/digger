@@ -64,7 +64,7 @@ func (mg *MoveGrid) Update(_ int64) {
 
 func (mg *MoveGrid) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
-	rl.DrawTexturePro(mg.texture.Texture, mg.sourceRec, mg.destRec, ZERO_VECTOR2, 0, rl.White)
+	//rl.DrawTexturePro(mg.texture.Texture, mg.sourceRec, mg.destRec, ZERO_VECTOR2, 0, rl.White)
 	//rl.DrawFPS(5, 5)
 	rl.EndTextureMode()
 }
@@ -72,6 +72,8 @@ func (mg *MoveGrid) Render(drawTarget rl.RenderTexture2D) {
 func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 	cellX := int32(7)
 	cellY := int32(9)
+	//cellX := int32(0)
+	//cellY := int32(0)
 	posX := FIELD_OFFSET_X + CELL_WIDTH/2 + cellX*CELL_WIDTH
 	posY := FIELD_OFFSET_Y + CELL_HEIGHT/2 + cellY*CELL_HEIGHT
 	if !mg.dots[posX][posY] {

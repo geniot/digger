@@ -53,7 +53,19 @@ func (digger *Digger) Update(tick int64) {
 		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.leftSprites))
 	}
 	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
-		digger.posX, digger.posY, digger.direction = digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
+		posX, posY, dir := digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
+		if digger.posX != posX || digger.posY != posY || digger.direction != dir {
+			digger.posX, digger.posY, digger.direction = posX, posY, dir
+			if dir == RIGHT {
+				digger.scene.field.draw(float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1), digger.scene.field.rightBlob)
+			} else if dir == LEFT {
+				digger.scene.field.draw(float32(digger.posX-digger.posX%4-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1), digger.scene.field.leftBlob)
+			} else if dir == UP {
+				digger.scene.field.draw(float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-digger.posY%3+1), digger.scene.field.upBlob)
+			} else if dir == DOWN {
+				digger.scene.field.draw(float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-digger.posY%3-2), digger.scene.field.downBlob)
+			}
+		}
 	}
 }
 
@@ -110,6 +122,6 @@ func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+renderOffsetsMap[digger.direction].X,
 		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+renderOffsetsMap[digger.direction].Y,
 		rl.White)
-	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
+	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()
 }
