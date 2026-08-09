@@ -98,13 +98,6 @@ func (field *Field) draw(textureImage *TextureImage, x float32, y float32, rects
 	rl.EndTextureMode()
 }
 
-func (field *Field) drawRect(rect rl.Rectangle) {
-	rl.BeginTextureMode(field.texture)
-	rl.DrawRectangleRec(rect, rl.Black)
-	rl.ImageDrawRectangle(field.image, int32(rect.X), int32(rect.Y), int32(rect.Width), int32(rect.Height), rl.Black)
-	rl.EndTextureMode()
-}
-
 func (field *Field) Update(_ int64) {
 }
 

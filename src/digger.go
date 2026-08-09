@@ -56,11 +56,9 @@ func (digger *Digger) Update(tick int64) {
 		posX, posY, dir := digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
 		if digger.posX != posX || digger.posY != posY || digger.direction != dir { //any change from previous state?
 			digger.posX, digger.posY, digger.direction = posX, posY, dir
-			//digger.scene.field.drawRect(digger.getCollisionRec())
 			if dir == RIGHT {
 				blob := digger.scene.field.rightBlob
-				digger.scene.field.draw(
-					blob,
+				digger.scene.field.draw(blob,
 					float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1),
 					rl.Rectangle{Width: blob.width / 2, Height: blob.height},
 					rl.Rectangle{X: float32(digger.posX - digger.posX%4 + 4), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
@@ -71,6 +69,12 @@ func (digger *Digger) Update(tick int64) {
 					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
 					rl.Rectangle{X: float32(digger.posX + 8), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
 				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX+3), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX + 7), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
 			} else if dir == LEFT {
 				blob := digger.scene.field.leftBlob
 				digger.scene.field.draw(
@@ -78,6 +82,12 @@ func (digger *Digger) Update(tick int64) {
 					float32(digger.posX-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1),
 					rl.Rectangle{X: 0, Width: blob.width / 2, Height: blob.height},
 					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2 - 2), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2-1), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{X: 0, Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2 - 1), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
 				)
 				digger.scene.field.draw(
 					blob,
@@ -99,6 +109,12 @@ func (digger *Digger) Update(tick int64) {
 					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
 					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
 				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2),
+					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2), Width: blob.width, Height: blob.height / 2},
+				)
 			} else if dir == DOWN {
 				blob := digger.scene.field.downBlob
 				digger.scene.field.draw(
@@ -112,6 +128,12 @@ func (digger *Digger) Update(tick int64) {
 					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-1),
 					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
 					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-2),
+					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - 2), Width: blob.width, Height: blob.height / 2},
 				)
 			}
 		}
@@ -171,6 +193,6 @@ func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+renderOffsetsMap[digger.direction].X,
 		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+renderOffsetsMap[digger.direction].Y,
 		rl.White)
-	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
+	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()
 }
