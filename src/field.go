@@ -83,6 +83,21 @@ func NewField(scene *GameScene) *Field {
 	return fld
 }
 
+func (field *Field) drawExt(textureImage *TextureImage, x, y float32, splitX, splitY, splitWidth, splitHeight bool) {
+	field.draw(textureImage,
+		x, y,
+		rl.Rectangle{
+			X:      If(splitX, textureImage.width/2, 0),
+			Y:      If(splitY, textureImage.height/2, 0),
+			Width:  If(splitWidth, textureImage.width/2, textureImage.width),
+			Height: If(splitHeight, textureImage.height/2, textureImage.height)},
+
+		rl.Rectangle{X: x, Y: y,
+			Width:  If(splitWidth, textureImage.width/2, textureImage.width),
+			Height: If(splitHeight, textureImage.height/2, textureImage.height)},
+	)
+}
+
 func (field *Field) draw(textureImage *TextureImage, x float32, y float32, rects ...rl.Rectangle) {
 	rl.BeginTextureMode(field.texture)
 	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)

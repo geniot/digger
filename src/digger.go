@@ -19,6 +19,7 @@ type Digger struct {
 	rightSprites       []*TextureImage
 	upSprites          []*TextureImage
 	downSprites        []*TextureImage
+	speed              int64
 }
 
 func NewDigger(scene *GameScene) *Digger {
@@ -37,6 +38,7 @@ func NewDigger(scene *GameScene) *Digger {
 	digger.posX, digger.posY = scene.moveGrid.getDiggerStartPos()
 	digger.direction = RIGHT
 	digger.shouldMove = false
+	digger.speed = DIGGER_SPEED
 	return digger
 }
 
@@ -52,89 +54,30 @@ func (digger *Digger) Update(tick int64) {
 	if tick%SPRITE_UPDATE_RATE == 0 {
 		digger.spritePointer, digger.spritePointerInc = GetNextSpritePointerAndInc(digger.spritePointer, digger.spritePointerInc, len(digger.leftSprites))
 	}
-	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
+	if tick%digger.speed == 0 && digger.shouldMove {
 		posX, posY, dir := digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
 		if digger.posX != posX || digger.posY != posY || digger.direction != dir { //any change from previous state?
 			digger.posX, digger.posY, digger.direction = posX, posY, dir
 			if dir == RIGHT {
 				blob := digger.scene.field.rightBlob
-				digger.scene.field.draw(blob,
-					float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX - digger.posX%4 + 4), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX+4), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX + 8), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX+3), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX + 7), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
+				digger.scene.field.drawExt(blob, float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1), false, false, true, false)
+				digger.scene.field.drawExt(blob, float32(digger.posX+8), float32(digger.posY-CELL_HEIGHT/2+1), true, false, true, false)
+				digger.scene.field.drawExt(blob, float32(digger.posX+7), float32(digger.posY-CELL_HEIGHT/2+1), true, false, true, false)
 			} else if dir == LEFT {
 				blob := digger.scene.field.leftBlob
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{X: 0, Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2 - 2), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2-1), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{X: 0, Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2 - 1), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-digger.posX%4-CELL_WIDTH/2+IfInt(digger.posX <= 20, 2, 6)), float32(digger.posY-CELL_HEIGHT/2+1),
-					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
-					rl.Rectangle{X: float32(digger.posX - digger.posX%4 - CELL_WIDTH/2 + IfInt(digger.posX <= 20, 2, 6)), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
-				)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1), false, false, true, false)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2-1), float32(digger.posY-CELL_HEIGHT/2+1), false, false, true, false)
+				digger.scene.field.drawExt(blob, float32(digger.posX-digger.posX%4-CELL_WIDTH/2+IfInt(digger.posX <= 20, 2, 6)), float32(digger.posY-CELL_HEIGHT/2+1), true, false, true, false)
 			} else if dir == UP {
 				blob := digger.scene.field.upBlob
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-digger.posY%3+4),
-					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2 - digger.posY%3 + 4), Width: blob.width, Height: blob.height / 2},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-1),
-					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2),
-					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2), Width: blob.width, Height: blob.height / 2},
-				)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-digger.posY%3+4), false, true, false, true)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-1), false, false, false, true)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2), false, false, false, true)
 			} else if dir == DOWN {
 				blob := digger.scene.field.downBlob
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-digger.posY%3-IfInt(digger.posY >= 173, 2, 5)),
-					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - digger.posY%3 - IfInt(digger.posY >= 173, 2, 5)), Width: blob.width, Height: blob.height / 2},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-1),
-					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
-				)
-				digger.scene.field.draw(
-					blob,
-					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-2),
-					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
-					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - 2), Width: blob.width, Height: blob.height / 2},
-				)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-digger.posY%3-IfInt(digger.posY >= 173, 2, 5)), false, false, false, true)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-1), false, true, false, true)
+				digger.scene.field.drawExt(blob, float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-2), false, true, false, true)
 			}
 		}
 	}
