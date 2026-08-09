@@ -39,7 +39,7 @@ func NewField(scene *GameScene) *Field {
 	rl.ClearBackground(rl.Black)
 	for y := int32(0); y < FIELD_HEIGHT; y += int32(bg.height) {
 		for x := int32(0); x < FIELD_WIDTH; x += int32(bg.width) {
-			fld.draw(float32(x), float32(y), bg)
+			fld.draw(bg, float32(x), float32(y))
 		}
 	}
 	rl.EndTextureMode()
@@ -61,21 +61,21 @@ func NewField(scene *GameScene) *Field {
 				yp := y*18 + 18
 				if c == 'V' || c == 'S' {
 					for decr := int32(-15); decr <= -3; decr += 3 {
-						fld.draw(float32(xp+dX), float32(yp+decr+dY), fld.downBlob)
+						fld.draw(fld.downBlob, float32(xp+dX), float32(yp+decr+dY))
 					}
-					fld.draw(float32(xp+uX), float32(yp+3+uY), fld.upBlob)
+					fld.draw(fld.upBlob, float32(xp+uX), float32(yp+3+uY))
 				}
 				if c == 'H' || c == 'S' {
 					for decr := int32(-16); decr <= -4; decr += 4 {
-						fld.draw(float32(xp+decr+rX), float32(yp+rY), fld.rightBlob)
+						fld.draw(fld.rightBlob, float32(xp+decr+rX), float32(yp+rY))
 					}
-					fld.draw(float32(xp+4+lX), float32(yp+lY), fld.leftBlob)
+					fld.draw(fld.leftBlob, float32(xp+4+lX), float32(yp+lY))
 				}
 				if x < 14 && (getLevelChar(x+1, y, LevelPlan()) == 'H' || getLevelChar(x+1, y, LevelPlan()) == 'S') {
-					fld.draw(float32(xp+rX), float32(yp+rY), fld.rightBlob)
+					fld.draw(fld.rightBlob, float32(xp+rX), float32(yp+rY))
 				}
 				if y < 9 && (getLevelChar(x, y+1, LevelPlan()) == 'V' || getLevelChar(x, y+1, LevelPlan()) == 'H') {
-					fld.draw(float32(xp+dX), float32(yp+dY), fld.downBlob)
+					fld.draw(fld.downBlob, float32(xp+dX), float32(yp+dY))
 				}
 			}
 		}
@@ -83,12 +83,25 @@ func NewField(scene *GameScene) *Field {
 	return fld
 }
 
-func (field *Field) draw(x float32, y float32, textureImage *TextureImage) {
+func (field *Field) draw(textureImage *TextureImage, x float32, y float32, rects ...rl.Rectangle) {
 	rl.BeginTextureMode(field.texture)
 	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)
 	destRect := rl.NewRectangle(x, y, textureImage.width, textureImage.height)
+	if len(rects) >= 1 {
+		sourceRect = rects[0]
+	}
+	if len(rects) >= 2 {
+		destRect = rects[1]
+	}
 	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
 	rl.ImageDraw(field.image, textureImage.image, sourceRect, destRect, rl.White)
+	rl.EndTextureMode()
+}
+
+func (field *Field) drawRect(rect rl.Rectangle) {
+	rl.BeginTextureMode(field.texture)
+	rl.DrawRectangleRec(rect, rl.Black)
+	rl.ImageDrawRectangle(field.image, int32(rect.X), int32(rect.Y), int32(rect.Width), int32(rect.Height), rl.Black)
 	rl.EndTextureMode()
 }
 

@@ -54,16 +54,65 @@ func (digger *Digger) Update(tick int64) {
 	}
 	if tick%DIGGER_SPEED == 0 && digger.shouldMove {
 		posX, posY, dir := digger.scene.moveGrid.move(digger.posX, digger.posY, digger.direction, digger.requestedDirection)
-		if digger.posX != posX || digger.posY != posY || digger.direction != dir {
+		if digger.posX != posX || digger.posY != posY || digger.direction != dir { //any change from previous state?
 			digger.posX, digger.posY, digger.direction = posX, posY, dir
+			//digger.scene.field.drawRect(digger.getCollisionRec())
 			if dir == RIGHT {
-				digger.scene.field.draw(float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1), digger.scene.field.rightBlob)
+				blob := digger.scene.field.rightBlob
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-digger.posX%4+4), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX - digger.posX%4 + 4), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX+4), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX + 8), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
 			} else if dir == LEFT {
-				digger.scene.field.draw(float32(digger.posX-digger.posX%4-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1), digger.scene.field.leftBlob)
+				blob := digger.scene.field.leftBlob
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2-2), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{X: 0, Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2 - 2), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-digger.posX%4-CELL_WIDTH/2+IfInt(digger.posX <= 20, 2, 6)), float32(digger.posY-CELL_HEIGHT/2+1),
+					rl.Rectangle{X: blob.width / 2, Width: blob.width / 2, Height: blob.height},
+					rl.Rectangle{X: float32(digger.posX - digger.posX%4 - CELL_WIDTH/2 + IfInt(digger.posX <= 20, 2, 6)), Y: float32(digger.posY - CELL_HEIGHT/2 + 1), Width: blob.width / 2, Height: blob.height},
+				)
 			} else if dir == UP {
-				digger.scene.field.draw(float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-digger.posY%3+1), digger.scene.field.upBlob)
+				blob := digger.scene.field.upBlob
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-digger.posY%3+4),
+					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2 - digger.posY%3 + 4), Width: blob.width, Height: blob.height / 2},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY-CELL_HEIGHT/2-1),
+					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY - CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
+				)
 			} else if dir == DOWN {
-				digger.scene.field.draw(float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-digger.posY%3-2), digger.scene.field.downBlob)
+				blob := digger.scene.field.downBlob
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-digger.posY%3-IfInt(digger.posY >= 173, 2, 5)),
+					rl.Rectangle{Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - digger.posY%3 - IfInt(digger.posY >= 173, 2, 5)), Width: blob.width, Height: blob.height / 2},
+				)
+				digger.scene.field.draw(
+					blob,
+					float32(digger.posX-CELL_WIDTH/2), float32(digger.posY+CELL_HEIGHT/2-1),
+					rl.Rectangle{Y: blob.height / 2, Width: blob.width, Height: blob.height / 2},
+					rl.Rectangle{X: float32(digger.posX - CELL_WIDTH/2), Y: float32(digger.posY + CELL_HEIGHT/2 - 1), Width: blob.width, Height: blob.height / 2},
+				)
 			}
 		}
 	}
@@ -122,6 +171,6 @@ func (digger *Digger) Render(drawTarget rl.RenderTexture2D) {
 		digger.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+renderOffsetsMap[digger.direction].X,
 		digger.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+renderOffsetsMap[digger.direction].Y,
 		rl.White)
-	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
+	rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()
 }
