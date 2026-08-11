@@ -7,7 +7,6 @@ import (
 type Emerald struct {
 	posX         int32
 	posY         int32
-	sprite       *TextureImage
 	emeraldsPool *EmeraldsPool
 }
 
@@ -15,7 +14,6 @@ func NewEmerald(emeraldsPool *EmeraldsPool, x int32, y int32) *Emerald {
 	emerald := &Emerald{}
 	emerald.posX = x*CELL_WIDTH + FIELD_OFFSET_X + CELL_WIDTH/2 - 1
 	emerald.posY = y*CELL_HEIGHT + FIELD_OFFSET_Y + CELL_HEIGHT/2 + 1
-	emerald.sprite = NewTextureImage("emerald.png", 0, false, false)
 	emerald.emeraldsPool = emeraldsPool
 	return emerald
 }
@@ -25,20 +23,22 @@ func (e *Emerald) Update(tick int64) {
 
 func (e *Emerald) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
+	sprite := e.emeraldsPool.sprite
 	rl.DrawTexture(
-		e.sprite.texture,
-		e.posX-int32(e.sprite.width/2),
-		e.posY-int32(e.sprite.height/2),
+		sprite.texture,
+		e.posX-int32(sprite.width/2),
+		e.posY-int32(sprite.height/2),
 		rl.White)
 	//rl.DrawRectangleLinesEx(e.getCollisionRec(), 1.0, TransparentBlue)
 	rl.EndTextureMode()
 }
 
 func (e *Emerald) getCollisionRec() rl.Rectangle {
+	sprite := e.emeraldsPool.sprite
 	return rl.Rectangle{
-		X:      float32(e.posX - int32(e.sprite.width/2)),
-		Y:      float32(e.posY - int32(e.sprite.height/2)),
-		Width:  e.sprite.width,
-		Height: e.sprite.height,
+		X:      float32(e.posX - int32(sprite.width/2)),
+		Y:      float32(e.posY - int32(sprite.height/2)),
+		Width:  sprite.width,
+		Height: sprite.height,
 	}
 }

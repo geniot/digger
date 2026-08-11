@@ -2,3 +2,11 @@ github.com/BrownNPC/Raylib-Go-Wasm/raylib v0.0.0-20260421110350-7c24b2d5e6d3 h1:
 github.com/BrownNPC/Raylib-Go-Wasm/raylib v0.0.0-20260421110350-7c24b2d5e6d3/go.mod h1:u1eTrnnsR5NVJMWwlQEq/FoeDPAKmq9PoRCiO8lwVH4=
 github.com/BrownNPC/wasm-ffi-go v1.3.0 h1:lnVeot/PN2bZtMqnaeEl89wRgvbOEvxSBlOEXZvW6tA=
 github.com/BrownNPC/wasm-ffi-go v1.3.0/go.mod h1:D5+RBMb672fgw6vPz4HOWYxpyrmPrIao8VqlXihOFFg=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/deckarep/golang-set/v2 v2.9.0 h1:prva4eP9UysWagLyKrtn074ughi0NnkIf0A4M5yOCKI=
+github.com/deckarep/golang-set/v2 v2.9.0/go.mod h1:EWknQXbs0mcFpat2QOoXV0Ee57cD+w6ZEN76BR2JVrM=
+github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
+github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+go.mongodb.org/mongo-driver v1.17.4 h1:jUorfmVzljjr0FLzYQsGP8cgN/qzzxlY9Vh0C9KFXVw=
+go.mongodb.org/mongo-driver v1.17.4/go.mod h1:Hy04i7O2kC4RS06ZrhPRqj/u4DTYkFDAAccj+rVKqgQ=

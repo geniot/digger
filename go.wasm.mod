@@ -4,6 +4,7 @@ go 1.26.1
 
 require (
 	github.com/BrownNPC/Raylib-Go-Wasm/raylib v0.0.0-20260421110350-7c24b2d5e6d3
+	github.com/deckarep/golang-set/v2 v2.9.0
 	github.com/gen2brain/raylib-go/raygui v0.0.0-20250617194346-eddd038123ee
 	github.com/gen2brain/raylib-go/raylib v0.0.0-20250504022611-e6017e5fc409
 )
@@ -11,6 +12,7 @@ require (
 require (
 	github.com/BrownNPC/Raylib-Go-Wasm/wasm-runtime v0.0.0-20260421110350-7c24b2d5e6d3 // indirect
 	github.com/BrownNPC/wasm-ffi-go v1.3.0 // indirect
+	go.mongodb.org/mongo-driver v1.17.4 // indirect
 )
 
 replace (
