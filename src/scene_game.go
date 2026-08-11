@@ -14,6 +14,7 @@ type GameScene struct {
 	debugGrid    *DebugGrid
 	moveGrid     *MoveGrid
 	isStarted    bool
+	level        int32
 }
 
 func NewGameScene(a *Application) *GameScene {
@@ -25,6 +26,7 @@ func NewGameScene(a *Application) *GameScene {
 	gameScene.emeraldsPool = NewEmeraldsPool(&gameScene)
 	gameScene.debugGrid = NewDebugGrid(&gameScene)
 	gameScene.isStarted = false
+	gameScene.level = LevelPlan(1)
 	return &gameScene
 }
 

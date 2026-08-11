@@ -53,9 +53,11 @@ func NewField(scene *GameScene) *Field {
 	lX := int32(-8)
 	lY := int32(-15)
 
+	lp := LevelPlan(scene.level)
+
 	for x := int32(0); x < 15; x++ {
 		for y := int32(0); y < 10; y++ {
-			c := getLevelChar(x, y, LevelPlan())
+			c := getLevelChar(x, y, lp)
 			if c == 'S' || c == 'V' || c == 'H' {
 				xp := x*20 + 12
 				yp := y*18 + 18
@@ -71,10 +73,10 @@ func NewField(scene *GameScene) *Field {
 					}
 					fld.draw(fld.leftBlob, float32(xp+4+lX), float32(yp+lY))
 				}
-				if x < 14 && (getLevelChar(x+1, y, LevelPlan()) == 'H' || getLevelChar(x+1, y, LevelPlan()) == 'S') {
+				if x < 14 && (getLevelChar(x+1, y, lp) == 'H' || getLevelChar(x+1, y, lp) == 'S') {
 					fld.draw(fld.rightBlob, float32(xp+rX), float32(yp+rY))
 				}
-				if y < 9 && (getLevelChar(x, y+1, LevelPlan()) == 'V' || getLevelChar(x, y+1, LevelPlan()) == 'H') {
+				if y < 9 && (getLevelChar(x, y+1, lp) == 'V' || getLevelChar(x, y+1, lp) == 'H') {
 					fld.draw(fld.downBlob, float32(xp+dX), float32(yp+dY))
 				}
 			}
