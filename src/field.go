@@ -25,12 +25,12 @@ func NewField(scene *GameScene) *Field {
 	fld.imageSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
 
-	bg := NewTextureImage("cback1.png", 0, false, false)
+	bg := NewTextureImage("cback1.png", 0, false, false, false)
 
-	fld.upBlob = NewTextureImage("cublob.png", 0, false, false)
-	fld.downBlob = NewTextureImage("cdblob.png", 0, false, false)
-	fld.leftBlob = NewTextureImage("clblob.png", 0, false, false)
-	fld.rightBlob = NewTextureImage("crblob.png", 0, false, false)
+	fld.upBlob = NewTextureImage("cublob.png", 0, false, false, false)
+	fld.downBlob = NewTextureImage("cdblob.png", 0, false, false, false)
+	fld.leftBlob = NewTextureImage("clblob.png", 0, false, false, false)
+	fld.rightBlob = NewTextureImage("crblob.png", 0, false, false, false)
 
 	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
 	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)

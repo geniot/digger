@@ -11,10 +11,13 @@ type TextureImage struct {
 	height  float32
 }
 
-func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVertical bool) *TextureImage {
+func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *TextureImage {
 	textureImage := &TextureImage{}
 	imgBytes := orPanicRes(resList.ReadFile("res/" + fileName))
 	textureImage.image = rl.LoadImageFromMemory(".png", imgBytes, int32(len(imgBytes)))
+	if shouldMask {
+		rl.ImageColorTint(textureImage.image, rl.Black)
+	}
 	rl.ImageRotate(textureImage.image, degrees)
 	if flipHorizontal {
 		rl.ImageFlipHorizontal(textureImage.image)
