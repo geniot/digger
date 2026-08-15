@@ -5,21 +5,24 @@ import (
 )
 
 type Digger struct {
-	scene              *GameScene
-	posX               int32
-	posY               int32
-	width              int32
-	height             int32
-	direction          Direction
-	requestedDirection Direction
-	shouldMove         bool
-	spritePointer      int
-	spritePointerInc   int
-	leftSprites        []*TextureImage
-	rightSprites       []*TextureImage
-	upSprites          []*TextureImage
-	downSprites        []*TextureImage
-	speed              int64
+	scene               *GameScene
+	posX                int32
+	posY                int32
+	width               int32
+	height              int32
+	direction           Direction
+	requestedDirection  Direction
+	shouldMove          bool
+	spritePointer       int
+	spritePointerInc    int
+	leftSprites         []*TextureImage
+	rightSprites        []*TextureImage
+	upSprites           []*TextureImage
+	downSprites         []*TextureImage
+	speed               int64
+	renderOffsetsMap    map[Direction]Pos
+	collisionOffsetsMap map[Direction]Pos
+	collisionSizeMap    map[Direction]WidthHeight
 }
 
 func NewDigger(scene *GameScene) *Digger {
@@ -39,6 +42,25 @@ func NewDigger(scene *GameScene) *Digger {
 	dg.direction = RIGHT
 	dg.shouldMove = false
 	dg.speed = DIGGER_SPEED
+
+	dg.renderOffsetsMap = map[Direction]Pos{
+		LEFT:  {0, 0},
+		RIGHT: {0, 0},
+		UP:    {-1, 0},
+		DOWN:  {1, 1},
+	}
+	dg.collisionOffsetsMap = map[Direction]Pos{
+		LEFT:  {0, 2},
+		RIGHT: {0, 2},
+		UP:    {0, 0},
+		DOWN:  {2, 1},
+	}
+	dg.collisionSizeMap = map[Direction]WidthHeight{
+		LEFT:  {0, -2},
+		RIGHT: {0, -2},
+		UP:    {-2, 0},
+		DOWN:  {-2, 0},
+	}
 	return dg
 }
 
@@ -58,6 +80,7 @@ func (dg *Digger) Update(tick int64) {
 		posX, posY, dir := dg.scene.moveGrid.move(dg.posX, dg.posY, dg.direction, dg.requestedDirection)
 		if dg.posX != posX || dg.posY != posY || dg.direction != dir { //any change from previous state?
 			dg.scene.emeraldsPool.handle(dg)
+			dg.scene.bagsPool.handle(dg)
 			dg.posX, dg.posY, dg.direction = posX, posY, dir
 			if dir == RIGHT {
 				blob := dg.scene.field.rightBlob
@@ -102,41 +125,20 @@ func (dg *Digger) getSprites() []*TextureImage {
 
 func (dg *Digger) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
-		X:      float32(dg.posX + (CELL_WIDTH-dg.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + collisionOffsetsMap[dg.direction].X),
-		Y:      float32(dg.posY + (CELL_WIDTH-dg.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + collisionOffsetsMap[dg.direction].Y),
-		Width:  float32(dg.width + collisionSizeMap[dg.direction].W),
-		Height: float32(dg.height + collisionSizeMap[dg.direction].H),
+		X:      float32(dg.posX + (CELL_WIDTH-dg.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + dg.collisionOffsetsMap[dg.direction].X),
+		Y:      float32(dg.posY + (CELL_WIDTH-dg.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + dg.collisionOffsetsMap[dg.direction].Y),
+		Width:  float32(dg.width + dg.collisionSizeMap[dg.direction].W),
+		Height: float32(dg.height + dg.collisionSizeMap[dg.direction].H),
 	}
 }
-
-var (
-	renderOffsetsMap = map[Direction]Pos{
-		LEFT:  {0, 0},
-		RIGHT: {0, 0},
-		UP:    {-1, 0},
-		DOWN:  {1, 1},
-	}
-	collisionOffsetsMap = map[Direction]Pos{
-		LEFT:  {0, 2},
-		RIGHT: {0, 2},
-		UP:    {0, 0},
-		DOWN:  {2, 1},
-	}
-	collisionSizeMap = map[Direction]WidthHeight{
-		LEFT:  {0, -2},
-		RIGHT: {0, -2},
-		UP:    {-2, 0},
-		DOWN:  {-2, 0},
-	}
-)
 
 func (dg *Digger) Render(drawTarget rl.RenderTexture2D) {
 	sprites := dg.getSprites()
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
 		sprites[dg.spritePointer].texture,
-		dg.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+renderOffsetsMap[dg.direction].X,
-		dg.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+renderOffsetsMap[dg.direction].Y,
+		dg.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+dg.renderOffsetsMap[dg.direction].X,
+		dg.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)
 	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()

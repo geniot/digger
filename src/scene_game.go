@@ -11,6 +11,7 @@ type GameScene struct {
 	field        *Field
 	digger       *Digger
 	emeraldsPool *EmeraldsPool
+	bagsPool     *BagsPool
 	debugGrid    *DebugGrid
 	moveGrid     *MoveGrid
 	isStarted    bool
@@ -24,6 +25,7 @@ func NewGameScene(a *Application) *GameScene {
 	gameScene.moveGrid = NewMoveGrid(&gameScene)
 	gameScene.digger = NewDigger(&gameScene)
 	gameScene.emeraldsPool = NewEmeraldsPool(&gameScene)
+	gameScene.bagsPool = NewBagsPool(&gameScene)
 	gameScene.debugGrid = NewDebugGrid(&gameScene)
 	gameScene.isStarted = false
 	gameScene.level = LevelPlan(1)
@@ -44,6 +46,7 @@ func (gs *GameScene) Update(tick int64) {
 	gs.field.Update(tick)
 	gs.digger.Update(tick)
 	gs.emeraldsPool.Update(tick)
+	gs.bagsPool.Update(tick)
 	gs.debugGrid.Update(tick)
 	gs.moveGrid.Update(tick)
 }
@@ -52,6 +55,7 @@ func (gs *GameScene) Render(drawTarget rl.RenderTexture2D) {
 	gs.field.Render(drawTarget)
 	gs.digger.Render(drawTarget)
 	gs.emeraldsPool.Render(drawTarget)
+	gs.bagsPool.Render(drawTarget)
 	gs.debugGrid.Render(drawTarget)
 	gs.moveGrid.Render(drawTarget)
 }
