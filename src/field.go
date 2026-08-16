@@ -21,9 +21,9 @@ func NewField(scene *GameScene) *Field {
 	fld := &Field{}
 	fld.scene = scene
 
-	fld.textureSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, -FIELD_HEIGHT) //see https://github.com/raysan5/raylib/issues/3803
-	fld.imageSourceRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
-	fld.destRec = rl.NewRectangle(0, 0, FIELD_WIDTH, FIELD_HEIGHT)
+	fld.textureSourceRec = rl.NewRectangle(0, 0, FieldWidth, -FieldHeight) //see https://github.com/raysan5/raylib/issues/3803
+	fld.imageSourceRec = rl.NewRectangle(0, 0, FieldWidth, FieldHeight)
+	fld.destRec = rl.NewRectangle(0, 0, FieldWidth, FieldHeight)
 
 	bg := NewTextureImage("cback1.png", 0, false, false, false)
 
@@ -32,13 +32,13 @@ func NewField(scene *GameScene) *Field {
 	fld.leftBlob = NewTextureImage("clblob.png", 0, false, false, false)
 	fld.rightBlob = NewTextureImage("crblob.png", 0, false, false, false)
 
-	fld.texture = rl.LoadRenderTexture(FIELD_WIDTH, FIELD_HEIGHT)
-	fld.image = rl.GenImageColor(FIELD_WIDTH, FIELD_HEIGHT, rl.Black)
+	fld.texture = rl.LoadRenderTexture(FieldWidth, FieldHeight)
+	fld.image = rl.GenImageColor(FieldWidth, FieldHeight, rl.Black)
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
-	for y := int32(0); y < FIELD_HEIGHT; y += int32(bg.height) {
-		for x := int32(0); x < FIELD_WIDTH; x += int32(bg.width) {
+	for y := int32(0); y < FieldHeight; y += int32(bg.height) {
+		for x := int32(0); x < FieldWidth; x += int32(bg.width) {
 			fld.draw(bg, float32(x), float32(y))
 		}
 	}

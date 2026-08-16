@@ -12,8 +12,8 @@ type Emerald struct {
 
 func NewEmerald(emeraldsPool *EmeraldsPool, x int32, y int32) *Emerald {
 	emerald := &Emerald{}
-	emerald.posX = x*CELL_WIDTH + FIELD_OFFSET_X + CELL_WIDTH/2 - 1 // +1 in the original game, not centered, why?
-	emerald.posY = y*CELL_HEIGHT + FIELD_OFFSET_Y + CELL_HEIGHT/2 + 1
+	emerald.posX = x*CellWidth + FieldOffsetX + CellWidth/2 - 1 // +1 in the original game, not centered, why?
+	emerald.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + 1
 	emerald.emeraldsPool = emeraldsPool
 	return emerald
 }

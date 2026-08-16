@@ -15,15 +15,15 @@ type Application struct {
 func (a *Application) onResize() {
 	screenWidth := float32(rl.GetScreenWidth())
 	screenHeight := float32(rl.GetScreenHeight())
-	a.sourceRect = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(-SCREEN_LOGICAL_HEIGHT))
-	ratioX := screenWidth / float32(SCREEN_LOGICAL_WIDTH)
-	ratioY := screenHeight / float32(SCREEN_LOGICAL_HEIGHT)
+	a.sourceRect = rl.NewRectangle(0, 0, float32(ScreenLogicalWidth), float32(-ScreenLogicalHeight))
+	ratioX := screenWidth / float32(ScreenLogicalWidth)
+	ratioY := screenHeight / float32(ScreenLogicalHeight)
 	resizeRatio := If(ratioX < ratioY, ratioX, ratioY)
 	a.destRect = rl.NewRectangle(
-		(screenWidth-(float32(SCREEN_LOGICAL_WIDTH)*resizeRatio))*0.5,
-		(screenHeight-(float32(SCREEN_LOGICAL_HEIGHT)*resizeRatio))*0.5,
-		float32(SCREEN_LOGICAL_WIDTH)*resizeRatio,
-		float32(SCREEN_LOGICAL_HEIGHT)*resizeRatio,
+		(screenWidth-(float32(ScreenLogicalWidth)*resizeRatio))*0.5,
+		(screenHeight-(float32(ScreenLogicalHeight)*resizeRatio))*0.5,
+		float32(ScreenLogicalWidth)*resizeRatio,
+		float32(ScreenLogicalHeight)*resizeRatio,
 	)
 }
 
@@ -70,7 +70,7 @@ func NewApplication() *Application {
 	//debug
 	//app.currentSceneIndex = controlsSceneKey
 
-	app.drawTarget = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
+	app.drawTarget = rl.LoadRenderTexture(ScreenLogicalWidth, ScreenLogicalHeight)
 	app.onResize()
 
 	return &app

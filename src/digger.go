@@ -4,6 +4,14 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type DiggerState int64
+
+const (
+	DiggerAlive DiggerState = iota
+	DiggerDie
+	DiggerGrave
+)
+
 type Digger struct {
 	scene               *GameScene
 	posX                int32
@@ -23,6 +31,9 @@ type Digger struct {
 	renderOffsetsMap    map[Direction]Pos
 	collisionOffsetsMap map[Direction]Pos
 	collisionSizeMap    map[Direction]WidthHeight
+	innerOffsetX        int32
+	innerOffsetY        int32
+	state               DiggerState
 }
 
 func NewDigger(scene *GameScene) *Digger {
@@ -41,7 +52,10 @@ func NewDigger(scene *GameScene) *Digger {
 	dg.posX, dg.posY = scene.moveGrid.getDiggerStartPos()
 	dg.direction = RIGHT
 	dg.shouldMove = false
-	dg.speed = DIGGER_SPEED
+	dg.speed = DiggerSpeed
+	dg.state = DiggerAlive
+	dg.innerOffsetX = 0
+	dg.innerOffsetY = 1
 
 	dg.renderOffsetsMap = map[Direction]Pos{
 		LEFT:  {0, 0},
@@ -73,7 +87,7 @@ func (dg *Digger) initSprites(degrees int32, flipHorizontal bool, flipVertical b
 }
 
 func (dg *Digger) Update(tick int64) {
-	if tick%SPRITE_UPDATE_RATE == 0 {
+	if tick%SpriteUpdateRate == 0 {
 		dg.spritePointer, dg.spritePointerInc = GetNextSpritePointerAndInc(dg.spritePointer, dg.spritePointerInc, len(dg.leftSprites))
 	}
 	if tick%dg.speed == 0 && dg.shouldMove {
@@ -84,24 +98,24 @@ func (dg *Digger) Update(tick int64) {
 			dg.posX, dg.posY, dg.direction = posX, posY, dir
 			if dir == RIGHT {
 				blob := dg.scene.field.rightBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4+4), float32(dg.posY-CELL_HEIGHT/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX+8), float32(dg.posY-CELL_HEIGHT/2+1), true, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX+7), float32(dg.posY-CELL_HEIGHT/2+1), true, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4+4), float32(dg.posY-CellHeight/2+1), false, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX+8), float32(dg.posY-CellHeight/2+1), true, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX+7), float32(dg.posY-CellHeight/2+1), true, false, true, false)
 			} else if dir == LEFT {
 				blob := dg.scene.field.leftBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2-2), float32(dg.posY-CELL_HEIGHT/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2-1), float32(dg.posY-CELL_HEIGHT/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4-CELL_WIDTH/2+IfInt(dg.posX <= 20, 2, 6)), float32(dg.posY-CELL_HEIGHT/2+1), true, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2-2), float32(dg.posY-CellHeight/2+1), false, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2-1), float32(dg.posY-CellHeight/2+1), false, false, true, false)
+				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4-CellWidth/2+IfInt(dg.posX <= 20, 2, 6)), float32(dg.posY-CellHeight/2+1), true, false, true, false)
 			} else if dir == UP {
 				blob := dg.scene.field.upBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY-CELL_HEIGHT/2-dg.posY%3+4), false, true, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY-CELL_HEIGHT/2-1), false, false, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY-CELL_HEIGHT/2), false, false, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2-dg.posY%3+4), false, true, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2-1), false, false, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2), false, false, false, true)
 			} else if dir == DOWN {
 				blob := dg.scene.field.downBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY+CELL_HEIGHT/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5)), false, false, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY+CELL_HEIGHT/2-1), false, true, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CELL_WIDTH/2), float32(dg.posY+CELL_HEIGHT/2-2), false, true, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5)), false, false, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-1), false, true, false, true)
+				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-2), false, true, false, true)
 			}
 
 		}
@@ -125,8 +139,8 @@ func (dg *Digger) getSprites() []*TextureImage {
 
 func (dg *Digger) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
-		X:      float32(dg.posX + (CELL_WIDTH-dg.width)/2 - CELL_WIDTH/2 - DIGGER_INNER_OFFSET_X + dg.collisionOffsetsMap[dg.direction].X),
-		Y:      float32(dg.posY + (CELL_WIDTH-dg.height)/2 - CELL_HEIGHT/2 - DIGGER_INNER_OFFSET_Y + dg.collisionOffsetsMap[dg.direction].Y),
+		X:      float32(dg.posX + (CellWidth-dg.width)/2 - CellWidth/2 - dg.innerOffsetX + dg.collisionOffsetsMap[dg.direction].X),
+		Y:      float32(dg.posY + (CellWidth-dg.height)/2 - CellHeight/2 - dg.innerOffsetY + dg.collisionOffsetsMap[dg.direction].Y),
 		Width:  float32(dg.width + dg.collisionSizeMap[dg.direction].W),
 		Height: float32(dg.height + dg.collisionSizeMap[dg.direction].H),
 	}
@@ -137,8 +151,8 @@ func (dg *Digger) Render(drawTarget rl.RenderTexture2D) {
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
 		sprites[dg.spritePointer].texture,
-		dg.posX-CELL_WIDTH/2-DIGGER_INNER_OFFSET_X+dg.renderOffsetsMap[dg.direction].X,
-		dg.posY-CELL_HEIGHT/2-DIGGER_INNER_OFFSET_Y+dg.renderOffsetsMap[dg.direction].Y,
+		dg.posX-CellWidth/2-dg.innerOffsetX+dg.renderOffsetsMap[dg.direction].X,
+		dg.posY-CellHeight/2-dg.innerOffsetY+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)
 	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()

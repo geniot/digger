@@ -22,33 +22,33 @@ type MoveGrid struct {
 	texture   rl.RenderTexture2D
 	sourceRec rl.Rectangle
 	destRec   rl.Rectangle
-	dots      [FIELD_WIDTH][FIELD_HEIGHT]bool
+	dots      [FieldWidth][FieldHeight]bool
 }
 
 func NewMoveGrid(scene *GameScene) *MoveGrid {
 	moveGrid := &MoveGrid{}
 	moveGrid.scene = scene
 
-	moveGrid.sourceRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), -float32(SCREEN_LOGICAL_HEIGHT)) //see https://github.com/raysan5/raylib/issues/3803
-	moveGrid.destRec = rl.NewRectangle(0, 0, float32(SCREEN_LOGICAL_WIDTH), float32(SCREEN_LOGICAL_HEIGHT))
+	moveGrid.sourceRec = rl.NewRectangle(0, 0, float32(ScreenLogicalWidth), -float32(ScreenLogicalHeight)) //see https://github.com/raysan5/raylib/issues/3803
+	moveGrid.destRec = rl.NewRectangle(0, 0, float32(ScreenLogicalWidth), float32(ScreenLogicalHeight))
 
-	moveGrid.texture = rl.LoadRenderTexture(SCREEN_LOGICAL_WIDTH, SCREEN_LOGICAL_HEIGHT)
-	moveGrid.dots = [FIELD_WIDTH][FIELD_HEIGHT]bool{}
+	moveGrid.texture = rl.LoadRenderTexture(ScreenLogicalWidth, ScreenLogicalHeight)
+	moveGrid.dots = [FieldWidth][FieldHeight]bool{}
 
-	for y := FIELD_OFFSET_Y + CELL_HEIGHT/2; y < FIELD_HEIGHT-FIELD_OFFSET_Y-CELL_HEIGHT/2; y += CELL_HEIGHT {
-		for x := FIELD_OFFSET_X + CELL_WIDTH/2; x < FIELD_WIDTH-FIELD_OFFSET_X-CELL_WIDTH/2; x += 1 {
+	for y := FieldOffsetY + CellHeight/2; y < FieldHeight-FieldOffsetY-CellHeight/2; y += CellHeight {
+		for x := FieldOffsetX + CellWidth/2; x < FieldWidth-FieldOffsetX-CellWidth/2; x += 1 {
 			moveGrid.dots[x][y] = true
 		}
 	}
-	for x := FIELD_OFFSET_X + CELL_WIDTH/2; x < FIELD_WIDTH-CELL_WIDTH/2; x += CELL_WIDTH {
-		for y := FIELD_OFFSET_Y + CELL_HEIGHT/2; y < FIELD_HEIGHT-FIELD_OFFSET_Y-CELL_HEIGHT/2-1; y += 1 {
+	for x := FieldOffsetX + CellWidth/2; x < FieldWidth-CellWidth/2; x += CellWidth {
+		for y := FieldOffsetY + CellHeight/2; y < FieldHeight-FieldOffsetY-CellHeight/2-1; y += 1 {
 			moveGrid.dots[x][y] = true
 		}
 	}
 
 	rl.BeginTextureMode(moveGrid.texture)
-	for x := int32(0); x < FIELD_WIDTH; x += 1 {
-		for y := int32(0); y < FIELD_HEIGHT; y += 1 {
+	for x := int32(0); x < FieldWidth; x += 1 {
+		for y := int32(0); y < FieldHeight; y += 1 {
 			if moveGrid.dots[x][y] {
 				rl.DrawPixel(x, y, rl.Red)
 			}
@@ -74,8 +74,8 @@ func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 	cellY := int32(9)
 	//cellX := int32(0)
 	//cellY := int32(0)
-	posX := FIELD_OFFSET_X + CELL_WIDTH/2 + cellX*CELL_WIDTH
-	posY := FIELD_OFFSET_Y + CELL_HEIGHT/2 + cellY*CELL_HEIGHT
+	posX := FieldOffsetX + CellWidth/2 + cellX*CellWidth
+	posY := FieldOffsetY + CellHeight/2 + cellY*CellHeight
 	if !mg.dots[posX][posY] {
 		panic("digger start pos should be valid")
 	}

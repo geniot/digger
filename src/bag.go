@@ -4,17 +4,32 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type BagState int64
+
+const (
+	BagSet BagState = iota
+	BagPushed
+	BagHold
+	BagMoving
+	BagWobble
+	BagFalling
+	BagGoldFalling
+	BagGold
+)
+
 type Bag struct {
 	posX     int32
 	posY     int32
 	bagsPool *BagsPool
+	state    BagState
 }
 
 func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
 	bg := &Bag{}
-	bg.posX = x*CELL_WIDTH + FIELD_OFFSET_X + CELL_WIDTH/2
-	bg.posY = y*CELL_HEIGHT + FIELD_OFFSET_Y + CELL_HEIGHT/2
+	bg.posX = x*CellWidth + FieldOffsetX + CellWidth/2
+	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2
 	bg.bagsPool = bagsPool
+	bg.state = BagSet
 	return bg
 }
 
@@ -29,7 +44,7 @@ func (bg *Bag) Render(drawTarget rl.RenderTexture2D) {
 		bg.posX-int32(sprite.width/2),
 		bg.posY-int32(sprite.height/2),
 		rl.White)
-	rl.DrawRectangleLinesEx(bg.getCollisionRec(), 1.0, TransparentBlue)
+	//rl.DrawRectangleLinesEx(bg.getCollisionRec(), 1.0, TransparentBlue)
 	rl.EndTextureMode()
 }
 

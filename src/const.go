@@ -7,22 +7,20 @@ import (
 )
 
 const (
-	TICK               float64 = 1.0 / 200.0
-	SPRITE_UPDATE_RATE         = 18
-	DIGGER_SPEED               = 4 //less is faster
-	FIELD_WIDTH                = 320
-	FIELD_HEIGHT               = 186
+	TICK             float64 = 1.0 / 200.0
+	SpriteUpdateRate         = 18
+	DiggerSpeed              = 4 //less is faster
+	FieldWidth               = 320
+	FieldHeight              = 186
 
-	SCREEN_LOGICAL_WIDTH  = int32(320)
-	SCREEN_LOGICAL_HEIGHT = int32(240)
-	CELLS_HORIZONTAL      = int32(15)
-	CELLS_VERTICAL        = int32(10)
-	CELL_WIDTH            = int32(20)
-	CELL_HEIGHT           = int32(18)
-	FIELD_OFFSET_X        = int32(10)
-	FIELD_OFFSET_Y        = int32(2)
-	DIGGER_INNER_OFFSET_X = int32(0)
-	DIGGER_INNER_OFFSET_Y = int32(1)
+	ScreenLogicalWidth  = int32(320)
+	ScreenLogicalHeight = int32(240)
+	CellsHorizontal     = int32(15)
+	CellsVertical       = int32(10)
+	CellWidth           = int32(20)
+	CellHeight          = int32(18)
+	FieldOffsetX        = int32(10)
+	FieldOffsetY        = int32(2)
 
 	menuSceneKey = iota
 	gameSceneKey
@@ -76,7 +74,7 @@ var (
 
 var (
 	ZERO_VECTOR2        = rl.Vector2{}
-	CELL_CENTER_VECTOR2 = rl.Vector2{X: float32(CELL_WIDTH / 2), Y: float32(CELL_HEIGHT / 2)}
+	CELL_CENTER_VECTOR2 = rl.Vector2{X: float32(CellWidth / 2), Y: float32(CellHeight / 2)}
 )
 
 var (
