@@ -47,23 +47,23 @@ func (gs *GameScene) ProcessInput() {
 }
 
 func (gs *GameScene) Update(tick int64) {
-	gs.field.Update(tick)
-	gs.digger.Update(tick)
-	gs.fire.Update(tick)
-	gs.emeraldsPool.Update(tick)
-	gs.bagsPool.Update(tick)
-	gs.monstersPool.Update(tick)
 	gs.debugGrid.Update(tick)
 	gs.moveGrid.Update(tick)
+	gs.field.Update(tick)
+	gs.emeraldsPool.Update(tick)
+	gs.bagsPool.Update(tick)
+	gs.fire.Update(tick)
+	gs.monstersPool.Update(tick)
+	gs.digger.Update(tick)
 }
 
 func (gs *GameScene) Render(drawTarget rl.RenderTexture2D) {
 	gs.field.Render(drawTarget)
+	gs.emeraldsPool.Render(drawTarget)
 	gs.digger.Render(drawTarget)
 	gs.fire.Render(drawTarget)
-	gs.emeraldsPool.Render(drawTarget)
-	gs.bagsPool.Render(drawTarget)
 	gs.monstersPool.Render(drawTarget)
+	gs.bagsPool.Render(drawTarget)
 	gs.debugGrid.Render(drawTarget)
 	gs.moveGrid.Render(drawTarget)
 }
