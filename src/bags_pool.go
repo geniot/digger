@@ -15,7 +15,7 @@ func NewBagsPool(scene *GameScene) *BagsPool {
 	bagsPool := &BagsPool{}
 	bagsPool.scene = scene
 	bagsPool.bags = mapset.NewThreadUnsafeSet[*Bag]()
-	bagsPool.sprite = NewTextureImage("csbag.png", 0, false, false, false)
+	bagsPool.sprite = NewTextureImage("graphics/bag/csbag.png", 0, false, false, false)
 	lp := LevelPlan(scene.level)
 	for x := int32(0); x < 15; x++ {
 		for y := int32(0); y < 10; y++ {

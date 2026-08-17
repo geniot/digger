@@ -80,9 +80,9 @@ func NewDigger(scene *GameScene) *Digger {
 
 func (dg *Digger) initSprites(degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
 	sprites := make([]*TextureImage, 3)
-	sprites[0] = NewTextureImage("cldig1.png", degrees, flipHorizontal, flipVertical, false)
-	sprites[1] = NewTextureImage("cldig2.png", degrees, flipHorizontal, flipVertical, false)
-	sprites[2] = NewTextureImage("cldig3.png", degrees, flipHorizontal, flipVertical, false)
+	sprites[0] = NewTextureImage("graphics/digger/cldig1.png", degrees, flipHorizontal, flipVertical, false)
+	sprites[1] = NewTextureImage("graphics/digger/cldig2.png", degrees, flipHorizontal, flipVertical, false)
+	sprites[2] = NewTextureImage("graphics/digger/cldig3.png", degrees, flipHorizontal, flipVertical, false)
 	return sprites
 }
 
