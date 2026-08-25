@@ -5,9 +5,18 @@ import (
 )
 
 type Fire struct {
-	posX  int32
-	posY  int32
-	scene *GameScene
+	posX                      int32
+	posY                      int32
+	shouldShoot               bool
+	isOn                      bool
+	sprites                   []*TextureImage
+	explosionSprites          []*TextureImage
+	spritePointer             int
+	spritePointerInc          int
+	spriteExplosionPointer    int
+	spriteExplosionPointerInc int
+	direction                 Direction
+	scene                     *GameScene
 }
 
 func NewFire(scene *GameScene) *Fire {
@@ -15,10 +24,19 @@ func NewFire(scene *GameScene) *Fire {
 	//fire.posX = x*CellWidth + FieldOffsetX + CellWidth/2 - 1 // +1 in the original game, not centered, why?
 	//fire.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + 1
 	fire.scene = scene
+	fire.isOn = false
+	fire.shouldShoot = false
+	fire.direction = NONE
 	return fire
 }
 
-func (e *Fire) Update(_ int64) {
+func (e *Fire) Update(tick int64) {
+	if tick%SpriteUpdateRate == 0 {
+		e.spritePointer, e.spritePointerInc = GetNextSpritePointerAndInc(e.spritePointer, e.spritePointerInc, len(e.sprites))
+	}
+	if tick%FireSpeed == 0 && e.shouldShoot {
+
+	}
 }
 
 func (e *Fire) Render(drawTarget rl.RenderTexture2D) {

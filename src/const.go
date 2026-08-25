@@ -1,8 +1,6 @@
 package main
 
 import (
-	"embed"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -10,6 +8,7 @@ const (
 	TICK             float64 = 1.0 / 200.0
 	SpriteUpdateRate         = 18
 	DiggerSpeed              = 4 //less is faster
+	FireSpeed                = 3
 	FieldWidth               = 320
 	FieldHeight              = 186
 
@@ -31,14 +30,6 @@ var (
 	TransparentYellow = rl.NewColor(253, 249, 0, 100)
 	TransparentRed    = rl.NewColor(230, 41, 55, 100)
 	TransparentBlue   = rl.NewColor(41, 41, 253, 100)
-)
-
-const (
-	UP Direction = iota
-	DOWN
-	LEFT
-	RIGHT
-	NONE
 )
 
 // TSP button codes
@@ -68,20 +59,6 @@ const (
 )
 
 var (
-	//go:embed res/*
-	resList embed.FS
-)
-
-var (
 	ZERO_VECTOR2        = rl.Vector2{}
 	CELL_CENTER_VECTOR2 = rl.Vector2{X: float32(CellWidth / 2), Y: float32(CellHeight / 2)}
-)
-
-var (
-	keysToDirectionsMap = map[int32]Direction{
-		rl.KeyLeft:  LEFT,
-		rl.KeyRight: RIGHT,
-		rl.KeyUp:    UP,
-		rl.KeyDown:  DOWN,
-	}
 )
