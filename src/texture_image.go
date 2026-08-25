@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"strconv"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -38,10 +39,10 @@ func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVe
 	return textureImage
 }
 
-func initSprites(prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
-	sprites := make([]*TextureImage, 3)
-	sprites[0] = NewTextureImage("graphics/digger/"+prefix+"1.png", degrees, flipHorizontal, flipVertical, false)
-	sprites[1] = NewTextureImage("graphics/digger/"+prefix+"2.png", degrees, flipHorizontal, flipVertical, false)
-	sprites[2] = NewTextureImage("graphics/digger/"+prefix+"3.png", degrees, flipHorizontal, flipVertical, false)
+func initSprites(size int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
+	sprites := make([]*TextureImage, size)
+	for i := range size {
+		sprites[i] = NewTextureImage(prefix+strconv.Itoa(i+1)+".png", degrees, flipHorizontal, flipVertical, false)
+	}
 	return sprites
 }

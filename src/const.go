@@ -21,9 +21,9 @@ const (
 	FieldOffsetX        = int32(10)
 	FieldOffsetY        = int32(2)
 
-	menuSceneKey = iota
-	gameSceneKey
-	controlsSceneKey
+	MenuSceneKey = iota
+	GameSceneKey
+	ControlsSceneKey
 )
 
 var (

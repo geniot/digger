@@ -36,11 +36,12 @@ func NewDigger(scene *GameScene) *Digger {
 	dg := &Digger{}
 	dg.scene = scene
 
+	prefix := "graphics/digger/cldig"
 	dg.sprites = make(map[Direction][]*TextureImage)
-	dg.sprites[LEFT] = initSprites("cldig", 0, false, false)
-	dg.sprites[RIGHT] = initSprites("cldig", 0, true, false)
-	dg.sprites[UP] = initSprites("cldig", 90, false, false)
-	dg.sprites[DOWN] = initSprites("cldig", 90, true, true)
+	dg.sprites[LEFT] = initSprites(3, prefix, 0, false, false)
+	dg.sprites[RIGHT] = initSprites(3, prefix, 0, true, false)
+	dg.sprites[UP] = initSprites(3, prefix, 90, false, false)
+	dg.sprites[DOWN] = initSprites(3, prefix, 90, true, true)
 
 	dg.spritePointer = 0
 	dg.spritePointerInc = 1

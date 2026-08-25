@@ -64,8 +64,8 @@ func NewApplication() *Application {
 
 	// scenes
 	app.scenes = make(map[int]Scene)
-	app.scenes[gameSceneKey] = NewGameScene(&app)
-	app.currentSceneIndex = gameSceneKey
+	app.scenes[GameSceneKey] = NewGameScene(&app)
+	app.currentSceneIndex = GameSceneKey
 
 	//debug
 	//app.currentSceneIndex = controlsSceneKey
