@@ -93,9 +93,9 @@ func (dg *Digger) Update(tick int64) {
 	if tick%dg.speed == 0 && dg.shouldMove {
 		posX, posY, dir := dg.scene.moveGrid.move(dg.posX, dg.posY, dg.direction, dg.requestedDirection)
 		if dg.posX != posX || dg.posY != posY || dg.direction != dir { //any change from previous state?
-			dg.scene.emeraldsPool.handle(dg)
 			dg.scene.bagsPool.handle(dg)
 			dg.posX, dg.posY, dg.direction = posX, posY, dir
+			dg.scene.emeraldsPool.handle(dg)
 			if dir == RIGHT {
 				blob := dg.scene.field.rightBlob
 				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4+4), float32(dg.posY-CellHeight/2+1), false, false, true, false)

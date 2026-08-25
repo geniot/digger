@@ -55,8 +55,8 @@ func NewField(scene *GameScene) *Field {
 
 	lp := LevelPlan(scene.level)
 
-	for x := int32(0); x < 15; x++ {
-		for y := int32(0); y < 10; y++ {
+	for x := range int32(15) {
+		for y := range int32(10) {
 			c := getLevelChar(x, y, lp)
 			if c == 'S' || c == 'V' || c == 'H' {
 				xp := x*20 + 12
@@ -140,7 +140,7 @@ func (field *Field) Debug() {
 	if len(colors1) != len(colors2) {
 		panic("colors are different")
 	}
-	for i := 0; i < len(colors1); i++ {
+	for i := range colors1 {
 		if colors1[i].R != colors2[i].R || colors1[i].G != colors2[i].G || colors1[i].B != colors2[i].B || colors1[i].A != colors2[i].A {
 			println(colors1[i].R, " ", colors1[i].G, " ", colors1[i].B, " ", colors1[i].A, " ")
 			println(colors2[i].R, " ", colors2[i].G, " ", colors2[i].B, " ", colors2[i].A, " ")

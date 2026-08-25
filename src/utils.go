@@ -14,7 +14,7 @@ type WidthHeight struct {
 	H int32
 }
 
-func orPanic(err interface{}) {
+func orPanic(err any) {
 	switch v := err.(type) {
 	case error:
 		if v != nil {
@@ -41,7 +41,7 @@ func IfInt(cond bool, vTrue int32, vFalse int32) int32 {
 	return vFalse
 }
 
-func orPanicRes[T any](res T, err interface{}) T {
+func orPanicRes[T any](res T, err any) T {
 	orPanic(err)
 	return res
 }
