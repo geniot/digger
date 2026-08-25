@@ -27,9 +27,9 @@ const (
 )
 
 var (
-	TransparentYellow = rl.NewColor(253, 249, 0, 100)
-	TransparentRed    = rl.NewColor(230, 41, 55, 100)
-	TransparentBlue   = rl.NewColor(41, 41, 253, 100)
+	TransparentYellow = rl.NewColor(253, 249, 0, 150)
+	TransparentRed    = rl.NewColor(230, 41, 55, 150)
+	TransparentBlue   = rl.NewColor(41, 41, 253, 150)
 )
 
 // TSP button codes

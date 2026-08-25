@@ -39,7 +39,7 @@ func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVe
 	return textureImage
 }
 
-func initSprites(size int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
+func initTextureImages(size int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
 	sprites := make([]*TextureImage, size)
 	for i := range size {
 		sprites[i] = NewTextureImage(prefix+strconv.Itoa(i+1)+".png", degrees, flipHorizontal, flipVertical, false)

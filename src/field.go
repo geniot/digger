@@ -148,3 +148,16 @@ func (field *Field) Debug() {
 		}
 	}
 }
+
+func (field *Field) IsColliding(rec rl.Rectangle) bool {
+	recX, recY, recW, recH := int32(rec.X), int32(rec.Y), int32(rec.Width), int32(rec.Height)
+	for x := recX; x < recX+recW; x++ {
+		for y := recY; y < recY+recH; y++ {
+			color := rl.GetImageColor(*field.image, x, y)
+			if color.R != 0 || color.G != 0 || color.B != 0 {
+				return true
+			}
+		}
+	}
+	return false
+}

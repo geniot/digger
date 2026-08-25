@@ -3,13 +3,13 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 var (
-	moveMap = map[Direction]Pos{
+	MoveMap = map[Direction]Pos{
 		LEFT:  {-1, 0},
 		RIGHT: {1, 0},
 		UP:    {0, -1},
 		DOWN:  {0, 1},
 	}
-	dirMap = map[Direction][3]int32{
+	DirMap = map[Direction][3]int32{
 		LEFT:  {int32(LEFT), int32(UP), int32(DOWN)},
 		RIGHT: {int32(RIGHT), int32(UP), int32(DOWN)},
 		UP:    {int32(UP), int32(LEFT), int32(RIGHT)},
@@ -94,12 +94,12 @@ func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
 
 func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
 	direction := requestedDirection
-	d0 := Direction(dirMap[requestedDirection][0])
-	d1 := Direction(dirMap[requestedDirection][1])
-	d2 := Direction(dirMap[requestedDirection][2])
-	m0 := moveMap[d0]
-	m1 := moveMap[d1]
-	m2 := moveMap[d2]
+	d0 := Direction(DirMap[requestedDirection][0])
+	d1 := Direction(DirMap[requestedDirection][1])
+	d2 := Direction(DirMap[requestedDirection][2])
+	m0 := MoveMap[d0]
+	m1 := MoveMap[d1]
+	m2 := MoveMap[d2]
 
 	if requestedDirection == d0 {
 		if mg.dots[x+m0.X][y+m0.Y] { //most expected situation

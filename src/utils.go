@@ -59,7 +59,7 @@ func setTextStyle(ts gui.PropertyValue, sp gui.PropertyValue, ta gui.PropertyVal
 	gui.SetStyle(gui.TEXTBOX, gui.TEXT_ALIGNMENT, gui.TEXT_ALIGN_LEFT)
 }
 
-func GetNextSpritePointerAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
+func GetNextSpritePtrAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
 	nextSpritePointerInc := spritePointerInc
 	nextSpritePointer := currentPointer + spritePointerInc
 	if nextSpritePointer >= spritesLen {

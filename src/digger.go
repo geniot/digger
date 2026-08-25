@@ -21,8 +21,8 @@ type Digger struct {
 	direction           Direction
 	requestedDirection  Direction
 	shouldMove          bool
-	spritePointer       int
-	spritePointerInc    int
+	spritePtr           int
+	spritePtrInc        int
 	sprites             map[Direction][]*TextureImage
 	renderOffsetsMap    map[Direction]Pos
 	collisionOffsetsMap map[Direction]Pos
@@ -38,13 +38,13 @@ func NewDigger(scene *GameScene) *Digger {
 
 	prefix := "graphics/digger/cldig"
 	dg.sprites = make(map[Direction][]*TextureImage)
-	dg.sprites[LEFT] = initSprites(3, prefix, 0, false, false)
-	dg.sprites[RIGHT] = initSprites(3, prefix, 0, true, false)
-	dg.sprites[UP] = initSprites(3, prefix, 90, false, false)
-	dg.sprites[DOWN] = initSprites(3, prefix, 90, true, true)
+	dg.sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
+	dg.sprites[RIGHT] = initTextureImages(3, prefix, 0, true, false)
+	dg.sprites[UP] = initTextureImages(3, prefix, 90, false, false)
+	dg.sprites[DOWN] = initTextureImages(3, prefix, 90, true, true)
 
-	dg.spritePointer = 0
-	dg.spritePointerInc = 1
+	dg.spritePtr = 0
+	dg.spritePtrInc = 1
 	dg.width = 16
 	dg.height = 16
 	dg.posX, dg.posY = scene.moveGrid.getDiggerStartPos()
@@ -77,7 +77,7 @@ func NewDigger(scene *GameScene) *Digger {
 
 func (dg *Digger) Update(tick int64) {
 	if tick%SpriteUpdateRate == 0 {
-		dg.spritePointer, dg.spritePointerInc = GetNextSpritePointerAndInc(dg.spritePointer, dg.spritePointerInc, len(dg.sprites[dg.direction]))
+		dg.spritePtr, dg.spritePtrInc = GetNextSpritePtrAndInc(dg.spritePtr, dg.spritePtrInc, len(dg.sprites[dg.direction]))
 	}
 	if tick%DiggerSpeed == 0 && dg.shouldMove {
 		posX, posY, dir := dg.scene.moveGrid.move(dg.posX, dg.posY, dg.direction, dg.requestedDirection)
@@ -124,10 +124,10 @@ func (dg *Digger) Render(drawTarget rl.RenderTexture2D) {
 	sprites := dg.sprites[dg.direction]
 	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
-		sprites[dg.spritePointer].texture,
+		sprites[dg.spritePtr].texture,
 		dg.posX-CellWidth/2-dg.innerOffsetX+dg.renderOffsetsMap[dg.direction].X,
 		dg.posY-CellHeight/2-dg.innerOffsetY+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)
-	//rl.DrawRectangleLinesEx(digger.getCollisionRec(), 1.0, TransparentYellow)
+	//rl.DrawRectangleLinesEx(dg.getCollisionRec(), 1.0, TransparentYellow)
 	rl.EndTextureMode()
 }

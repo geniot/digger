@@ -13,81 +13,114 @@ const (
 )
 
 type Fire struct {
-	posX                      int32
-	posY                      int32
-	shouldShoot               bool
-	state                     FireState
-	sprites                   map[Direction][]*TextureImage
-	explosionSprites          map[Direction][]*TextureImage
-	spritePointer             int
-	spritePointerInc          int
-	spriteExplosionPointer    int
-	spriteExplosionPointerInc int
-	direction                 Direction
-	scene                     *GameScene
+	posX                 int32
+	posY                 int32
+	shouldShoot          bool
+	state                FireState
+	sprites              map[Direction][]*TextureImage
+	expSprites           map[Direction][]*TextureImage
+	initialPosOffsetsMap map[Direction]Pos
+	spritePtr            int
+	spritePtrInc         int
+	spriteExpPtr         int
+	spriteExpPtrInc      int
+	direction            Direction
+	scene                *GameScene
 }
 
 func NewFire(scene *GameScene) *Fire {
 	f := &Fire{}
-
 	prefix := "graphics/fire/cfire"
 	f.sprites = make(map[Direction][]*TextureImage)
-	f.sprites[LEFT] = initSprites(3, prefix, 0, false, false)
-	f.sprites[RIGHT] = initSprites(3, prefix, 0, true, false)
-	f.sprites[UP] = initSprites(3, prefix, 90, false, false)
-	f.sprites[DOWN] = initSprites(3, prefix, 90, true, true)
-	//no rotations for explosion
+	f.sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
+	f.sprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
+	f.sprites[UP] = initTextureImages(3, prefix, 0, false, false)
+	f.sprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
 	prefix = "graphics/fire/cexp"
-	f.explosionSprites = make(map[Direction][]*TextureImage)
-	f.explosionSprites[LEFT] = initSprites(3, prefix, 0, false, false)
-	f.explosionSprites[RIGHT] = initSprites(3, prefix, 0, true, false)
-	f.explosionSprites[UP] = initSprites(3, prefix, 0, false, false)
-	f.explosionSprites[DOWN] = initSprites(3, prefix, 0, false, false)
+	f.expSprites = make(map[Direction][]*TextureImage)
+	f.expSprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
+	f.expSprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
+	f.expSprites[UP] = initTextureImages(3, prefix, 0, false, false)
+	f.expSprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
+
+	f.initialPosOffsetsMap = map[Direction]Pos{
+		LEFT:  {-int32(f.sprites[LEFT][f.spritePtr].width) * 2, -2},
+		RIGHT: {int32(f.sprites[RIGHT][f.spritePtr].width), -2},
+		UP:    {-5, -int32(f.sprites[UP][f.spritePtr].height) * 2},
+		DOWN:  {-2, int32(f.sprites[DOWN][f.spritePtr].height) + 1},
+	}
 
 	f.scene = scene
+	f.spritePtr = 0
+	f.spriteExpPtr = 0
+	f.spritePtrInc = 1
+	f.spriteExpPtrInc = 1
 	f.state = FireNone
 	f.shouldShoot = false
 	f.direction = NONE
+
 	return f
 }
 
 func (f *Fire) Update(tick int64) {
 	if f.shouldShoot && f.state == FireNone {
-		f.posX, f.posY = f.scene.digger.posX, f.scene.digger.posY
 		f.direction = f.scene.digger.direction
-		f.state = FireMoving
+		newPosX := f.scene.digger.posX + f.initialPosOffsetsMap[f.direction].X
+		newPosY := f.scene.digger.posY + f.initialPosOffsetsMap[f.direction].Y
+		newColRec := f.getCollisionRec(newPosX, newPosY)
+		if f.scene.field.IsColliding(newColRec) {
+			f.state = FireExploding
+		} else {
+			f.posX, f.posY = newPosX, newPosY
+			f.state = FireMoving
+		}
 	}
 	if f.state != FireNone {
 		if tick%SpriteUpdateRate == 0 {
-			f.spritePointer, f.spritePointerInc = GetNextSpritePointerAndInc(f.spritePointer, f.spritePointerInc, len(f.sprites))
-			f.spriteExplosionPointer, f.spriteExplosionPointerInc = GetNextSpritePointerAndInc(f.spriteExplosionPointer, f.spriteExplosionPointerInc, len(f.explosionSprites))
+			if f.state == FireMoving {
+				f.spritePtr, f.spritePtrInc = GetNextSpritePtrAndInc(f.spritePtr, f.spritePtrInc, len(f.sprites[f.direction]))
+			} else if f.state == FireExploding {
+				f.spriteExpPtr, f.spriteExpPtrInc = GetNextSpritePtrAndInc(f.spriteExpPtr, f.spriteExpPtrInc, len(f.expSprites[f.direction]))
+			}
 		}
-		if tick%FireSpeed == 0 {
-
+		if f.state == FireExploding && f.spriteExpPtr+1 >= len(f.expSprites[f.direction]) {
+			f.spritePtr = 0
+			f.spriteExpPtr = 0
+			f.state = FireNone
+		} else if tick%FireSpeed == 0 {
+			newPosX, newPosY := f.posX+MoveMap[f.direction].X, f.posY+MoveMap[f.direction].Y
+			newColRec := f.getCollisionRec(newPosX, newPosY)
+			if f.scene.field.IsColliding(newColRec) {
+				f.state = FireExploding
+			} else {
+				f.posX, f.posY = newPosX, newPosY
+			}
 		}
 	}
 }
 
 func (f *Fire) Render(drawTarget rl.RenderTexture2D) {
 	if f.state != FireNone {
-		sprites := f.sprites[f.direction]
+		sprites := If(f.state == FireMoving, f.sprites[f.direction], f.expSprites[f.direction])
+		ptr := If(f.state == FireMoving, f.spritePtr, f.spriteExpPtr)
 		rl.BeginTextureMode(drawTarget)
 		rl.DrawTexture(
-			sprites[f.spritePointer].texture,
+			sprites[ptr].texture,
 			f.posX,
 			f.posY,
 			rl.White)
-		//rl.DrawRectangleLinesEx(e.getCollisionRec(), 1.0, TransparentBlue)
+		//rl.DrawRectangleLinesEx(f.getCollisionRec(f.posX, f.posY), 1.0, TransparentYellow)
 		rl.EndTextureMode()
 	}
 }
 
-func (f *Fire) getCollisionRec() rl.Rectangle {
-	return rl.Rectangle{}
-	//return rl.Rectangle{
-	//	X:      float32(e.posX - int32(sprite.width/2)),
-	//	Y:      float32(e.posY - int32(sprite.height/2)),
-	//	Width:  sprite.width,
-	//	Height: sprite.height,
-	//}
+func (f *Fire) getCollisionRec(posX int32, posY int32) rl.Rectangle {
+	sprites := If(f.state == FireMoving, f.sprites[f.direction], f.expSprites[f.direction])
+	ptr := If(f.state == FireMoving, f.spritePtr, f.spriteExpPtr)
+	return rl.Rectangle{
+		X:      float32(posX),
+		Y:      float32(posY),
+		Width:  sprites[ptr].width,
+		Height: sprites[ptr].height,
+	}
 }
