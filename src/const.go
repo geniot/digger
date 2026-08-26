@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	TICK             float64 = 1.0 / 200.0
-	SpriteUpdateRate         = 18
+	TICK             float64 = 1.0 / (60.0 * 4.0)
+	SpriteUpdateRate         = 20
 	DiggerSpeed              = 4 //less is faster
 	FireSpeed                = 3
 	FieldWidth               = 320

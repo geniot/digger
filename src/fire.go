@@ -68,10 +68,10 @@ func (f *Fire) Update(tick int64) {
 		newPosX := f.scene.digger.posX + f.initialPosOffsetsMap[f.direction].X
 		newPosY := f.scene.digger.posY + f.initialPosOffsetsMap[f.direction].Y
 		newColRec := f.getCollisionRec(newPosX, newPosY)
+		f.posX, f.posY = newPosX, newPosY
 		if f.scene.field.IsColliding(newColRec) {
-			f.state = FireExploding
+			f.state = FireNone
 		} else {
-			f.posX, f.posY = newPosX, newPosY
 			f.state = FireMoving
 		}
 	}
@@ -89,7 +89,7 @@ func (f *Fire) Update(tick int64) {
 			f.state = FireNone
 		} else if tick%FireSpeed == 0 {
 			newPosX, newPosY := f.posX+MoveMap[f.direction].X, f.posY+MoveMap[f.direction].Y
-			newColRec := f.getCollisionRec(newPosX, newPosY)
+			newColRec := f.getCollisionRec(newPosX, newPosY) //can be optimized to check only one row of pixels
 			if f.scene.field.IsColliding(newColRec) {
 				f.state = FireExploding
 			} else {
