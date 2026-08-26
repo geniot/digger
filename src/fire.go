@@ -30,18 +30,8 @@ type Fire struct {
 
 func NewFire(scene *GameScene) *Fire {
 	f := &Fire{}
-	prefix := "graphics/fire/cfire"
-	f.sprites = make(map[Direction][]*TextureImage)
-	f.sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
-	f.sprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
-	f.sprites[UP] = initTextureImages(3, prefix, 0, false, false)
-	f.sprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
-	prefix = "graphics/fire/cexp"
-	f.expSprites = make(map[Direction][]*TextureImage)
-	f.expSprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
-	f.expSprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
-	f.expSprites[UP] = initTextureImages(3, prefix, 0, false, false)
-	f.expSprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
+	f.sprites = f.initSprites("graphics/fire/cfire")
+	f.expSprites = f.initSprites("graphics/fire/cexp")
 
 	f.initialPosOffsetsMap = map[Direction]Pos{
 		LEFT:  {-int32(f.sprites[LEFT][f.spritePtr].width) * 2, -2},
@@ -60,6 +50,15 @@ func NewFire(scene *GameScene) *Fire {
 	f.direction = NONE
 
 	return f
+}
+
+func (f *Fire) initSprites(prefix string) map[Direction][]*TextureImage {
+	sprites := make(map[Direction][]*TextureImage)
+	sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
+	sprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
+	sprites[UP] = initTextureImages(3, prefix, 0, false, false)
+	sprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
+	return sprites
 }
 
 func (f *Fire) Update(tick int64) {
