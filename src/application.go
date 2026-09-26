@@ -15,7 +15,8 @@ type Application struct {
 func (a *Application) onResize() {
 	screenWidth := float32(rl.GetScreenWidth())
 	screenHeight := float32(rl.GetScreenHeight())
-	a.sourceRect = rl.NewRectangle(0, 0, float32(ScreenLogicalWidth), float32(-ScreenLogicalHeight))
+	padding := float32(0)
+	a.sourceRect = rl.NewRectangle(padding, padding, float32(ScreenLogicalWidth)+padding*2, float32(-ScreenLogicalHeight)+padding*2)
 	ratioX := screenWidth / float32(ScreenLogicalWidth)
 	ratioY := screenHeight / float32(ScreenLogicalHeight)
 	resizeRatio := If(ratioX < ratioY, ratioX, ratioY)
@@ -39,7 +40,11 @@ func (a *Application) Update(tick int64) {
 }
 
 func (a *Application) Render() {
+	rl.BeginTextureMode(a.drawTarget)
+	rl.ClearBackground(rl.Black)
 	a.scenes[a.currentSceneIndex].Render(a.drawTarget)
+	rl.EndTextureMode()
+
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
 	rl.DrawTexturePro(a.drawTarget.Texture,

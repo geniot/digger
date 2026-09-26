@@ -37,7 +37,6 @@ func (bg *Bag) Update(_ int64) {
 }
 
 func (bg *Bag) Render(drawTarget rl.RenderTexture2D) {
-	rl.BeginTextureMode(drawTarget)
 	sprite := bg.bagsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,
@@ -45,7 +44,6 @@ func (bg *Bag) Render(drawTarget rl.RenderTexture2D) {
 		bg.posY-int32(sprite.height/2),
 		rl.White)
 	//rl.DrawRectangleLinesEx(bg.getCollisionRec(), 1.0, TransparentBlue)
-	rl.EndTextureMode()
 }
 
 func (bg *Bag) getCollisionRec() rl.Rectangle {

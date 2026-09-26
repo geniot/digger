@@ -32,7 +32,6 @@ func (mr *Monster) Update(_ int64) {
 }
 
 func (mr *Monster) Render(drawTarget rl.RenderTexture2D) {
-	rl.BeginTextureMode(drawTarget)
 	sprite := mr.monstersPool.sprite
 	rl.DrawTexture(
 		sprite.texture,
@@ -40,7 +39,6 @@ func (mr *Monster) Render(drawTarget rl.RenderTexture2D) {
 		mr.posY-int32(sprite.height/2),
 		rl.White)
 	//rl.DrawRectangleLinesEx(e.getCollisionRec(), 1.0, TransparentBlue)
-	rl.EndTextureMode()
 }
 
 func (mr *Monster) getCollisionRec() rl.Rectangle {

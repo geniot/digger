@@ -122,12 +122,10 @@ func (dg *Digger) getCollisionRec() rl.Rectangle {
 
 func (dg *Digger) Render(drawTarget rl.RenderTexture2D) {
 	sprites := dg.sprites[dg.direction]
-	rl.BeginTextureMode(drawTarget)
 	rl.DrawTexture(
 		sprites[dg.spritePtr].texture,
 		dg.posX-CellWidth/2-dg.innerOffsetX+dg.renderOffsetsMap[dg.direction].X,
 		dg.posY-CellHeight/2-dg.innerOffsetY+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)
 	//rl.DrawRectangleLinesEx(dg.getCollisionRec(), 1.0, TransparentYellow)
-	rl.EndTextureMode()
 }

@@ -120,10 +120,8 @@ func (field *Field) Update(_ int64) {
 
 func (field *Field) Render(drawTarget rl.RenderTexture2D) {
 	//field.Debug()
-	rl.BeginTextureMode(drawTarget)
 	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)
 	rl.DrawTexturePro(field.texture.Texture, field.textureSourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
-	rl.EndTextureMode()
 }
 
 func (field *Field) Debug() {

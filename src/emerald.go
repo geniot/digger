@@ -22,7 +22,6 @@ func (e *Emerald) Update(_ int64) {
 }
 
 func (e *Emerald) Render(drawTarget rl.RenderTexture2D) {
-	rl.BeginTextureMode(drawTarget)
 	sprite := e.emeraldsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,
@@ -30,7 +29,6 @@ func (e *Emerald) Render(drawTarget rl.RenderTexture2D) {
 		e.posY-int32(sprite.height/2),
 		rl.White)
 	//rl.DrawRectangleLinesEx(e.getCollisionRec(), 1.0, TransparentBlue)
-	rl.EndTextureMode()
 }
 
 func (e *Emerald) getCollisionRec() rl.Rectangle {

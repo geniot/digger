@@ -102,14 +102,12 @@ func (f *Fire) Render(drawTarget rl.RenderTexture2D) {
 	if f.state != FireNone {
 		sprites := If(f.state == FireMoving, f.sprites[f.direction], f.expSprites[f.direction])
 		ptr := If(f.state == FireMoving, f.spritePtr, f.spriteExpPtr)
-		rl.BeginTextureMode(drawTarget)
 		rl.DrawTexture(
 			sprites[ptr].texture,
 			f.posX,
 			f.posY,
 			rl.White)
 		//rl.DrawRectangleLinesEx(f.getCollisionRec(f.posX, f.posY), 1.0, TransparentYellow)
-		rl.EndTextureMode()
 	}
 }
 
