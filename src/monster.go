@@ -31,7 +31,7 @@ func NewMonster(monstersPool *MonstersPool, x int32, y int32) *Monster {
 func (mr *Monster) Update(_ int64) {
 }
 
-func (mr *Monster) Render(drawTarget rl.RenderTexture2D) {
+func (mr *Monster) Render() {
 	sprite := mr.monstersPool.sprite
 	rl.DrawTexture(
 		sprite.texture,

@@ -21,7 +21,7 @@ func NewEmerald(emeraldsPool *EmeraldsPool, x int32, y int32) *Emerald {
 func (e *Emerald) Update(_ int64) {
 }
 
-func (e *Emerald) Render(drawTarget rl.RenderTexture2D) {
+func (e *Emerald) Render() {
 	sprite := e.emeraldsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,

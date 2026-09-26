@@ -26,9 +26,9 @@ func (mp *MonstersPool) Update(tick int64) {
 	}
 }
 
-func (mp *MonstersPool) Render(drawTarget rl.RenderTexture2D) {
+func (mp *MonstersPool) Render() {
 	for monster := range mp.monsters.Iter() {
-		monster.Render(drawTarget)
+		monster.Render()
 	}
 }
 

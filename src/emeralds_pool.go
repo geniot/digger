@@ -36,9 +36,9 @@ func (ep *EmeraldsPool) Update(tick int64) {
 	}
 }
 
-func (ep *EmeraldsPool) Render(drawTarget rl.RenderTexture2D) {
+func (ep *EmeraldsPool) Render() {
 	for emerald := range ep.emeralds.Iter() {
-		emerald.Render(drawTarget)
+		emerald.Render()
 	}
 }
 

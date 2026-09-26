@@ -66,15 +66,15 @@ func (gs *GameScene) Update(tick int64) {
 	gs.digger.Update(tick)
 }
 
-func (gs *GameScene) Render(drawTarget rl.RenderTexture2D) {
-	gs.field.Render(drawTarget)
-	gs.emeraldsPool.Render(drawTarget)
-	gs.digger.Render(drawTarget)
-	gs.fire.Render(drawTarget)
-	gs.monstersPool.Render(drawTarget)
-	gs.bagsPool.Render(drawTarget)
-	gs.debugGrid.Render(drawTarget)
-	gs.moveGrid.Render(drawTarget)
+func (gs *GameScene) Render() {
+	gs.field.Render()
+	gs.emeraldsPool.Render()
+	gs.digger.Render()
+	gs.fire.Render()
+	gs.monstersPool.Render()
+	gs.bagsPool.Render()
+	gs.debugGrid.Render()
+	gs.moveGrid.Render()
 }
 
 func (gs *GameScene) ShouldExit() bool {

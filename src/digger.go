@@ -120,7 +120,7 @@ func (dg *Digger) getCollisionRec() rl.Rectangle {
 	}
 }
 
-func (dg *Digger) Render(drawTarget rl.RenderTexture2D) {
+func (dg *Digger) Render() {
 	sprites := dg.sprites[dg.direction]
 	rl.DrawTexture(
 		sprites[dg.spritePtr].texture,

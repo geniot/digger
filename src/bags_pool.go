@@ -34,9 +34,9 @@ func (ep *BagsPool) Update(tick int64) {
 	}
 }
 
-func (ep *BagsPool) Render(drawTarget rl.RenderTexture2D) {
+func (ep *BagsPool) Render() {
 	for bag := range ep.bags.Iter() {
-		bag.Render(drawTarget)
+		bag.Render()
 	}
 }
 

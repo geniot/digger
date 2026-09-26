@@ -42,7 +42,7 @@ func (a *Application) Update(tick int64) {
 func (a *Application) Render() {
 	rl.BeginTextureMode(a.drawTarget)
 	rl.ClearBackground(rl.Black)
-	a.scenes[a.currentSceneIndex].Render(a.drawTarget)
+	a.scenes[a.currentSceneIndex].Render()
 	rl.EndTextureMode()
 
 	rl.BeginDrawing()

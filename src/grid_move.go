@@ -62,7 +62,7 @@ func NewMoveGrid(scene *GameScene) *MoveGrid {
 func (mg *MoveGrid) Update(_ int64) {
 }
 
-func (mg *MoveGrid) Render(drawTarget rl.RenderTexture2D) {
+func (mg *MoveGrid) Render() {
 	//rl.DrawTexturePro(mg.texture.Texture, mg.sourceRec, mg.destRec, ZERO_VECTOR2, 0, rl.White)
 	//rl.DrawFPS(5, 5)
 }

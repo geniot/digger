@@ -36,7 +36,7 @@ func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
 func (bg *Bag) Update(_ int64) {
 }
 
-func (bg *Bag) Render(drawTarget rl.RenderTexture2D) {
+func (bg *Bag) Render() {
 	sprite := bg.bagsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,

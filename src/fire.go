@@ -98,7 +98,7 @@ func (f *Fire) Update(tick int64) {
 	}
 }
 
-func (f *Fire) Render(drawTarget rl.RenderTexture2D) {
+func (f *Fire) Render() {
 	if f.state != FireNone {
 		sprites := If(f.state == FireMoving, f.sprites[f.direction], f.expSprites[f.direction])
 		ptr := If(f.state == FireMoving, f.spritePtr, f.spriteExpPtr)
