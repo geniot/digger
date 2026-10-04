@@ -51,7 +51,7 @@ func (bg *Bag) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
 		X:      float32(bg.posX - int32(sprite.width/2) + 2),
 		Y:      float32(bg.posY - int32(sprite.height/2) + 3),
-		Width:  sprite.width - 4,
-		Height: sprite.height - 5,
+		Width:  float32(sprite.width - 4),
+		Height: float32(sprite.height - 5),
 	}
 }

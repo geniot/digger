@@ -87,24 +87,24 @@ func (dg *Digger) Update(tick int64) {
 			dg.scene.emeraldsPool.handle(dg)
 			if dir == RIGHT {
 				blob := dg.scene.field.rightBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4+4), float32(dg.posY-CellHeight/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX+8), float32(dg.posY-CellHeight/2+1), true, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX+7), float32(dg.posY-CellHeight/2+1), true, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX-dg.posX%4+4, dg.posY-CellHeight/2+1, false, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX+8, dg.posY-CellHeight/2+1, true, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX+7, dg.posY-CellHeight/2+1, true, false, true, false)
 			} else if dir == LEFT {
 				blob := dg.scene.field.leftBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2-2), float32(dg.posY-CellHeight/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2-1), float32(dg.posY-CellHeight/2+1), false, false, true, false)
-				dg.scene.field.drawExt(blob, float32(dg.posX-dg.posX%4-CellWidth/2+IfInt(dg.posX <= 20, 2, 6)), float32(dg.posY-CellHeight/2+1), true, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2-2, dg.posY-CellHeight/2+1, false, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2-1, dg.posY-CellHeight/2+1, false, false, true, false)
+				dg.scene.field.drawExt(blob, dg.posX-dg.posX%4-CellWidth/2+IfInt(dg.posX <= 20, 2, 6), dg.posY-CellHeight/2+1, true, false, true, false)
 			} else if dir == UP {
 				blob := dg.scene.field.upBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2-dg.posY%3+4), false, true, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2-1), false, false, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY-CellHeight/2), false, false, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2-dg.posY%3+4, false, true, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2-1, false, false, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2, false, false, false, true)
 			} else if dir == DOWN {
 				blob := dg.scene.field.downBlob
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5)), false, false, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-1), false, true, false, true)
-				dg.scene.field.drawExt(blob, float32(dg.posX-CellWidth/2), float32(dg.posY+CellHeight/2-2), false, true, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY+CellHeight/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5), false, false, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY+CellHeight/2-1, false, true, false, true)
+				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY+CellHeight/2-2, false, true, false, true)
 			}
 
 		}

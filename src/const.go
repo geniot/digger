@@ -9,8 +9,8 @@ const (
 	SpriteUpdateRate         = 20
 	DiggerSpeed              = 4 //less is faster
 	FireSpeed                = 3
-	FieldWidth               = 320
-	FieldHeight              = 186
+	FieldWidth               = int32(320)
+	FieldHeight              = int32(186)
 
 	ScreenLogicalWidth  = int32(320)
 	ScreenLogicalHeight = int32(240)

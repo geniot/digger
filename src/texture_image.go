@@ -13,29 +13,41 @@ var (
 )
 
 type TextureImage struct {
-	image   *rl.Image
 	texture rl.Texture2D
-	width   float32
-	height  float32
+	mask    [][]bool
+	width   int32
+	height  int32
 }
 
 func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *TextureImage {
 	textureImage := &TextureImage{}
 	imgBytes := orPanicRes(resList.ReadFile("res/" + fileName))
-	textureImage.image = rl.LoadImageFromMemory(".png", imgBytes, int32(len(imgBytes)))
+	image := rl.LoadImageFromMemory(".png", imgBytes, int32(len(imgBytes)))
 	if shouldMask {
-		rl.ImageColorTint(textureImage.image, rl.Black)
+		rl.ImageColorTint(image, rl.Black)
 	}
-	rl.ImageRotate(textureImage.image, degrees)
+	rl.ImageRotate(image, degrees)
 	if flipHorizontal {
-		rl.ImageFlipHorizontal(textureImage.image)
+		rl.ImageFlipHorizontal(image)
 	}
 	if flipVertical {
-		rl.ImageFlipVertical(textureImage.image)
+		rl.ImageFlipVertical(image)
 	}
-	textureImage.texture = rl.LoadTextureFromImage(textureImage.image)
-	textureImage.width = float32(textureImage.image.Width)
-	textureImage.height = float32(textureImage.image.Height)
+	textureImage.texture = rl.LoadTextureFromImage(image)
+	textureImage.width = image.Width
+	textureImage.height = image.Height
+	//mask
+	textureImage.mask = make([][]bool, image.Width)
+	for x := range image.Width {
+		textureImage.mask[x] = make([]bool, image.Height)
+	}
+	for y := range image.Height {
+		for x := range image.Width {
+			if IsPixelColored(x, y, image) {
+				textureImage.mask[x][y] = true
+			}
+		}
+	}
 	return textureImage
 }
 

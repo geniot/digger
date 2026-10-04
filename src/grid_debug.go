@@ -39,6 +39,6 @@ func (debugGrid *DebugGrid) Update(_ int64) {
 }
 
 func (debugGrid *DebugGrid) Render() {
-	rl.DrawTexturePro(debugGrid.texture.Texture, debugGrid.sourceRec, debugGrid.destRec, ZERO_VECTOR2, 0, rl.White)
+	//rl.DrawTexturePro(debugGrid.texture.Texture, debugGrid.sourceRec, debugGrid.destRec, ZERO_VECTOR2, 0, rl.White)
 	rl.DrawFPS(5, 5)
 }

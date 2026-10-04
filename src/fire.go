@@ -117,7 +117,7 @@ func (f *Fire) getCollisionRec(posX int32, posY int32) rl.Rectangle {
 	return rl.Rectangle{
 		X:      float32(posX),
 		Y:      float32(posY),
-		Width:  sprites[ptr].width,
-		Height: sprites[ptr].height,
+		Width:  float32(sprites[ptr].width),
+		Height: float32(sprites[ptr].height),
 	}
 }

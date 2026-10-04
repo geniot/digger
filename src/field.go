@@ -7,7 +7,7 @@ import (
 type Field struct {
 	scene            *GameScene
 	texture          rl.RenderTexture2D
-	image            *rl.Image
+	state            [FieldWidth][FieldHeight]bool
 	textureSourceRec rl.Rectangle
 	imageSourceRec   rl.Rectangle
 	destRec          rl.Rectangle
@@ -21,9 +21,9 @@ func NewField(scene *GameScene) *Field {
 	fld := &Field{}
 	fld.scene = scene
 
-	fld.textureSourceRec = rl.NewRectangle(0, 0, FieldWidth, -FieldHeight) //see https://github.com/raysan5/raylib/issues/3803
-	fld.imageSourceRec = rl.NewRectangle(0, 0, FieldWidth, FieldHeight)
-	fld.destRec = rl.NewRectangle(0, 0, FieldWidth, FieldHeight)
+	fld.textureSourceRec = rl.NewRectangle(0, 0, float32(FieldWidth), -float32(FieldHeight)) //see https://github.com/raysan5/raylib/issues/3803
+	fld.imageSourceRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
+	fld.destRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
 
 	bg := NewTextureImage("graphics/field/cback1.png", 0, false, false, false)
 
@@ -33,13 +33,18 @@ func NewField(scene *GameScene) *Field {
 	fld.rightBlob = NewTextureImage("graphics/field/crblob.png", 0, false, false, false)
 
 	fld.texture = rl.LoadRenderTexture(FieldWidth, FieldHeight)
-	fld.image = rl.GenImageColor(FieldWidth, FieldHeight, rl.Black)
+	fld.state = [FieldWidth][FieldHeight]bool{}
+	for x := range FieldWidth {
+		for y := range FieldHeight {
+			fld.state[x][y] = true
+		}
+	}
 
 	rl.BeginTextureMode(fld.texture)
 	rl.ClearBackground(rl.Black)
-	for y := int32(0); y < FieldHeight; y += int32(bg.height) {
-		for x := int32(0); x < FieldWidth; x += int32(bg.width) {
-			fld.draw(bg, float32(x), float32(y))
+	for x := int32(0); x < FieldWidth; x += bg.width {
+		for y := int32(0); y < FieldHeight; y += bg.height {
+			fld.draw(bg, x, y)
 		}
 	}
 	rl.EndTextureMode()
@@ -63,21 +68,21 @@ func NewField(scene *GameScene) *Field {
 				yp := y*18 + 18
 				if c == 'V' || c == 'S' {
 					for decr := int32(-15); decr <= -3; decr += 3 {
-						fld.draw(fld.downBlob, float32(xp+dX), float32(yp+decr+dY))
+						fld.draw(fld.downBlob, xp+dX, yp+decr+dY)
 					}
-					fld.draw(fld.upBlob, float32(xp+uX), float32(yp+3+uY))
+					fld.draw(fld.upBlob, xp+uX, yp+3+uY)
 				}
 				if c == 'H' || c == 'S' {
 					for decr := int32(-16); decr <= -4; decr += 4 {
-						fld.draw(fld.rightBlob, float32(xp+decr+rX), float32(yp+rY))
+						fld.draw(fld.rightBlob, xp+decr+rX, yp+rY)
 					}
-					fld.draw(fld.leftBlob, float32(xp+4+lX), float32(yp+lY))
+					fld.draw(fld.leftBlob, xp+4+lX, yp+lY)
 				}
 				if x < 14 && (getLevelChar(x+1, y, lp) == 'H' || getLevelChar(x+1, y, lp) == 'S') {
-					fld.draw(fld.rightBlob, float32(xp+rX), float32(yp+rY))
+					fld.draw(fld.rightBlob, xp+rX, yp+rY)
 				}
 				if y < 9 && (getLevelChar(x, y+1, lp) == 'V' || getLevelChar(x, y+1, lp) == 'H') {
-					fld.draw(fld.downBlob, float32(xp+dX), float32(yp+dY))
+					fld.draw(fld.downBlob, xp+dX, yp+dY)
 				}
 			}
 		}
@@ -85,25 +90,26 @@ func NewField(scene *GameScene) *Field {
 	return fld
 }
 
-func (field *Field) drawExt(textureImage *TextureImage, x, y float32, splitX, splitY, splitWidth, splitHeight bool) {
+func (field *Field) drawExt(textureImage *TextureImage, x, y int32, splitX, splitY, splitWidth, splitHeight bool) {
 	field.draw(textureImage,
 		x, y,
 		rl.Rectangle{
-			X:      If(splitX, textureImage.width/2, 0),
-			Y:      If(splitY, textureImage.height/2, 0),
-			Width:  If(splitWidth, textureImage.width/2, textureImage.width),
-			Height: If(splitHeight, textureImage.height/2, textureImage.height)},
-
-		rl.Rectangle{X: x, Y: y,
-			Width:  If(splitWidth, textureImage.width/2, textureImage.width),
-			Height: If(splitHeight, textureImage.height/2, textureImage.height)},
+			X:      float32(If(splitX, textureImage.width/2, 0)),
+			Y:      float32(If(splitY, textureImage.height/2, 0)),
+			Width:  float32(If(splitWidth, textureImage.width/2, textureImage.width)),
+			Height: float32(If(splitHeight, textureImage.height/2, textureImage.height))},
+		rl.Rectangle{
+			X:      float32(x),
+			Y:      float32(y),
+			Width:  float32(If(splitWidth, textureImage.width/2, textureImage.width)),
+			Height: float32(If(splitHeight, textureImage.height/2, textureImage.height))},
 	)
 }
 
-func (field *Field) draw(textureImage *TextureImage, x float32, y float32, rects ...rl.Rectangle) {
+func (field *Field) draw(textureImage *TextureImage, x int32, y int32, rects ...rl.Rectangle) {
 	rl.BeginTextureMode(field.texture)
-	sourceRect := rl.NewRectangle(0, 0, textureImage.width, textureImage.height)
-	destRect := rl.NewRectangle(x, y, textureImage.width, textureImage.height)
+	sourceRect := rl.NewRectangle(0, 0, float32(textureImage.width), float32(textureImage.height))
+	destRect := rl.NewRectangle(float32(x), float32(y), float32(textureImage.width), float32(textureImage.height))
 	if len(rects) >= 1 {
 		sourceRect = rects[0]
 	}
@@ -111,7 +117,13 @@ func (field *Field) draw(textureImage *TextureImage, x float32, y float32, rects
 		destRect = rects[1]
 	}
 	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
-	rl.ImageDraw(field.image, textureImage.image, sourceRect, destRect, rl.White)
+	for xx := int32(0); xx < int32(len(textureImage.mask)); xx++ {
+		for yy := int32(0); yy < int32(len(textureImage.mask[xx])); yy++ {
+			if textureImage.mask[xx][yy] && x+xx < FieldWidth && y+yy < FieldHeight {
+				field.state[x+xx][y+yy] = true
+			}
+		}
+	}
 	rl.EndTextureMode()
 }
 
@@ -125,24 +137,13 @@ func (field *Field) Render() {
 }
 
 func (field *Field) Debug() {
-	clone1 := rl.ImageCopy(field.image)
-	rl.ImageFlipVertical(clone1)
-	colors1 := rl.LoadImageColors(clone1)
-	defer rl.UnloadImageColors(colors1)
-
-	clone2 := rl.LoadImageFromTexture(field.texture.Texture)
-	colors2 := rl.LoadImageColors(clone2)
-	defer rl.UnloadImageColors(colors2)
-
-	//println(len(colors1))
-	if len(colors1) != len(colors2) {
-		panic("colors are different")
-	}
-	for i := range colors1 {
-		if colors1[i].R != colors2[i].R || colors1[i].G != colors2[i].G || colors1[i].B != colors2[i].B || colors1[i].A != colors2[i].A {
-			println(colors1[i].R, " ", colors1[i].G, " ", colors1[i].B, " ", colors1[i].A, " ")
-			println(colors2[i].R, " ", colors2[i].G, " ", colors2[i].B, " ", colors2[i].A, " ")
-			panic("colors are different")
+	image := rl.LoadImageFromTexture(field.texture.Texture)
+	for x := range FieldWidth {
+		for y := range FieldHeight {
+			if IsPixelColored(x, y, image) && field.state[x][y] {
+				println(x, " ", y, " ")
+				panic("colors are different")
+			}
 		}
 	}
 }
@@ -151,8 +152,7 @@ func (field *Field) IsColliding(rec rl.Rectangle) bool {
 	recX, recY, recW, recH := int32(rec.X), int32(rec.Y), int32(rec.Width), int32(rec.Height)
 	for x := recX; x < recX+recW; x++ {
 		for y := recY; y < recY+recH; y++ {
-			color := rl.GetImageColor(*field.image, x, y)
-			if color.R != 0 || color.G != 0 || color.B != 0 {
+			if field.state[x][y] {
 				return true
 			}
 		}

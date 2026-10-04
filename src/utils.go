@@ -2,6 +2,7 @@ package main
 
 import (
 	gui "github.com/gen2brain/raylib-go/raygui"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Pos struct {
@@ -72,4 +73,12 @@ func GetNextSpritePtrAndInc(currentPointer int, spritePointerInc int, spritesLen
 		nextSpritePointerInc = -spritePointerInc
 	}
 	return nextSpritePointer, nextSpritePointerInc
+}
+
+func IsPixelColored(x int32, y int32, image *rl.Image) bool {
+	color := rl.GetImageColor(*image, x, y)
+	if color.R != 0 || color.G != 0 || color.B != 0 || color.A != 0 {
+		return true
+	}
+	return false
 }
