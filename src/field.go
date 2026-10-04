@@ -91,18 +91,20 @@ func NewField(scene *GameScene) *Field {
 }
 
 func (field *Field) drawExt(textureImage *TextureImage, x, y int32, splitX, splitY, splitWidth, splitHeight bool) {
+	width := float32(If(splitWidth, textureImage.width/2, textureImage.width))
+	height := float32(If(splitHeight, textureImage.height/2, textureImage.height))
 	field.draw(textureImage,
 		x, y,
 		rl.Rectangle{
 			X:      float32(If(splitX, textureImage.width/2, 0)),
 			Y:      float32(If(splitY, textureImage.height/2, 0)),
-			Width:  float32(If(splitWidth, textureImage.width/2, textureImage.width)),
-			Height: float32(If(splitHeight, textureImage.height/2, textureImage.height))},
+			Width:  width,
+			Height: height},
 		rl.Rectangle{
 			X:      float32(x),
 			Y:      float32(y),
-			Width:  float32(If(splitWidth, textureImage.width/2, textureImage.width)),
-			Height: float32(If(splitHeight, textureImage.height/2, textureImage.height))},
+			Width:  width,
+			Height: height},
 	)
 }
 
@@ -117,32 +119,30 @@ func (field *Field) draw(textureImage *TextureImage, x int32, y int32, rects ...
 		destRect = rects[1]
 	}
 	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
-	for xx := int32(0); xx < int32(len(textureImage.mask)); xx++ {
-		for yy := int32(0); yy < int32(len(textureImage.mask[xx])); yy++ {
-			if textureImage.mask[xx][yy] && x+xx < FieldWidth && y+yy < FieldHeight {
-				field.state[x+xx][y+yy] = true
+	rl.EndTextureMode()
+	// updating the masked state
+	for xx := int32(destRect.X); xx < int32(destRect.X)+int32(destRect.Width); xx++ {
+		for yy := int32(destRect.Y); yy < int32(destRect.Y)+int32(destRect.Height); yy++ {
+			if textureImage.mask[xx-int32(destRect.X)+int32(sourceRect.X)][yy-int32(destRect.Y)+int32(sourceRect.Y)] {
+				field.state[xx][yy] = false
 			}
 		}
 	}
-	rl.EndTextureMode()
 }
 
 func (field *Field) Update(_ int64) {
 }
 
 func (field *Field) Render() {
-	//field.Debug()
-	//rl.DrawTextureRec(rl.LoadTextureFromImage(field.image), field.imageSourceRec, ZERO_VECTOR2, rl.White)
 	rl.DrawTexturePro(field.texture.Texture, field.textureSourceRec, field.destRec, ZERO_VECTOR2, 0, rl.White)
+	//field.Debug()
 }
 
 func (field *Field) Debug() {
-	image := rl.LoadImageFromTexture(field.texture.Texture)
 	for x := range FieldWidth {
 		for y := range FieldHeight {
-			if IsPixelColored(x, y, image) && field.state[x][y] {
-				println(x, " ", y, " ")
-				panic("colors are different")
+			if field.state[x][y] {
+				rl.DrawPixel(x, y, TransparentBlue)
 			}
 		}
 	}

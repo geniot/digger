@@ -13,15 +13,16 @@ var (
 )
 
 type TextureImage struct {
-	texture rl.Texture2D
-	mask    [][]bool
-	width   int32
-	height  int32
+	fileName string
+	texture  rl.Texture2D
+	mask     [][]bool
+	width    int32
+	height   int32
 }
 
-func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *TextureImage {
-	textureImage := &TextureImage{}
-	imgBytes := orPanicRes(resList.ReadFile("res/" + fileName))
+func NewTextureImage(fn string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *TextureImage {
+	textureImage := &TextureImage{fileName: fn}
+	imgBytes := orPanicRes(resList.ReadFile("res/" + fn))
 	image := rl.LoadImageFromMemory(".png", imgBytes, int32(len(imgBytes)))
 	if shouldMask {
 		rl.ImageColorTint(image, rl.Black)
@@ -43,7 +44,7 @@ func NewTextureImage(fileName string, degrees int32, flipHorizontal bool, flipVe
 	}
 	for y := range image.Height {
 		for x := range image.Width {
-			if IsPixelColored(x, y, image) {
+			if IsPixelBlack(x, y, image) {
 				textureImage.mask[x][y] = true
 			}
 		}

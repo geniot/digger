@@ -75,9 +75,9 @@ func GetNextSpritePtrAndInc(currentPointer int, spritePointerInc int, spritesLen
 	return nextSpritePointer, nextSpritePointerInc
 }
 
-func IsPixelColored(x int32, y int32, image *rl.Image) bool {
+func IsPixelBlack(x int32, y int32, image *rl.Image) bool {
 	color := rl.GetImageColor(*image, x, y)
-	if color.R != 0 || color.G != 0 || color.B != 0 || color.A != 0 {
+	if color.R == 0 && color.G == 0 && color.B == 0 && color.A == 255 {
 		return true
 	}
 	return false
