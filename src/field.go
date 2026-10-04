@@ -123,7 +123,9 @@ func (field *Field) draw(textureImage *TextureImage, x int32, y int32, rects ...
 	// updating the masked state
 	for xx := int32(destRect.X); xx < int32(destRect.X)+int32(destRect.Width); xx++ {
 		for yy := int32(destRect.Y); yy < int32(destRect.Y)+int32(destRect.Height); yy++ {
-			if textureImage.mask[xx-int32(destRect.X)+int32(sourceRect.X)][yy-int32(destRect.Y)+int32(sourceRect.Y)] {
+			xxx := xx - int32(destRect.X) + int32(sourceRect.X)
+			yyy := yy - int32(destRect.Y) + int32(sourceRect.Y)
+			if textureImage.mask[xxx][yyy] {
 				field.state[xx][yy] = false
 			}
 		}
