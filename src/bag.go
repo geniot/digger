@@ -49,8 +49,8 @@ func (bg *Bag) Render() {
 func (bg *Bag) getCollisionRec() rl.Rectangle {
 	sprite := bg.bagsPool.sprite
 	return rl.Rectangle{
-		X:      float32(bg.posX - int32(sprite.width/2) + 2),
-		Y:      float32(bg.posY - int32(sprite.height/2) + 3),
+		X:      float32(bg.posX - sprite.width/2 + 2),
+		Y:      float32(bg.posY - sprite.height/2 + 3),
 		Width:  float32(sprite.width - 4),
 		Height: float32(sprite.height - 5),
 	}

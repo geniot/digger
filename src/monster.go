@@ -44,8 +44,8 @@ func (mr *Monster) Render() {
 func (mr *Monster) getCollisionRec() rl.Rectangle {
 	sprite := mr.monstersPool.sprite
 	return rl.Rectangle{
-		X:      float32(mr.posX - int32(sprite.width/2)),
-		Y:      float32(mr.posY - int32(sprite.height/2)),
+		X:      float32(mr.posX - sprite.width/2),
+		Y:      float32(mr.posY - sprite.height/2),
 		Width:  float32(sprite.width),
 		Height: float32(sprite.height),
 	}

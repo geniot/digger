@@ -34,8 +34,8 @@ func (e *Emerald) Render() {
 func (e *Emerald) getCollisionRec() rl.Rectangle {
 	sprite := e.emeraldsPool.sprite
 	return rl.Rectangle{
-		X:      float32(e.posX - int32(sprite.width/2)),
-		Y:      float32(e.posY - int32(sprite.height/2)),
+		X:      float32(e.posX - sprite.width/2),
+		Y:      float32(e.posY - sprite.height/2),
 		Width:  float32(sprite.width),
 		Height: float32(sprite.height),
 	}
