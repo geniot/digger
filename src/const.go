@@ -18,7 +18,7 @@ const (
 	CellsVertical       = int32(10)
 	CellWidth           = int32(20)
 	CellHeight          = int32(18)
-	FieldVerticalOffset = int32(14)
+	ScoreHeight         = int32(14)
 	FieldOffsetX        = int32(10)
 	FieldOffsetY        = int32(2)
 

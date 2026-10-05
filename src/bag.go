@@ -27,7 +27,7 @@ type Bag struct {
 func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
 	bg := &Bag{}
 	bg.posX = x*CellWidth + FieldOffsetX + CellWidth/2
-	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + FieldVerticalOffset
+	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2
 	bg.bagsPool = bagsPool
 	bg.state = BagSet
 	return bg

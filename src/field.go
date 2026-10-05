@@ -23,7 +23,7 @@ func NewField(scene *GameScene) *Field {
 
 	fld.textureSourceRec = rl.NewRectangle(0, 0, float32(FieldWidth), -float32(FieldHeight)) //see https://github.com/raysan5/raylib/issues/3803
 	fld.imageSourceRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
-	fld.destRec = rl.NewRectangle(0, float32(FieldVerticalOffset), float32(FieldWidth), float32(FieldHeight))
+	fld.destRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
 
 	bg := NewMaskedTexture("graphics/field/cback1.png", 0, false, false, false)
 
@@ -144,7 +144,7 @@ func (field *Field) IsColliding(rec rl.Rectangle) bool {
 	recX, recY, recW, recH := int32(rec.X), int32(rec.Y), int32(rec.Width), int32(rec.Height)
 	for x := recX; x < recX+recW; x++ {
 		for y := recY; y < recY+recH; y++ {
-			if field.state[x][y-FieldVerticalOffset] {
+			if field.state[x][y] {
 				return true
 			}
 		}
@@ -156,7 +156,7 @@ func (field *Field) Debug() {
 	for x := range FieldWidth {
 		for y := range FieldHeight {
 			if field.state[x][y] {
-				rl.DrawPixel(x, y+FieldVerticalOffset, TransparentBlue)
+				rl.DrawPixel(x, y, TransparentBlue)
 			}
 		}
 	}

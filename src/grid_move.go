@@ -77,7 +77,7 @@ func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 	if !mg.dots[posX][posY] {
 		panic("digger start pos should be valid")
 	}
-	return posX, posY + FieldVerticalOffset
+	return posX, posY
 }
 
 func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
@@ -91,7 +91,6 @@ func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
 }
 
 func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
-	y -= FieldVerticalOffset
 	direction := requestedDirection
 	d0 := Direction(DirMap[requestedDirection][0])
 	d1 := Direction(DirMap[requestedDirection][1])
@@ -133,6 +132,5 @@ func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedD
 			}
 		}
 	}
-	y += FieldVerticalOffset
 	return x, y, direction
 }
