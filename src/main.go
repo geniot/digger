@@ -6,7 +6,7 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 func main() {
-	application := NewApplication()
+	application := NewApplication(false)
 
 	accumulator := float64(0)
 	lastTime := float64(0)

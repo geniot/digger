@@ -10,6 +10,7 @@ type Application struct {
 	currentSceneIndex int
 	sourceRect        rl.Rectangle
 	destRect          rl.Rectangle
+	isWeb             bool
 }
 
 func (a *Application) onResize() {
@@ -54,19 +55,21 @@ func (a *Application) Render() {
 	rl.EndDrawing()
 }
 
-func NewApplication() *Application {
+func NewApplication(iw bool) *Application {
 
-	app := Application{}
+	app := Application{isWeb: iw}
 
 	// the order of these calls matters
 	rl.SetTraceLogLevel(rl.LogTrace)
 	rl.SetConfigFlags(rl.FlagVsyncHint | rl.FlagWindowResizable) //should be set before window initialization!
 	rl.InitWindow(winWidth, winHeight, "Digger")
-	scaleFactor := int32(4)
-	rl.SetWindowSize(int(ScreenLogicalWidth*scaleFactor), int(ScreenLogicalHeight*scaleFactor))
-	rl.SetWindowMonitor(0) //used for testing on multiple monitors
-	rl.InitAudioDevice()
 
+	if !app.isWeb {
+		scaleFactor := int32(4)
+		rl.SetWindowSize(int(ScreenLogicalWidth*scaleFactor), int(ScreenLogicalHeight*scaleFactor))
+		rl.SetWindowMonitor(0) //used for testing on multiple monitors
+	}
+	rl.InitAudioDevice()
 	setDefaultTextStyle()
 
 	// scenes

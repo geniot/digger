@@ -6,7 +6,7 @@ package main
 import rl "github.com/BrownNPC/Raylib-Go-Wasm/raylib"
 
 func main() {
-	application := NewApplication()
+	application := NewApplication(true)
 	accumulator := float64(0)
 	lastTime := float64(0)
 	tick := int64(0)
