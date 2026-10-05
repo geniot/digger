@@ -35,8 +35,8 @@ func NewMoveGrid(scene *GameScene) *MoveGrid {
 	moveGrid.texture = rl.LoadRenderTexture(ScreenLogicalWidth, ScreenLogicalHeight)
 	moveGrid.dots = [FieldWidth][FieldHeight]bool{}
 
-	for y := FieldOffsetY + CellHeight/2; y < FieldHeight-FieldOffsetY-CellHeight/2; y += CellHeight {
-		for x := FieldOffsetX + CellWidth/2; x < FieldWidth-FieldOffsetX-CellWidth/2; x += 1 {
+	for x := FieldOffsetX + CellWidth/2; x < FieldWidth-FieldOffsetX-CellWidth/2; x += 1 {
+		for y := FieldOffsetY + CellHeight/2; y < FieldHeight-FieldOffsetY-CellHeight/2; y += CellHeight {
 			moveGrid.dots[x][y] = true
 		}
 	}
@@ -47,8 +47,8 @@ func NewMoveGrid(scene *GameScene) *MoveGrid {
 	}
 
 	rl.BeginTextureMode(moveGrid.texture)
-	for x := int32(0); x < FieldWidth; x += 1 {
-		for y := int32(0); y < FieldHeight; y += 1 {
+	for x := range FieldWidth {
+		for y := range FieldHeight {
 			if moveGrid.dots[x][y] {
 				rl.DrawPixel(x, y, rl.Red)
 			}
@@ -77,7 +77,7 @@ func (mg *MoveGrid) getDiggerStartPos() (int32, int32) {
 	if !mg.dots[posX][posY] {
 		panic("digger start pos should be valid")
 	}
-	return posX, posY
+	return posX, posY + FieldVerticalOffset
 }
 
 func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
@@ -91,6 +91,7 @@ func (mg *MoveGrid) canMove(x1, x2, x3, y1, y2, y3 int32) bool {
 }
 
 func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedDirection Direction) (int32, int32, Direction) {
+	y -= FieldVerticalOffset
 	direction := requestedDirection
 	d0 := Direction(DirMap[requestedDirection][0])
 	d1 := Direction(DirMap[requestedDirection][1])
@@ -132,5 +133,6 @@ func (mg *MoveGrid) move(x int32, y int32, actualDirection Direction, requestedD
 			}
 		}
 	}
+	y += FieldVerticalOffset
 	return x, y, direction
 }

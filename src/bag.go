@@ -27,7 +27,7 @@ type Bag struct {
 func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
 	bg := &Bag{}
 	bg.posX = x*CellWidth + FieldOffsetX + CellWidth/2
-	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2
+	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + FieldVerticalOffset
 	bg.bagsPool = bagsPool
 	bg.state = BagSet
 	return bg
@@ -40,8 +40,8 @@ func (bg *Bag) Render() {
 	sprite := bg.bagsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,
-		bg.posX-int32(sprite.width/2),
-		bg.posY-int32(sprite.height/2),
+		bg.posX-sprite.width/2,
+		bg.posY-sprite.height/2,
 		rl.White)
 	//rl.DrawRectangleLinesEx(bg.getCollisionRec(), 1.0, TransparentBlue)
 }

@@ -13,11 +13,12 @@ const (
 	FieldHeight              = int32(186)
 
 	ScreenLogicalWidth  = int32(320)
-	ScreenLogicalHeight = int32(240)
+	ScreenLogicalHeight = int32(200)
 	CellsHorizontal     = int32(15)
 	CellsVertical       = int32(10)
 	CellWidth           = int32(20)
 	CellHeight          = int32(18)
+	FieldVerticalOffset = int32(14)
 	FieldOffsetX        = int32(10)
 	FieldOffsetY        = int32(2)
 

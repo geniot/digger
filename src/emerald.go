@@ -13,7 +13,7 @@ type Emerald struct {
 func NewEmerald(emeraldsPool *EmeraldsPool, x int32, y int32) *Emerald {
 	emerald := &Emerald{}
 	emerald.posX = x*CellWidth + FieldOffsetX + CellWidth/2 - 1 // +1 in the original game, not centered, why?
-	emerald.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + 1
+	emerald.posY = y*CellHeight + FieldOffsetY + CellHeight/2 + 1 + FieldVerticalOffset
 	emerald.emeraldsPool = emeraldsPool
 	return emerald
 }
@@ -25,8 +25,8 @@ func (e *Emerald) Render() {
 	sprite := e.emeraldsPool.sprite
 	rl.DrawTexture(
 		sprite.texture,
-		e.posX-int32(sprite.width/2),
-		e.posY-int32(sprite.height/2),
+		e.posX-sprite.width/2,
+		e.posY-sprite.height/2,
 		rl.White)
 	//rl.DrawRectangleLinesEx(e.getCollisionRec(), 1.0, TransparentBlue)
 }

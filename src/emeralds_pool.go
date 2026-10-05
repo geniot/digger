@@ -45,7 +45,7 @@ func (ep *EmeraldsPool) Render() {
 func (ep *EmeraldsPool) handle(dg *Digger) {
 	for emerald := range ep.emeralds.Iter() {
 		if rl.CheckCollisionRecs(emerald.getCollisionRec(), dg.getCollisionRec()) {
-			ep.scene.field.draw(ep.spriteMask, emerald.posX-ep.spriteMask.width/2, emerald.posY-ep.spriteMask.height/2)
+			ep.scene.field.draw(ep.spriteMask, emerald.posX-ep.spriteMask.width/2, emerald.posY-ep.spriteMask.height/2-FieldVerticalOffset)
 			ep.emeralds.Remove(emerald)
 		}
 	}

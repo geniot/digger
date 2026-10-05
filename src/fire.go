@@ -34,9 +34,9 @@ func NewFire(scene *GameScene) *Fire {
 	f.expSprites = f.initSprites("graphics/fire/cexp")
 
 	f.initialPosOffsetsMap = map[Direction]Pos{
-		LEFT:  {-int32(f.sprites[LEFT][f.spritePtr].width) * 2, -2},
-		RIGHT: {int32(f.sprites[RIGHT][f.spritePtr].width), -2},
-		UP:    {-5, -int32(f.sprites[UP][f.spritePtr].height) * 2},
+		LEFT:  {-f.sprites[LEFT][f.spritePtr].width * 2, -2},
+		RIGHT: {f.sprites[RIGHT][f.spritePtr].width, -2},
+		UP:    {-5, -f.sprites[UP][f.spritePtr].height * 2},
 		DOWN:  {-2, int32(f.sprites[DOWN][f.spritePtr].height) + 1},
 	}
 
