@@ -17,8 +17,8 @@ type Fire struct {
 	posY                 int32
 	shouldShoot          bool
 	state                FireState
-	sprites              map[Direction][]*TextureImage
-	expSprites           map[Direction][]*TextureImage
+	sprites              map[Direction][]*MaskedTexture
+	expSprites           map[Direction][]*MaskedTexture
 	initialPosOffsetsMap map[Direction]Pos
 	spritePtr            int
 	spritePtrInc         int
@@ -52,12 +52,12 @@ func NewFire(scene *GameScene) *Fire {
 	return f
 }
 
-func (f *Fire) initSprites(prefix string) map[Direction][]*TextureImage {
-	sprites := make(map[Direction][]*TextureImage)
-	sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
-	sprites[RIGHT] = initTextureImages(3, prefix, 0, false, false)
-	sprites[UP] = initTextureImages(3, prefix, 0, false, false)
-	sprites[DOWN] = initTextureImages(3, prefix, 0, false, false)
+func (f *Fire) initSprites(prefix string) map[Direction][]*MaskedTexture {
+	sprites := make(map[Direction][]*MaskedTexture)
+	sprites[LEFT] = initMaskedTextures(3, prefix, 0, false, false)
+	sprites[RIGHT] = initMaskedTextures(3, prefix, 0, false, false)
+	sprites[UP] = initMaskedTextures(3, prefix, 0, false, false)
+	sprites[DOWN] = initMaskedTextures(3, prefix, 0, false, false)
 	return sprites
 }
 

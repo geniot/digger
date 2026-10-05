@@ -7,8 +7,8 @@ import (
 
 type MonstersPool struct {
 	scene      *GameScene
-	sprite     *TextureImage
-	spriteMask *TextureImage
+	sprite     *MaskedTexture
+	spriteMask *MaskedTexture
 	monsters   mapset.Set[*Monster]
 }
 
@@ -16,7 +16,7 @@ func NewMonstersPool(scene *GameScene) *MonstersPool {
 	monstersPool := &MonstersPool{}
 	monstersPool.scene = scene
 	monstersPool.monsters = mapset.NewThreadUnsafeSet[*Monster]()
-	//monstersPool.sprite = NewTextureImage("monster.png", 0, false, false, false)
+	//monstersPool.sprite = NewMaskedTexture("monster.png", 0, false, false, false)
 	return monstersPool
 }
 

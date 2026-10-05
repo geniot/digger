@@ -7,8 +7,8 @@ import (
 
 type EmeraldsPool struct {
 	scene      *GameScene
-	sprite     *TextureImage
-	spriteMask *TextureImage
+	sprite     *MaskedTexture
+	spriteMask *MaskedTexture
 	emeralds   mapset.Set[*Emerald]
 }
 
@@ -16,8 +16,8 @@ func NewEmeraldsPool(scene *GameScene) *EmeraldsPool {
 	emeraldsPool := &EmeraldsPool{}
 	emeraldsPool.scene = scene
 	emeraldsPool.emeralds = mapset.NewThreadUnsafeSet[*Emerald]()
-	emeraldsPool.sprite = NewTextureImage("graphics/emerald/emerald.png", 0, false, false, false)
-	emeraldsPool.spriteMask = NewTextureImage("graphics/emerald/emerald.png", 0, false, false, true)
+	emeraldsPool.sprite = NewMaskedTexture("graphics/emerald/emerald.png", 0, false, false, false)
+	emeraldsPool.spriteMask = NewMaskedTexture("graphics/emerald/emerald.png", 0, false, false, true)
 	lp := LevelPlan(scene.level)
 	for x := int32(0); x < 15; x++ {
 		for y := int32(0); y < 10; y++ {

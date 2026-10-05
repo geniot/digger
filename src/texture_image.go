@@ -12,7 +12,7 @@ var (
 	resList embed.FS
 )
 
-type TextureImage struct {
+type MaskedTexture struct {
 	fileName string
 	texture  rl.Texture2D
 	mask     [][]bool
@@ -20,8 +20,8 @@ type TextureImage struct {
 	height   int32
 }
 
-func NewTextureImage(fn string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *TextureImage {
-	textureImage := &TextureImage{fileName: fn}
+func NewMaskedTexture(fn string, degrees int32, flipHorizontal bool, flipVertical bool, shouldMask bool) *MaskedTexture {
+	maskedTexture := &MaskedTexture{fileName: fn}
 	imgBytes := orPanicRes(resList.ReadFile("res/" + fn))
 	image := rl.LoadImageFromMemory(".png", imgBytes, int32(len(imgBytes)))
 	if shouldMask {
@@ -34,28 +34,28 @@ func NewTextureImage(fn string, degrees int32, flipHorizontal bool, flipVertical
 	if flipVertical {
 		rl.ImageFlipVertical(image)
 	}
-	textureImage.texture = rl.LoadTextureFromImage(image)
-	textureImage.width = image.Width
-	textureImage.height = image.Height
+	maskedTexture.texture = rl.LoadTextureFromImage(image)
+	maskedTexture.width = image.Width
+	maskedTexture.height = image.Height
 	//mask
-	textureImage.mask = make([][]bool, image.Width)
+	maskedTexture.mask = make([][]bool, image.Width)
 	for x := range image.Width {
-		textureImage.mask[x] = make([]bool, image.Height)
+		maskedTexture.mask[x] = make([]bool, image.Height)
 	}
 	for y := range image.Height {
 		for x := range image.Width {
 			if IsPixelBlack(x, y, image) {
-				textureImage.mask[x][y] = true
+				maskedTexture.mask[x][y] = true
 			}
 		}
 	}
-	return textureImage
+	return maskedTexture
 }
 
-func initTextureImages(size int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*TextureImage {
-	sprites := make([]*TextureImage, size)
+func initMaskedTextures(size int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) []*MaskedTexture {
+	sprites := make([]*MaskedTexture, size)
 	for i := range size {
-		sprites[i] = NewTextureImage(prefix+strconv.Itoa(i+1)+".png", degrees, flipHorizontal, flipVertical, false)
+		sprites[i] = NewMaskedTexture(prefix+strconv.Itoa(i+1)+".png", degrees, flipHorizontal, flipVertical, false)
 	}
 	return sprites
 }

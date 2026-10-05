@@ -23,7 +23,7 @@ type Digger struct {
 	shouldMove          bool
 	spritePtr           int
 	spritePtrInc        int
-	sprites             map[Direction][]*TextureImage
+	sprites             map[Direction][]*MaskedTexture
 	renderOffsetsMap    map[Direction]Pos
 	collisionOffsetsMap map[Direction]Pos
 	collisionSizeMap    map[Direction]WidthHeight
@@ -37,11 +37,11 @@ func NewDigger(scene *GameScene) *Digger {
 	dg.scene = scene
 
 	prefix := "graphics/digger/cldig"
-	dg.sprites = make(map[Direction][]*TextureImage)
-	dg.sprites[LEFT] = initTextureImages(3, prefix, 0, false, false)
-	dg.sprites[RIGHT] = initTextureImages(3, prefix, 0, true, false)
-	dg.sprites[UP] = initTextureImages(3, prefix, 90, false, false)
-	dg.sprites[DOWN] = initTextureImages(3, prefix, 90, true, true)
+	dg.sprites = make(map[Direction][]*MaskedTexture)
+	dg.sprites[LEFT] = initMaskedTextures(3, prefix, 0, false, false)
+	dg.sprites[RIGHT] = initMaskedTextures(3, prefix, 0, true, false)
+	dg.sprites[UP] = initMaskedTextures(3, prefix, 90, false, false)
+	dg.sprites[DOWN] = initMaskedTextures(3, prefix, 90, true, true)
 
 	dg.spritePtr = 0
 	dg.spritePtrInc = 1

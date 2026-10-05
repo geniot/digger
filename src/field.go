@@ -11,10 +11,10 @@ type Field struct {
 	textureSourceRec rl.Rectangle
 	imageSourceRec   rl.Rectangle
 	destRec          rl.Rectangle
-	upBlob           *TextureImage
-	downBlob         *TextureImage
-	leftBlob         *TextureImage
-	rightBlob        *TextureImage
+	upBlob           *MaskedTexture
+	downBlob         *MaskedTexture
+	leftBlob         *MaskedTexture
+	rightBlob        *MaskedTexture
 }
 
 func NewField(scene *GameScene) *Field {
@@ -25,12 +25,12 @@ func NewField(scene *GameScene) *Field {
 	fld.imageSourceRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
 	fld.destRec = rl.NewRectangle(0, 0, float32(FieldWidth), float32(FieldHeight))
 
-	bg := NewTextureImage("graphics/field/cback1.png", 0, false, false, false)
+	bg := NewMaskedTexture("graphics/field/cback1.png", 0, false, false, false)
 
-	fld.upBlob = NewTextureImage("graphics/field/cublob.png", 0, false, false, false)
-	fld.downBlob = NewTextureImage("graphics/field/cdblob.png", 0, false, false, false)
-	fld.leftBlob = NewTextureImage("graphics/field/clblob.png", 0, false, false, false)
-	fld.rightBlob = NewTextureImage("graphics/field/crblob.png", 0, false, false, false)
+	fld.upBlob = NewMaskedTexture("graphics/field/cublob.png", 0, false, false, false)
+	fld.downBlob = NewMaskedTexture("graphics/field/cdblob.png", 0, false, false, false)
+	fld.leftBlob = NewMaskedTexture("graphics/field/clblob.png", 0, false, false, false)
+	fld.rightBlob = NewMaskedTexture("graphics/field/crblob.png", 0, false, false, false)
 
 	fld.texture = rl.LoadRenderTexture(FieldWidth, FieldHeight)
 	fld.state = [FieldWidth][FieldHeight]bool{}
@@ -90,14 +90,14 @@ func NewField(scene *GameScene) *Field {
 	return fld
 }
 
-func (field *Field) drawExt(textureImage *TextureImage, x, y int32, splitX, splitY, splitWidth, splitHeight bool) {
-	width := float32(If(splitWidth, textureImage.width/2, textureImage.width))
-	height := float32(If(splitHeight, textureImage.height/2, textureImage.height))
-	field.draw(textureImage,
+func (field *Field) drawExt(maskedTexture *MaskedTexture, x, y int32, splitX, splitY, splitWidth, splitHeight bool) {
+	width := float32(If(splitWidth, maskedTexture.width/2, maskedTexture.width))
+	height := float32(If(splitHeight, maskedTexture.height/2, maskedTexture.height))
+	field.draw(maskedTexture,
 		x, y,
 		rl.Rectangle{
-			X:      float32(If(splitX, textureImage.width/2, 0)),
-			Y:      float32(If(splitY, textureImage.height/2, 0)),
+			X:      float32(If(splitX, maskedTexture.width/2, 0)),
+			Y:      float32(If(splitY, maskedTexture.height/2, 0)),
 			Width:  width,
 			Height: height},
 		rl.Rectangle{
@@ -108,24 +108,24 @@ func (field *Field) drawExt(textureImage *TextureImage, x, y int32, splitX, spli
 	)
 }
 
-func (field *Field) draw(textureImage *TextureImage, x int32, y int32, rects ...rl.Rectangle) {
+func (field *Field) draw(maskedTexture *MaskedTexture, x int32, y int32, rects ...rl.Rectangle) {
 	rl.BeginTextureMode(field.texture)
-	sourceRect := rl.NewRectangle(0, 0, float32(textureImage.width), float32(textureImage.height))
-	destRect := rl.NewRectangle(float32(x), float32(y), float32(textureImage.width), float32(textureImage.height))
+	sourceRect := rl.NewRectangle(0, 0, float32(maskedTexture.width), float32(maskedTexture.height))
+	destRect := rl.NewRectangle(float32(x), float32(y), float32(maskedTexture.width), float32(maskedTexture.height))
 	if len(rects) >= 1 {
 		sourceRect = rects[0]
 	}
 	if len(rects) >= 2 {
 		destRect = rects[1]
 	}
-	rl.DrawTexturePro(textureImage.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
+	rl.DrawTexturePro(maskedTexture.texture, sourceRect, destRect, ZERO_VECTOR2, 0, rl.White)
 	rl.EndTextureMode()
 	// updating the masked state
 	for xx := int32(destRect.X); xx < int32(destRect.X)+int32(destRect.Width); xx++ {
 		for yy := int32(destRect.Y); yy < int32(destRect.Y)+int32(destRect.Height); yy++ {
 			xxx := xx - int32(destRect.X) + int32(sourceRect.X)
 			yyy := yy - int32(destRect.Y) + int32(sourceRect.Y)
-			if textureImage.mask[xxx][yyy] {
+			if maskedTexture.mask[xxx][yyy] {
 				field.state[xx][yy] = false
 			}
 		}
@@ -140,16 +140,6 @@ func (field *Field) Render() {
 	//field.Debug()
 }
 
-func (field *Field) Debug() {
-	for x := range FieldWidth {
-		for y := range FieldHeight {
-			if field.state[x][y] {
-				rl.DrawPixel(x, y, TransparentBlue)
-			}
-		}
-	}
-}
-
 func (field *Field) IsColliding(rec rl.Rectangle) bool {
 	recX, recY, recW, recH := int32(rec.X), int32(rec.Y), int32(rec.Width), int32(rec.Height)
 	for x := recX; x < recX+recW; x++ {
@@ -160,4 +150,14 @@ func (field *Field) IsColliding(rec rl.Rectangle) bool {
 		}
 	}
 	return false
+}
+
+func (field *Field) Debug() {
+	for x := range FieldWidth {
+		for y := range FieldHeight {
+			if field.state[x][y] {
+				rl.DrawPixel(x, y, TransparentBlue)
+			}
+		}
+	}
 }

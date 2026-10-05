@@ -7,7 +7,7 @@ import (
 
 type BagsPool struct {
 	scene  *GameScene
-	sprite *TextureImage
+	sprite *MaskedTexture
 	bags   mapset.Set[*Bag]
 }
 
@@ -15,7 +15,7 @@ func NewBagsPool(scene *GameScene) *BagsPool {
 	bagsPool := &BagsPool{}
 	bagsPool.scene = scene
 	bagsPool.bags = mapset.NewThreadUnsafeSet[*Bag]()
-	bagsPool.sprite = NewTextureImage("graphics/bag/csbag.png", 0, false, false, false)
+	bagsPool.sprite = NewMaskedTexture("graphics/bag/csbag.png", 0, false, false, false)
 	lp := LevelPlan(scene.level)
 	for x := range int32(15) {
 		for y := range int32(10) {
