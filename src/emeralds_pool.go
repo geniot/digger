@@ -19,8 +19,8 @@ func NewEmeraldsPool(scene *GameScene) *EmeraldsPool {
 	emeraldsPool.sprite = NewMaskedTexture("graphics/emerald/emerald.png", 0, false, false, false)
 	emeraldsPool.spriteMask = NewMaskedTexture("graphics/emerald/emerald.png", 0, false, false, true)
 	lp := LevelPlan(scene.level)
-	for x := int32(0); x < 15; x++ {
-		for y := int32(0); y < 10; y++ {
+	for x := range int32(15) {
+		for y := range int32(10) {
 			c := getLevelChar(x, y, lp)
 			if c == 'C' {
 				emeraldsPool.emeralds.Add(NewEmerald(emeraldsPool, x, y))
