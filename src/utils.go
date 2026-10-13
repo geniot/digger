@@ -60,21 +60,6 @@ func setTextStyle(ts gui.PropertyValue, sp gui.PropertyValue, ta gui.PropertyVal
 	gui.SetStyle(gui.TEXTBOX, gui.TEXT_ALIGNMENT, gui.TEXT_ALIGN_LEFT)
 }
 
-func GetNextSpritePtrAndInc(currentPointer int, spritePointerInc int, spritesLen int) (int, int) {
-	nextSpritePointerInc := spritePointerInc
-	nextSpritePointer := currentPointer + spritePointerInc
-	if nextSpritePointer >= spritesLen {
-		nextSpritePointer = spritesLen - 1
-	}
-	if nextSpritePointer < 0 {
-		nextSpritePointer = 0
-	}
-	if nextSpritePointer == spritesLen-1 || nextSpritePointer == 0 {
-		nextSpritePointerInc = -spritePointerInc
-	}
-	return nextSpritePointer, nextSpritePointerInc
-}
-
 func IsPixelBlack(x int32, y int32, image *rl.Image) bool {
 	color := rl.GetImageColor(*image, x, y)
 	if color.R == 0 && color.G == 0 && color.B == 0 && color.A == 255 {

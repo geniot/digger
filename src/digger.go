@@ -21,9 +21,8 @@ type Digger struct {
 	direction           Direction
 	requestedDirection  Direction
 	shouldMove          bool
-	spritePtr           int
-	spritePtrInc        int
-	sprites             map[Direction][]*MaskedTexture
+	sprites             map[Direction]*Sprite
+	seqPtr              int
 	renderOffsetsMap    map[Direction]Pos
 	collisionOffsetsMap map[Direction]Pos
 	collisionSizeMap    map[Direction]WidthHeight
@@ -37,14 +36,13 @@ func NewDigger(scene *GameScene) *Digger {
 	dg.scene = scene
 
 	prefix := "graphics/digger/cldig"
-	dg.sprites = make(map[Direction][]*MaskedTexture)
-	dg.sprites[DirLeft] = initMaskedTextures(3, prefix, 0, false, false)
-	dg.sprites[DirRight] = initMaskedTextures(3, prefix, 0, true, false)
-	dg.sprites[DirUp] = initMaskedTextures(3, prefix, 90, false, false)
-	dg.sprites[DirDown] = initMaskedTextures(3, prefix, 90, true, true)
+	dg.sprites = make(map[Direction]*Sprite)
+	dg.sprites[DirLeft] = NewSprite([]int{0, 1, 2, 1}, prefix, 0, false, false)
+	dg.sprites[DirRight] = NewSprite([]int{0, 1, 2, 1}, prefix, 0, true, false)
+	dg.sprites[DirUp] = NewSprite([]int{0, 1, 2, 1}, prefix, 90, false, false)
+	dg.sprites[DirDown] = NewSprite([]int{0, 1, 2, 1}, prefix, 90, true, true)
 
-	dg.spritePtr = 0
-	dg.spritePtrInc = 1
+	dg.seqPtr = 0
 	dg.width = 16
 	dg.height = 16
 	dg.posX, dg.posY = scene.moveGrid.getDiggerStartPos()
@@ -77,7 +75,7 @@ func NewDigger(scene *GameScene) *Digger {
 
 func (dg *Digger) Update(tick int64) {
 	if tick%SpriteUpdateRate == 0 {
-		dg.spritePtr, dg.spritePtrInc = GetNextSpritePtrAndInc(dg.spritePtr, dg.spritePtrInc, len(dg.sprites[dg.direction]))
+		dg.seqPtr = dg.sprites[dg.direction].Next(dg.seqPtr)
 	}
 	if tick%DiggerSpeed == 0 && dg.shouldMove {
 		posX, posY, dir := dg.scene.moveGrid.move(dg.posX, dg.posY, dg.direction, dg.requestedDirection)
@@ -123,9 +121,8 @@ func (dg *Digger) getCollisionRec() rl.Rectangle {
 }
 
 func (dg *Digger) Render() {
-	sprites := dg.sprites[dg.direction]
 	rl.DrawTexture(
-		sprites[dg.spritePtr].texture,
+		dg.sprites[dg.direction].GetTexture(dg.seqPtr).texture,
 		dg.posX-CellWidth/2-dg.innerOffsetX+dg.renderOffsetsMap[dg.direction].X,
 		dg.posY-CellHeight/2-dg.innerOffsetY+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)

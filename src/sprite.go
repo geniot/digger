@@ -7,10 +7,10 @@ type Sprite struct {
 	textures []*MaskedTexture
 }
 
-func NewSprite(s []int, prefix string) *Sprite {
+func NewSprite(s []int, prefix string, degrees int32, flipHorizontal bool, flipVertical bool) *Sprite {
 	sp := &Sprite{}
 	sp.sequence = s
-	sp.textures = initMaskedTextures(slices.Max(s)+1, prefix, 0, false, false)
+	sp.textures = initMaskedTextures(slices.Max(s)+1, prefix, degrees, flipHorizontal, flipVertical)
 	return sp
 }
 

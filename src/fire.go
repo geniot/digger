@@ -29,8 +29,8 @@ type Fire struct {
 func NewFire(scene *GameScene) *Fire {
 	f := &Fire{}
 	f.sprites = make(map[FireState]*Sprite)
-	f.sprites[FireMoving] = NewSprite([]int{0, 1, 2, 1}, "graphics/fire/cfire")
-	f.sprites[FireExploding] = NewSprite([]int{0, 1, 2, 1}, "graphics/fire/cexp")
+	f.sprites[FireMoving] = NewSprite([]int{0, 1, 2, 1}, "graphics/fire/cfire", 0, false, false)
+	f.sprites[FireExploding] = NewSprite([]int{0, 1, 2, 1}, "graphics/fire/cexp", 0, false, false)
 
 	f.scene = scene
 	f.seqPtr = 0
@@ -52,7 +52,7 @@ func (f *Fire) Update(tick int64) {
 	switch f.state {
 	case FireNone:
 		{
-			if f.shouldShoot {
+			if f.shouldShoot { //initiate the fire shot
 				f.direction = f.scene.digger.direction
 				newPosX := f.scene.digger.posX + f.initialPosOffsetsMap[f.direction].X
 				newPosY := f.scene.digger.posY + f.initialPosOffsetsMap[f.direction].Y
