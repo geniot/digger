@@ -54,10 +54,10 @@ func NewGameScene(a *Application) *GameScene {
 	gs.isStarted = false
 	gs.level = LevelPlan(1)
 	gs.keysToDirectionsMap = map[int32]Direction{
-		rl.KeyLeft:  LEFT,
-		rl.KeyRight: RIGHT,
-		rl.KeyUp:    UP,
-		rl.KeyDown:  DOWN,
+		rl.KeyLeft:  DirLeft,
+		rl.KeyRight: DirRight,
+		rl.KeyUp:    DirUp,
+		rl.KeyDown:  DirDown,
 	}
 	return &gs
 }

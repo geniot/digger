@@ -4,16 +4,16 @@ import rl "github.com/gen2brain/raylib-go/raylib"
 
 var (
 	MoveMap = map[Direction]Pos{
-		LEFT:  {-1, 0},
-		RIGHT: {1, 0},
-		UP:    {0, -1},
-		DOWN:  {0, 1},
+		DirLeft:  {-1, 0},
+		DirRight: {1, 0},
+		DirUp:    {0, -1},
+		DirDown:  {0, 1},
 	}
 	DirMap = map[Direction][3]int32{
-		LEFT:  {int32(LEFT), int32(UP), int32(DOWN)},
-		RIGHT: {int32(RIGHT), int32(UP), int32(DOWN)},
-		UP:    {int32(UP), int32(LEFT), int32(RIGHT)},
-		DOWN:  {int32(DOWN), int32(LEFT), int32(RIGHT)},
+		DirLeft:  {int32(DirLeft), int32(DirUp), int32(DirDown)},
+		DirRight: {int32(DirRight), int32(DirUp), int32(DirDown)},
+		DirUp:    {int32(DirUp), int32(DirLeft), int32(DirRight)},
+		DirDown:  {int32(DirDown), int32(DirLeft), int32(DirRight)},
 	}
 )
 

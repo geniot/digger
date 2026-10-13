@@ -6,16 +6,26 @@ import (
 )
 
 type BagsPool struct {
-	scene  *GameScene
-	sprite *MaskedTexture
-	bags   mapset.Set[*Bag]
+	scene                        *GameScene
+	sprites                      map[BagState][]*MaskedTexture
+	bagSpritesShakeFrameSequence []int
+	bagSpritesGoldFrameSequence  []int
+	bags                         mapset.Set[*Bag]
 }
 
 func NewBagsPool(scene *GameScene) *BagsPool {
 	bagsPool := &BagsPool{}
 	bagsPool.scene = scene
 	bagsPool.bags = mapset.NewThreadUnsafeSet[*Bag]()
-	bagsPool.sprite = NewMaskedTexture("graphics/bag/csbag.png", 0, false, false, false)
+
+	bagsPool.sprites = make(map[BagState][]*MaskedTexture)
+	bagsPool.sprites[BagSet] = initMaskedTextures(1, "graphics/bag/csbag", 0, false, false)
+	bagsPool.sprites[BagWobble] = initMaskedTextures(3, "graphics/bag/csbag", 0, false, false)
+	bagsPool.sprites[BagGold] = initMaskedTextures(3, "graphics/bag/cgold", 0, false, false)
+	bagsPool.sprites[BagFalling] = initMaskedTextures(1, "graphics/bag/cfbag", 0, false, false)
+	bagsPool.bagSpritesShakeFrameSequence = []int{0, 1, 2, 1, 2}
+	bagsPool.bagSpritesGoldFrameSequence = []int{0, 1, 2}
+
 	lp := LevelPlan(scene.level)
 	for x := range int32(15) {
 		for y := range int32(10) {

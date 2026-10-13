@@ -38,39 +38,39 @@ func NewDigger(scene *GameScene) *Digger {
 
 	prefix := "graphics/digger/cldig"
 	dg.sprites = make(map[Direction][]*MaskedTexture)
-	dg.sprites[LEFT] = initMaskedTextures(3, prefix, 0, false, false)
-	dg.sprites[RIGHT] = initMaskedTextures(3, prefix, 0, true, false)
-	dg.sprites[UP] = initMaskedTextures(3, prefix, 90, false, false)
-	dg.sprites[DOWN] = initMaskedTextures(3, prefix, 90, true, true)
+	dg.sprites[DirLeft] = initMaskedTextures(3, prefix, 0, false, false)
+	dg.sprites[DirRight] = initMaskedTextures(3, prefix, 0, true, false)
+	dg.sprites[DirUp] = initMaskedTextures(3, prefix, 90, false, false)
+	dg.sprites[DirDown] = initMaskedTextures(3, prefix, 90, true, true)
 
 	dg.spritePtr = 0
 	dg.spritePtrInc = 1
 	dg.width = 16
 	dg.height = 16
 	dg.posX, dg.posY = scene.moveGrid.getDiggerStartPos()
-	dg.direction = RIGHT
+	dg.direction = DirRight
 	dg.shouldMove = false
 	dg.state = DiggerAlive
 	dg.innerOffsetX = 0
 	dg.innerOffsetY = 1
 
 	dg.renderOffsetsMap = map[Direction]Pos{
-		LEFT:  {0, 0},
-		RIGHT: {0, 0},
-		UP:    {-1, 0},
-		DOWN:  {1, 1},
+		DirLeft:  {0, 0},
+		DirRight: {0, 0},
+		DirUp:    {-1, 0},
+		DirDown:  {1, 1},
 	}
 	dg.collisionOffsetsMap = map[Direction]Pos{
-		LEFT:  {0, 2},
-		RIGHT: {0, 2},
-		UP:    {0, 0},
-		DOWN:  {2, 1},
+		DirLeft:  {0, 2},
+		DirRight: {0, 2},
+		DirUp:    {0, 0},
+		DirDown:  {2, 1},
 	}
 	dg.collisionSizeMap = map[Direction]WidthHeight{
-		LEFT:  {0, -2},
-		RIGHT: {0, -2},
-		UP:    {-2, 0},
-		DOWN:  {-2, 0},
+		DirLeft:  {0, -2},
+		DirRight: {0, -2},
+		DirUp:    {-2, 0},
+		DirDown:  {-2, 0},
 	}
 	return dg
 }
@@ -85,23 +85,23 @@ func (dg *Digger) Update(tick int64) {
 			dg.scene.bagsPool.handle(dg)
 			dg.posX, dg.posY, dg.direction = posX, posY, dir
 			dg.scene.emeraldsPool.handle(dg)
-			if dir == RIGHT {
+			if dir == DirRight {
 				blob := dg.scene.field.rightBlob
 				dg.scene.field.drawExt(blob, dg.posX-dg.posX%4+4, dg.posY-CellHeight/2+1, false, false, true, false)
 				dg.scene.field.drawExt(blob, dg.posX+8, dg.posY-CellHeight/2+1, true, false, true, false)
 				dg.scene.field.drawExt(blob, dg.posX+7, dg.posY-CellHeight/2+1, true, false, true, false)
-			} else if dir == LEFT {
+			} else if dir == DirLeft {
 				blob := dg.scene.field.leftBlob
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2-2, dg.posY-CellHeight/2+1, false, false, true, false)
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2-1, dg.posY-CellHeight/2+1, false, false, true, false)
 				//drawing all indentation when approaching the left side of the field (<=20)
 				dg.scene.field.drawExt(blob, dg.posX-dg.posX%4-CellWidth/2+IfInt(dg.posX <= 20, 2, 6), dg.posY-CellHeight/2+1, true, false, true, false)
-			} else if dir == UP {
+			} else if dir == DirUp {
 				blob := dg.scene.field.upBlob
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2-dg.posY%3+4, false, true, false, true)
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2-1, false, false, false, true)
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY-CellHeight/2, false, false, false, true)
-			} else if dir == DOWN {
+			} else if dir == DirDown {
 				blob := dg.scene.field.downBlob
 				//drawing all indentation when approaching the bottom side of the field (>=173)
 				dg.scene.field.drawExt(blob, dg.posX-CellWidth/2, dg.posY+CellHeight/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5), false, false, false, true)

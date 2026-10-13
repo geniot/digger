@@ -140,11 +140,11 @@ func (field *Field) Render() {
 	//field.Debug()
 }
 
-func (field *Field) IsColliding(rec rl.Rectangle) bool {
+func (field *Field) IsColliding(rec rl.Rectangle, check bool) bool {
 	recX, recY, recW, recH := int32(rec.X), int32(rec.Y), int32(rec.Width), int32(rec.Height)
 	for x := recX; x < recX+recW; x++ {
 		for y := recY; y < recY+recH; y++ {
-			if field.state[x][y] {
+			if field.state[x][y] == check {
 				return true
 			}
 		}
