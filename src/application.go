@@ -62,7 +62,7 @@ func NewApplication(iw bool) *Application {
 	rl.InitWindow(winWidth, winHeight, "Digger")
 
 	if !app.isWeb {
-		scaleFactor := int32(1)
+		scaleFactor := int32(4)
 		rl.SetWindowSize(int(ScreenLogicalWidth*scaleFactor), int(ScreenLogicalHeight*scaleFactor))
 		rl.SetWindowMonitor(0) //used for testing on multiple monitors
 	}

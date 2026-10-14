@@ -58,30 +58,31 @@ func NewField(scene *GameScene) *Field {
 	lX := int32(-8)
 	lY := int32(-15)
 
-	lp := LevelPlan(scene.level)
-
-	for x := range int32(15) {
-		for y := range int32(10) {
-			c := getLevelChar(x, y, lp)
-			if c == 'S' || c == 'V' || c == 'H' {
-				xp := x*20 + 12
-				yp := y*18 + 18
-				if c == 'V' || c == 'S' {
+	levelPlan := LevelPlan(scene.level)
+	//drawing tunnels
+	for x := range CellsHorizontal {
+		for y := range CellsVertical {
+			levelChar := getLevelChar(x, y, levelPlan)
+			if levelChar == 'S' || levelChar == 'V' || levelChar == 'H' {
+				xp := x*CellWidth + 12
+				yp := y*CellHeight + 18
+				if levelChar == 'V' || levelChar == 'S' {
 					for decr := int32(-15); decr <= -3; decr += 3 {
 						fld.draw(fld.downBlob, xp+dX, yp+decr+dY)
 					}
 					fld.draw(fld.upBlob, xp+uX, yp+3+uY)
 				}
-				if c == 'H' || c == 'S' {
+				if levelChar == 'H' || levelChar == 'S' {
 					for decr := int32(-16); decr <= -4; decr += 4 {
 						fld.draw(fld.rightBlob, xp+decr+rX, yp+rY)
 					}
 					fld.draw(fld.leftBlob, xp+4+lX, yp+lY)
 				}
-				if x < 14 && (getLevelChar(x+1, y, lp) == 'H' || getLevelChar(x+1, y, lp) == 'S') {
+				//edge cases
+				if x < 14 && (getLevelChar(x+1, y, levelPlan) == 'H' || getLevelChar(x+1, y, levelPlan) == 'S') {
 					fld.draw(fld.rightBlob, xp+rX, yp+rY)
 				}
-				if y < 9 && (getLevelChar(x, y+1, lp) == 'V' || getLevelChar(x, y+1, lp) == 'H') {
+				if y < 9 && (getLevelChar(x, y+1, levelPlan) == 'V' || getLevelChar(x, y+1, levelPlan) == 'H') {
 					fld.draw(fld.downBlob, xp+dX, yp+dY)
 				}
 			}

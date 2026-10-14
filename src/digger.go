@@ -16,8 +16,6 @@ type Digger struct {
 	scene               *GameScene
 	posX                int32
 	posY                int32
-	width               int32
-	height              int32
 	direction           Direction
 	requestedDirection  Direction
 	shouldMove          bool
@@ -26,8 +24,6 @@ type Digger struct {
 	renderOffsetsMap    map[Direction]Pos
 	collisionOffsetsMap map[Direction]Pos
 	collisionSizeMap    map[Direction]WidthHeight
-	innerOffsetX        int32
-	innerOffsetY        int32
 	state               DiggerState
 }
 
@@ -43,32 +39,28 @@ func NewDigger(scene *GameScene) *Digger {
 	dg.sprites[DirDown] = NewSprite([]int{0, 1, 2, 1}, prefix, 90, true, true)
 
 	dg.seqPtr = 0
-	dg.width = 16
-	dg.height = 16
 	dg.posX, dg.posY = scene.moveGrid.getDiggerStartPos()
 	dg.direction = DirRight
 	dg.shouldMove = false
 	dg.state = DiggerAlive
-	dg.innerOffsetX = 0
-	dg.innerOffsetY = 1
 
 	dg.renderOffsetsMap = map[Direction]Pos{
-		DirLeft:  {0, 0},
-		DirRight: {0, 0},
-		DirUp:    {-1, 0},
-		DirDown:  {1, 1},
+		DirLeft:  {-10, -10},
+		DirRight: {-10, -10},
+		DirUp:    {-11, -11},
+		DirDown:  {-9, -10},
 	}
 	dg.collisionOffsetsMap = map[Direction]Pos{
-		DirLeft:  {0, 2},
-		DirRight: {0, 2},
-		DirUp:    {0, 0},
-		DirDown:  {2, 1},
+		DirLeft:  {-8, -6},
+		DirRight: {-8, -6},
+		DirUp:    {-8, -9},
+		DirDown:  {-6, -8},
 	}
 	dg.collisionSizeMap = map[Direction]WidthHeight{
-		DirLeft:  {0, -2},
-		DirRight: {0, -2},
-		DirUp:    {-2, 0},
-		DirDown:  {-2, 0},
+		DirLeft:  {16, 14},
+		DirRight: {16, 14},
+		DirUp:    {14, 16},
+		DirDown:  {14, 16},
 	}
 	return dg
 }
@@ -113,18 +105,18 @@ func (dg *Digger) Update(tick int64) {
 
 func (dg *Digger) getCollisionRec() rl.Rectangle {
 	return rl.Rectangle{
-		X:      float32(dg.posX + (CellWidth-dg.width)/2 - CellWidth/2 - dg.innerOffsetX + dg.collisionOffsetsMap[dg.direction].X),
-		Y:      float32(dg.posY + (CellWidth-dg.height)/2 - CellHeight/2 - dg.innerOffsetY + dg.collisionOffsetsMap[dg.direction].Y),
-		Width:  float32(dg.width + dg.collisionSizeMap[dg.direction].W),
-		Height: float32(dg.height + dg.collisionSizeMap[dg.direction].H),
+		X:      float32(dg.posX + dg.collisionOffsetsMap[dg.direction].X),
+		Y:      float32(dg.posY + dg.collisionOffsetsMap[dg.direction].Y),
+		Width:  float32(dg.collisionSizeMap[dg.direction].W),
+		Height: float32(dg.collisionSizeMap[dg.direction].H),
 	}
 }
 
 func (dg *Digger) Render() {
 	rl.DrawTexture(
 		dg.sprites[dg.direction].GetTexture(dg.seqPtr).texture,
-		dg.posX-CellWidth/2-dg.innerOffsetX+dg.renderOffsetsMap[dg.direction].X,
-		dg.posY-CellHeight/2-dg.innerOffsetY+dg.renderOffsetsMap[dg.direction].Y,
+		dg.posX+dg.renderOffsetsMap[dg.direction].X,
+		dg.posY+dg.renderOffsetsMap[dg.direction].Y,
 		rl.White)
 	//rl.DrawRectangleLinesEx(dg.getCollisionRec(), 1.0, TransparentYellow)
 }
