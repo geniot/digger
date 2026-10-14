@@ -79,9 +79,9 @@ func (dg *Digger) Update(tick int64) {
 			posYY := dg.posY - CellHeight/2
 			if dir == DirRight {
 				blob := dg.scene.field.rightBlob
-				dg.scene.field.drawExt(blob, dg.posX+4-dg.posX%4, posYY+1, false, false, true, false)
-				dg.scene.field.drawExt(blob, dg.posX+8, posYY+1, true, false, true, false)
-				dg.scene.field.drawExt(blob, dg.posX+7, posYY+1, true, false, true, false)
+				dg.scene.field.drawExt(blob, posXX+14-dg.posX%4, posYY+1, false, false, true, false)
+				dg.scene.field.drawExt(blob, posXX+18, posYY+1, true, false, true, false)
+				dg.scene.field.drawExt(blob, posXX+17, posYY+1, true, false, true, false)
 			} else if dir == DirLeft {
 				blob := dg.scene.field.leftBlob
 				//drawing all indentation when approaching the left side of the field (<=20)
@@ -96,9 +96,9 @@ func (dg *Digger) Update(tick int64) {
 			} else if dir == DirDown {
 				blob := dg.scene.field.downBlob
 				//drawing all indentation when approaching the bottom side of the field (>=173)
-				dg.scene.field.drawExt(blob, posXX, dg.posY+CellHeight/2-dg.posY%3-IfInt(dg.posY >= 173, 2, 5), false, false, false, true)
-				dg.scene.field.drawExt(blob, posXX, dg.posY+CellHeight/2-1, false, true, false, true)
-				dg.scene.field.drawExt(blob, posXX, dg.posY+CellHeight/2-2, false, true, false, true)
+				dg.scene.field.drawExt(blob, posXX, posYY+CellHeight-dg.posY%3-IfInt(dg.posY >= 173, 2, 5), false, false, false, true)
+				dg.scene.field.drawExt(blob, posXX, posYY+CellHeight-1, false, true, false, true)
+				dg.scene.field.drawExt(blob, posXX, posYY+CellHeight-2, false, true, false, true)
 			}
 
 		}
