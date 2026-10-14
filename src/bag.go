@@ -18,11 +18,11 @@ const (
 )
 
 type Bag struct {
-	posX      int32
-	posY      int32
-	bagsPool  *BagsPool
-	state     BagState
-	spritePtr int
+	posX     int32
+	posY     int32
+	bagsPool *BagsPool
+	state    BagState
+	seqPtr   int
 }
 
 func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
@@ -31,7 +31,7 @@ func NewBag(bagsPool *BagsPool, x int32, y int32) *Bag {
 	bg.posY = y*CellHeight + FieldOffsetY + CellHeight/2
 	bg.bagsPool = bagsPool
 	bg.state = BagSet
-	bg.spritePtr = 0
+	bg.seqPtr = 0
 	return bg
 }
 
@@ -40,16 +40,16 @@ func (bg *Bag) Update(n int64) {
 	case BagSet:
 		{
 			if bg.bagsPool.scene.field.IsColliding(bg.getFallThroughRec(), false) {
-				bg.spritePtr = 0
+				bg.seqPtr = 0
 				bg.state = BagWobble
 			}
 		}
 	case BagWobble:
 		{
 			if n%(SpriteUpdateRate*3) == 0 {
-				bg.spritePtr += 1
-				if bg.spritePtr >= len(bg.bagsPool.bagSpritesShakeFrameSequence) {
-					bg.spritePtr = 0
+				bg.seqPtr = bg.bagsPool.sprites[bg.state].Next(bg.seqPtr)
+				if bg.seqPtr >= len(bg.bagsPool.sprites[bg.state].sequence) {
+					bg.seqPtr = 0
 					bg.state = BagFalling
 				}
 			}
@@ -60,23 +60,23 @@ func (bg *Bag) Update(n int64) {
 }
 
 func (bg *Bag) Render() {
-	sprite := bg.bagsPool.sprites[bg.state][bg.spritePtr]
+	maskedTexture := bg.bagsPool.sprites[bg.state].GetTexture(bg.seqPtr)
 	rl.DrawTexture(
-		sprite.texture,
-		bg.posX-sprite.width/2,
-		bg.posY-sprite.height/2,
+		maskedTexture.texture,
+		bg.posX-maskedTexture.width/2,
+		bg.posY-maskedTexture.height/2,
 		rl.White)
 	rl.DrawRectangleLinesEx(bg.getCollisionRec(), 1.0, TransparentBlue)
 	rl.DrawRectangleLinesEx(bg.getFallThroughRec(), 1.0, TransparentYellow)
 }
 
 func (bg *Bag) getCollisionRec() rl.Rectangle {
-	sprite := bg.bagsPool.sprites[bg.state][bg.spritePtr]
+	maskedTexture := bg.bagsPool.sprites[bg.state].GetTexture(bg.seqPtr)
 	return rl.Rectangle{
-		X:      float32(bg.posX - sprite.width/2 + 2),
-		Y:      float32(bg.posY - sprite.height/2 + 3),
-		Width:  float32(sprite.width - 4),
-		Height: float32(sprite.height - 5),
+		X:      float32(bg.posX - maskedTexture.width/2 + 2),
+		Y:      float32(bg.posY - maskedTexture.height/2 + 3),
+		Width:  float32(maskedTexture.width - 4),
+		Height: float32(maskedTexture.height - 5),
 	}
 }
 

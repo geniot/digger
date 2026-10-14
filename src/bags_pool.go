@@ -6,11 +6,9 @@ import (
 )
 
 type BagsPool struct {
-	scene                        *GameScene
-	sprites                      map[BagState][]*MaskedTexture
-	bagSpritesShakeFrameSequence []int
-	bagSpritesGoldFrameSequence  []int
-	bags                         mapset.Set[*Bag]
+	scene   *GameScene
+	sprites map[BagState]*Sprite
+	bags    mapset.Set[*Bag]
 }
 
 func NewBagsPool(scene *GameScene) *BagsPool {
@@ -18,19 +16,17 @@ func NewBagsPool(scene *GameScene) *BagsPool {
 	bagsPool.scene = scene
 	bagsPool.bags = mapset.NewThreadUnsafeSet[*Bag]()
 
-	bagsPool.sprites = make(map[BagState][]*MaskedTexture)
-	bagsPool.sprites[BagSet] = initMaskedTextures(1, "graphics/bag/csbag", 0, false, false)
-	bagsPool.sprites[BagWobble] = initMaskedTextures(3, "graphics/bag/csbag", 0, false, false)
-	bagsPool.sprites[BagGold] = initMaskedTextures(3, "graphics/bag/cgold", 0, false, false)
-	bagsPool.sprites[BagFalling] = initMaskedTextures(1, "graphics/bag/cfbag", 0, false, false)
-	bagsPool.bagSpritesShakeFrameSequence = []int{0, 1, 2, 1, 2}
-	bagsPool.bagSpritesGoldFrameSequence = []int{0, 1, 2}
+	bagsPool.sprites = make(map[BagState]*Sprite)
+	bagsPool.sprites[BagSet] = NewSprite([]int{0}, "graphics/bag/csbag", 0, false, false)
+	bagsPool.sprites[BagFalling] = NewSprite([]int{0}, "graphics/bag/cfbag", 0, false, false)
+	bagsPool.sprites[BagWobble] = NewSprite([]int{0, 1, 2, 1, 2}, "graphics/bag/csbag", 0, false, false)
+	bagsPool.sprites[BagGold] = NewSprite([]int{0, 1, 2}, "graphics/bag/cgold", 0, false, false)
 
-	lp := LevelPlan(scene.level)
-	for x := range int32(15) {
-		for y := range int32(10) {
-			c := getLevelChar(x, y, lp)
-			if c == 'B' {
+	levelPlan := LevelPlan(scene.level)
+	for x := range CellsHorizontal {
+		for y := range CellsVertical {
+			levelChar := getLevelChar(x, y, levelPlan)
+			if levelChar == 'B' {
 				bagsPool.bags.Add(NewBag(bagsPool, x, y))
 			}
 		}
